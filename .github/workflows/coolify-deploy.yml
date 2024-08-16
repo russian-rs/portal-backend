@@ -1,0 +1,40 @@
+name: My workflow
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: install jq
+        run: sudo apt-get install jq
+      - name: run deploy
+        run: |
+          response=$(curl --request GET '${{ secrets.COOLIFY_API_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_SERVICE_ID }}&force=false' --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}')
+          deployment_uuid=$(echo $response | jq -r '.deployments[0].deployment_uuid')
+          
+          status=""
+          deployment_url=""
+          
+          period=10 # 10 seconds
+          max_count=30 # 5 minutes
+          
+          count=0
+          while [ "$status" != "finished" ] && [ "$count" -lt "$max_count" ]
+          do
+            sleep $period
+            count=$(( $count + 1 ))
+            response=$(curl --request GET '${{ secrets.COOLIFY_API_URL }}/api/v1/deployments/$deployment_uuid' --header 'Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}')
+            status=$(echo $response | jq -r '.status')
+            deployment_url=$(echo $response | jq -r '.deployment_url')
+          done
+          
+          if [ "$status" != "deployed" ]; then
+            echo "Deployment failed after 5 minutes. More info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
+            exit 1
+          fi
+          
+          echo "Deployment finished successfully. More info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
