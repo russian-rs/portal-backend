@@ -1,0 +1,25 @@
+# Use the official Gradle image with JDK 21 installed
+FROM gradle:8.10.0-jdk21-alpine AS build
+
+# Set work directory
+WORKDIR /home/gradle/src
+
+# Copy your source code into the container
+COPY . /home/gradle/src
+
+# Build the project using Gradle
+RUN gradle clean build --no-daemon
+
+# For the runtime stage use the official OpenJDK 21 image from Docker Hub
+FROM alpine/java:21.0.4-jdk
+
+# Expose port 8080 for your application
+EXPOSE 8080
+
+# Set work directory
+WORKDIR /app
+
+# Copy the built jar file from the build stage into this new container
+COPY --from=build /home/gradle/src/build/libs/*.jar ./app.jar
+
+ENTRYPOINT exec java -jar -Dspring.profiles.active=$ACTIVE_PROFILES ./app.jar
