@@ -1,11 +1,11 @@
-name: My workflow
+name: Coolify Deploy
 
 on:
   push:
     branches: [ main ]
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -17,7 +17,7 @@ jobs:
           response=$(curl -s --request GET '${{ secrets.COOLIFY_API_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_SERVICE_ID }}&force=false' --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
           deployment_uuid=$(echo $response | jq -r '.deployments[0].deployment_uuid')
           if [[ $deployment_uuid == "null" ]]; then
-            echo "Failed to start deployment: \n$response"
+            printf "Failed to start deployment: \n$response"
             exit 1
           fi
           echo "deployment_uuid=$deployment_uuid" >> $GITHUB_OUTPUT
@@ -39,15 +39,15 @@ jobs:
             status=$(echo $response | jq -r '.status')
             echo "STATUS - $status"
             if [[ $status == "null" ]]; then
-              echo "Deployment failed: \n$response"
+              printf "Deployment failed: \n$response"
               exit 1
             fi
             deployment_url=$(echo $response | jq -r '.deployment_url')
           done
           
           if [ "$status" != "deployed" ]; then
-            echo "Deployment failed after 5 minutes. More info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
+            printf "Deployment failed after 5 minutes. \nMore info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
             exit 1
           fi
           
-          echo "Deployment finished successfully. More info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
+          printf "Deployment finished successfully. More info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
