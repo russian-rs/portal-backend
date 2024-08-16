@@ -16,7 +16,7 @@ jobs:
         run: |
           response=$(curl -s --request GET '${{ secrets.COOLIFY_API_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_SERVICE_ID }}&force=false' --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
           deployment_uuid=$(echo $response | jq -r '.deployments[0].deployment_uuid')
-          if [[ "deployment_uuid" == "null" ]]; then
+          if [[ $deployment_uuid == "null" ]]; then
             echo "Failed to start deployment: \n$response"
             exit 1
           fi
@@ -38,7 +38,7 @@ jobs:
             response=$(curl -s --request GET '${{ secrets.COOLIFY_API_URL }}/api/v1/deployments/$deployment_uuid' --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
             status=$(echo $response | jq -r '.status')
             echo "STATUS - $status"
-            if [[ "status" == "null" ]]; then
+            if [[ $status == "null" ]]; then
               echo "Deployment failed: \n$response"
               exit 1
             fi
