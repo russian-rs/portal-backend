@@ -14,14 +14,14 @@ jobs:
       - name: start deploy
         id: start_deploy
         run: |
-          response=$(curl --request GET '${{ secrets.COOLIFY_API_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_SERVICE_ID }}&force=false' --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
+          response=$(curl -s --request GET '${{ secrets.COOLIFY_API_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_SERVICE_ID }}&force=false' --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
           deployment_uuid=$(echo $response | jq -r '.deployments[0].deployment_uuid')
           if [[ "deployment_uuid" == "null" ]]; then
             echo "Failed to start deployment: \n$response"
             exit 1
           fi
           echo "deployment_uuid=$deployment_uuid" >> $GITHUB_OUTPUT
-      - name: check status
+      - name: checking status
         run: |
           deployment_uuid=${{ steps.vars.outputs.deployment_uuid }}
           status=""
@@ -35,8 +35,9 @@ jobs:
           do
             sleep $period
             count=$(( $count + 1 ))
-            response=$(curl --request GET '${{ secrets.COOLIFY_API_URL }}/api/v1/deployments/$deployment_uuid' --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
+            response=$(curl -s --request GET '${{ secrets.COOLIFY_API_URL }}/api/v1/deployments/$deployment_uuid' --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
             status=$(echo $response | jq -r '.status')
+            echo "STATUS - $status"
             if [[ "status" == "null" ]]; then
               echo "Deployment failed: \n$response"
               exit 1
