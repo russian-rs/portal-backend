@@ -4,6 +4,10 @@ on:
   push:
     branches: [ main ]
 
+env:
+  PERIOD: 10 # seconds
+  ATTEMPTS: 60 # PERIOD * ATTEMPTS = 600 s = 10 min
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -23,21 +27,21 @@ jobs:
           echo "deployment_uuid=$deployment_uuid" >> $GITHUB_OUTPUT
       - name: checking status
         run: |
-          deployment_uuid=${{ steps.vars.outputs.deployment_uuid }}
+          deployment_uuid=${{ steps.start_deploy.outputs.deployment_uuid }}
           status=""
           deployment_url=""
           
-          period=10 # 10 seconds
-          max_count=30 # 5 minutes
+          period=${{ env.PERIOD }}
+          attempts=${{ env.ATTEMPTS }}
           
           count=0
-          while [ "$status" != "finished" ] && [ "$count" -lt "$max_count" ]
+          while [ "$status" != "finished" ] && [ "$count" -lt "$attempts" ]
           do
             sleep $period
             count=$(( $count + 1 ))
             response=$(curl -s --request GET '${{ secrets.COOLIFY_API_URL }}/api/v1/deployments/$deployment_uuid' --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
             status=$(echo $response | jq -r '.status')
-            echo "STATUS - $status"
+            printf "STATUS - $status"
             if [[ $status == "null" ]]; then
               printf "Deployment failed: \n$response"
               exit 1
@@ -46,7 +50,7 @@ jobs:
           done
           
           if [ "$status" != "deployed" ]; then
-            printf "Deployment failed after 5 minutes. \nMore info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
+            printf "Deployment didn't completed after 10 minutes. \nMore info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
             exit 1
           fi
           
