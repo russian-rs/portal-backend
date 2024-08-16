@@ -27,9 +27,8 @@ jobs:
           fi
           echo "deployment_uuid=$deployment_uuid" >> $GITHUB_OUTPUT
       - name: check status
-        with:
-          deployment_uuid: ${{ steps.vars.outputs.deployment_uuid }}
         run: |
+          deployment_uuid=${{ steps.vars.outputs.deployment_uuid }}
           status=""
           deployment_url=""
           
