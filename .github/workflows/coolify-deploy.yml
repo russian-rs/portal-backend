@@ -28,7 +28,6 @@ jobs:
       - name: checking status
         run: |
           deployment_uuid=${{ steps.start_deploy.outputs.deployment_uuid }}
-          status=""
           deployment_url=""
           
           period=${{ env.PERIOD }}
@@ -41,18 +40,26 @@ jobs:
             count=$(( $count + 1 ))
             response=$(curl -s --request GET "${{ secrets.COOLIFY_API_URL }}/api/v1/deployments/$deployment_uuid" --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
             status=$(echo $response | jq -r '.status')
+            deployment_url=$(echo $response | jq -r '.deployment_url')
+          
             printf `expr $count \* $period`
             printf "s, status: $status\n"
-            if [[ $status == "null" ]] || [[ $status != "in_progress" ]]; then
+          
+            if [[ $status == "null" ]]; then
               printf "Deployment failed: \n$response"
               exit 1
             fi
-            deployment_url=$(echo $response | jq -r '.deployment_url')
+          
+            if [[ $status == "finished" ]]; then
+              printf "Deployment finished successfully. More info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
+              exit 0
+            fi
+          
+            if [[ $status != "in_progress" ]]; then
+              printf "Deployment failed. More info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
+              exit 1
+            fi
           done
           
-          if [ "$status" != "deployed" ]; then
-            printf "Deployment didn't completed after 10 minutes. \nMore info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
-            exit 1
-          fi
-          
-          printf "Deployment finished successfully. More info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
+          printf "Deployment didn't completed after 10 minutes. \nMore info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
+          exit 1
