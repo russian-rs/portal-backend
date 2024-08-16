@@ -25,7 +25,6 @@ jobs:
             exit 1
           fi
           echo "deployment_uuid=$deployment_uuid" >> $GITHUB_OUTPUT
-          sleep 5
       - name: checking status
         run: |
           deployment_uuid=${{ steps.start_deploy.outputs.deployment_uuid }}
@@ -40,7 +39,7 @@ jobs:
           do
             sleep $period
             count=$(( $count + 1 ))
-            response=$(curl -s --request GET '${{ secrets.COOLIFY_API_URL }}/api/v1/deployments/${{ deployment_uuid }}' --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
+            response=$(curl -s --request GET "${{ secrets.COOLIFY_API_URL }}/api/v1/deployments/$deployment_uuid" --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
             status=$(echo $response | jq -r '.status')
             printf "STATUS - $status\n"
             if [[ $status == "null" ]]; then
