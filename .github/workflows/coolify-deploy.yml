@@ -4,11 +4,6 @@ on:
   push:
     branches: [ main ]
 
-env:
-  API_URL: ${{ secrets.COOLIFY_API_URL }}
-  SERVICE: ${{ secrets.COOLIFY_SERVICE_ID }}
-  AUTH_HEADER: 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}'
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -19,7 +14,7 @@ jobs:
       - name: start deploy
         id: start_deploy
         run: |
-          response=$(curl --request GET '$API_URL/api/v1/deploy?uuid=$SERVICE&force=false' --header '$AUTH_HEADER')
+          response=$(curl --request GET '${{ secrets.COOLIFY_API_URL }}/api/v1/deploy?uuid=${{ secrets.COOLIFY_SERVICE_ID }}&force=false' --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
           deployment_uuid=$(echo $response | jq -r '.deployments[0].deployment_uuid')
           if [[ "deployment_uuid" == "null" ]]; then
             echo "Failed to start deployment: \n$response"
@@ -40,7 +35,7 @@ jobs:
           do
             sleep $period
             count=$(( $count + 1 ))
-            response=$(curl --request GET '$API_URL/api/v1/deployments/$deployment_uuid' --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
+            response=$(curl --request GET '${{ secrets.COOLIFY_API_URL }}/api/v1/deployments/$deployment_uuid' --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
             status=$(echo $response | jq -r '.status')
             if [[ "status" == "null" ]]; then
               echo "Deployment failed: \n$response"
@@ -50,8 +45,8 @@ jobs:
           done
           
           if [ "$status" != "deployed" ]; then
-            echo "Deployment failed after 5 minutes. More info at $API_URL/$deployment_url"
+            echo "Deployment failed after 5 minutes. More info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
             exit 1
           fi
           
-          echo "Deployment finished successfully. More info at $API_URL/$deployment_url"
+          echo "Deployment finished successfully. More info at ${{ secrets.COOLIFY_API_URL }}/$deployment_url"
