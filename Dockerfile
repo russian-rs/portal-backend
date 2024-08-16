@@ -14,7 +14,7 @@ RUN gradle clean build --no-daemon
 FROM alpine/java:21.0.4-jdk
 
 # Expose port 8080 for your application
-EXPOSE 8080
+EXPOSE 8081
 
 # Set work directory
 WORKDIR /app

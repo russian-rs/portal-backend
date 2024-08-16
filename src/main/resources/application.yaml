@@ -1,3 +1,6 @@
 spring:
   application:
     name: portal-backend
+
+server:
+  port: 8081
