@@ -41,8 +41,9 @@ jobs:
             count=$(( $count + 1 ))
             response=$(curl -s --request GET "${{ secrets.COOLIFY_API_URL }}/api/v1/deployments/$deployment_uuid" --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
             status=$(echo $response | jq -r '.status')
-            printf "STATUS - $status\n"
-            if [[ $status == "null" ]]; then
+            printf `expr $count \* $period`
+            printf "s, status: $status\n"
+            if [[ $status == "null" ]] || [[ $status != "in_progress" ]]; then
               printf "Deployment failed: \n$response"
               exit 1
             fi
