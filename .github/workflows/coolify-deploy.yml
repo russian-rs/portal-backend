@@ -51,12 +51,12 @@ jobs:
             fi
           
             if [[ $status == "finished" ]]; then
-              printf "Deployment finished successfully. More info at ${{ vars.COOLIFY_API_URL }}$deployment_url"
+              printf "Deployment finished successfully. \nMore info at ${{ vars.COOLIFY_API_URL }}$deployment_url"
               exit 0
             fi
           
             if [[ $status != "in_progress" ]]; then
-              printf "Deployment failed. More info at ${{ vars.COOLIFY_API_URL }}$deployment_url"
+              printf "Deployment failed. \nMore info at ${{ vars.COOLIFY_API_URL }}$deployment_url"
               exit 1
             fi
           done
