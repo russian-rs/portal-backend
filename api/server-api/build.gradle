@@ -7,12 +7,6 @@ plugins {
 group = "rs.russian.api"
 version = resolveApiVersion()
 
-ext {
-    springBootVersion = "3.3.2"
-    kotlinxCoroutines = "1.8.1"
-    jakartaValidation = "3.1.0"
-}
-
 def openApiPath = "$projectDir/../openapi.yaml"
 
 repositories {

@@ -2,6 +2,12 @@ import org.yaml.snakeyaml.Yaml
 
 def openApiPath = "${projectDir}/api/openapi.yaml"
 
+ext {
+    springBootVersion = "3.3.2"
+    kotlinxCoroutines = "1.8.1"
+    jakartaValidation = "3.1.0"
+}
+
 buildscript {
     dependencies {
         classpath("org.yaml:snakeyaml:2.2")
