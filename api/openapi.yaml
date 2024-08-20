@@ -1,0 +1,29 @@
+openapi: 3.0.1
+info:
+  title: volunteer-portal-api
+  version: 1.0.0
+  contact:
+    email: dev@russian.rs
+    url: https://russian.rs
+
+servers:
+  - url: https://REDACTED_HOST/api
+    description: Test Environment
+  - url: https://portal.russian.rs/api
+    description: Prod Environment
+
+tags:
+  - name: auth
+    'x-displayName': Аутентификация
+  - name: hello
+    'x-displayName': Hello
+
+paths:
+  /hello:
+    get:
+      operationId: hello
+      tags:
+        - hello
+      responses:
+        '200':
+          description: OK

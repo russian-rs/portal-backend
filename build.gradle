@@ -1,0 +1,18 @@
+import org.yaml.snakeyaml.Yaml
+
+def openApiPath = "${projectDir}/api/openapi.yaml"
+
+buildscript {
+    dependencies {
+        classpath("org.yaml:snakeyaml:2.2")
+    }
+    repositories {
+        mavenCentral()
+    }
+}
+
+ext.resolveApiVersion = {
+    def file = new File(openApiPath).newInputStream()
+    def yaml = new Yaml().load(file)
+    return "${yaml.info.version}"
+}
