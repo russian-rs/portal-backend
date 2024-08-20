@@ -20,6 +20,6 @@ EXPOSE 8081
 WORKDIR /app
 
 # Copy the built jar file from the build stage into this new container
-COPY --from=build /home/gradle/src/portal-service/build/libs/*.jar ./app.jar
+COPY --from=build /home/gradle/src/service/build/libs/*.jar ./app.jar
 
 ENTRYPOINT exec java -jar -Dspring.profiles.active=$ACTIVE_PROFILES ./app.jar

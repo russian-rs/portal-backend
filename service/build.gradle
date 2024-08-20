@@ -1,6 +1,5 @@
-val springBootVersion: String by rootProject.extra
-
 plugins {
+	id("java")
 	id("org.springframework.boot")
 	id("org.jetbrains.kotlin.jvm")
 	id("io.spring.dependency-management")
@@ -42,10 +41,10 @@ kotlin {
 	}
 }
 
-tasks.withType<Test> {
+test {
 	useJUnitPlatform()
 }
 
-tasks.getByName<Jar>("jar") {
+jar {
 	enabled = false
 }

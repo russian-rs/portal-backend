@@ -11,4 +11,4 @@ rootProject.name = "portal-backend"
 include(":server-api")
 project(":server-api").projectDir = file("api/server-api")
 
-include(":portal-service")
+include(":service")
