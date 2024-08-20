@@ -11,6 +11,7 @@ jobs:
     steps:
       - name: Generate API
         run: |
+          ls
           ./gradlew clean build -x test
       - name: Publish NPM package
         working-directory: ./api/axios-client/build
