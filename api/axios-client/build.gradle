@@ -16,7 +16,7 @@ openApiGenerate {
             "set": "Array"
     ]
     configOptions = [
-            "npmName"       : "@russianrs/portal-api-axios",
+            "npmName"       : "@russian-rs/portal-api-axios",
             "npmVersion"    : resolveApiVersion(),
             "npmRepository" : "https://npm.pkg.github.com"
     ]
