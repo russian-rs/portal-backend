@@ -1,0 +1,14 @@
+plugins {
+    id("org.openapi.generator") version "7.7.0" apply false
+    id("org.springframework.boot") version "3.3.2" apply false
+    id("org.jetbrains.kotlin.jvm") version "2.0.10" apply false
+    id("io.spring.dependency-management") version "1.1.6" apply false
+    id("org.jetbrains.kotlin.plugin.spring") version "2.0.10" apply false
+}
+
+rootProject.name = "portal-backend"
+
+include(":server-api")
+project(":server-api").projectDir = file("api/server-api")
+
+include(":portal-service")

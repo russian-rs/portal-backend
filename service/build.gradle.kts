@@ -1,8 +1,10 @@
+val springBootVersion: String by rootProject.extra
+
 plugins {
-	kotlin("jvm") version "1.9.24"
-	kotlin("plugin.spring") version "1.9.24"
-	id("org.springframework.boot") version "3.3.2"
-	id("io.spring.dependency-management") version "1.1.6"
+	id("org.springframework.boot")
+	id("org.jetbrains.kotlin.jvm")
+	id("io.spring.dependency-management")
+	id("org.jetbrains.kotlin.plugin.spring")
 }
 
 group = "rs.russian"
@@ -19,7 +21,7 @@ repositories {
 }
 
 dependencies {
-	implementation(project(":portal-api"))
+	implementation(project(":server-api"))
 
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-web")
