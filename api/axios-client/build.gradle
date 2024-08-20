@@ -1,0 +1,27 @@
+plugins {
+    id("base")
+    id("org.openapi.generator")
+}
+
+group = "rs.russian.api"
+
+def openApiPath = "$projectDir/../openapi.yaml"
+
+openApiGenerate {
+    generatorName = "typescript-axios"
+    inputSpec = openApiPath
+    outputDir = "${projectDir}/build"
+    templateDir = "${projectDir}/templates"
+    typeMappings = [
+            "set": "Array"
+    ]
+    configOptions = [
+            "npmName"               : "@russianrs/portal-api-axios",
+            "npmVersion"            : resolveApiVersion()
+    ]
+}
+
+
+build {
+    dependsOn(tasks.named("openApiGenerate"))
+}
