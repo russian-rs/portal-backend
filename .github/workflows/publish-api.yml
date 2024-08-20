@@ -1,0 +1,20 @@
+name: Publish API
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Generate API
+        run: |
+          ./gradlew clean build -x test
+      - name: Publish NPM package
+        working-directory: ./api/axios-client/build
+        run: |
+          echo //npm.pkg.github.com/:_authToken=${{ secrets.GITHUB_TOKEN }} > .npmrc
+          npm install
+          npm publish
