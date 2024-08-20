@@ -11,4 +11,7 @@ rootProject.name = "portal-backend"
 include(":server-api")
 project(":server-api").projectDir = file("api/server-api")
 
+include(":axios-client")
+project(":axios-client").projectDir = file("api/axios-client")
+
 include(":service")
