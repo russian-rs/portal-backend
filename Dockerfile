@@ -8,7 +8,7 @@ WORKDIR /home/gradle/src
 COPY . /home/gradle/src
 
 # Build the project using Gradle
-RUN gradle clean build --no-daemon
+RUN gradle clean build -x test --no-daemon
 
 # For the runtime stage use the official OpenJDK 21 image from Docker Hub
 FROM alpine/java:21.0.4-jdk

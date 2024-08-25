@@ -31,12 +31,12 @@ openApiGenerate {
     modelPackage = "rs.russian.generated.model"
     configOptions = [
             "useTags"               : "true",
-            "reactive"              : "true",
             "useSwaggerUI"          : "false",
             "interfaceOnly"         : "true",
             "useSpringBoot3"        : "true",
             "serializableModel"     : "true",
-            "documentationProvider" : "none",
+            "skipDefaultInterface"  : "true",
+            "documentationProvider" : "none"
     ]
 }
 
