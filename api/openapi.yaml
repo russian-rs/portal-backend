@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 0.0.0
+  version: 1.0.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -14,16 +14,108 @@ servers:
 
 tags:
   - name: auth
-    'x-displayName': Аутентификация
-  - name: hello
-    'x-displayName': Hello
+    'x-displayName': Authentication
 
 paths:
-  /hello:
-    get:
-      operationId: hello
+  /auth/login:
+    post:
+      operationId: authenticate
       tags:
-        - hello
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AuthenticationRequest'
       responses:
         '200':
-          description: OK
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /auth/refresh:
+    post:
+      operationId: refresh
+      tags:
+        - auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RefreshTokenRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthenticationResponse'
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      description: Common object for error responses
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Error description
+          nullable: false
+    AuthenticationRequest:
+      type: object
+      description: Authentication request
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 100
+          nullable: false
+        password:
+          type: string
+          minLength: 8
+          maxLength: 500
+          nullable: false
+    RefreshTokenRequest:
+      type: object
+      description: Refresh request to obtain new access token
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          description: JWT Refresh Token
+          nullable: false
+    AuthenticationResponse:
+      type: object
+      description: Authentication response
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+          description: JWT Access Token
+          nullable: false
+        refreshToken:
+          type: string
+          description: JWT Refresh Token
+          nullable: false

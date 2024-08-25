@@ -3,7 +3,9 @@ plugins {
 	id("org.springframework.boot")
 	id("org.jetbrains.kotlin.jvm")
 	id("io.spring.dependency-management")
+	id("org.jetbrains.kotlin.plugin.jpa")
 	id("org.jetbrains.kotlin.plugin.spring")
+	id("org.jetbrains.kotlin.plugin.allopen")
 }
 
 group = "rs.russian"
@@ -20,19 +22,39 @@ repositories {
 }
 
 dependencies {
+	// OpenAPI
 	implementation(project(":server-api"))
 
+	// Spring
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+	implementation("org.springframework.boot:spring-boot-starter-security")
 
+	// Data
+	implementation("org.postgresql:postgresql")
+	implementation("org.liquibase:liquibase-core")
+	implementation("net.lbruun.springboot:preliquibase-spring-boot-starter:1.5.1")
+	implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.8.2")
+
+	// Kotlin
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
 
+	// Security
 	implementation("org.mindrot:jbcrypt:0.4")
+	implementation("io.jsonwebtoken:jjwt:0.12.6")
+	implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
 
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+	// Logging
+	implementation("ch.qos.logback:logback-classic:1.5.6")
+	implementation("net.logstash.logback:logstash-logback-encoder:8.0")
+
+	// Tests
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 kotlin {

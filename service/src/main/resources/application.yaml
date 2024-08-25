@@ -1,6 +1,35 @@
+--- # Common
 spring:
   application:
     name: portal-backend
 
 server:
   port: 8081
+  error:
+    whitelabel.enabled: false
+    include-message: never
+    include-stacktrace: never
+
+--- # Data
+spring:
+  datasource:
+    url: jdbc:postgresql://${DB_HOST}/${DB_NAME}?ApplicationName=${spring.application.name}&targetServerType=master
+    username: ${DB_USER}
+    password: ${DB_PASS}
+    hikari:
+      schema: portal
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  liquibase:
+    default-schema: ${spring.datasource.hikari.schema}
+    change-log: classpath:/liquibase/changelog-master.yaml
+
+--- # App
+app:
+  security:
+    auth:
+      jwt-signing-key: ${JWT_SIGNING_KEY}
+      access-token-expiration: ${ACCESS_TOKEN_EXPIRATION}
+      refresh-token-expiration: ${REFRESH_TOKEN_EXPIRATION}
