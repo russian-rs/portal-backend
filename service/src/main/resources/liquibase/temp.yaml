@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: temp-users-1
+      author: Maksim Aminov
+      changes:
+        - sql:
+            sql: INSERT INTO user_profile VALUES (1000, '2024-09-01 13:40:37.000000', 'admin', 'admin@gmail.com', '$2a$10$mo0erIpuWX0uJYm2XtVGDO35iSit7g/LEquwwkj8yuQn9WPjY2T.S')

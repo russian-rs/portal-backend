@@ -1,0 +1,60 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.0.0-user-token-create-table
+      author: Maksim Aminov
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_user_token
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: version
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: token
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: valid_until
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: type
+                  type: VARCHAR
+              - column:
+                  constraints:
+                    nullable: false
+                  name: user_id
+                  type: BIGINT
+            tableName: user_token
+        - createSequence:
+            dataType: BIGINT
+            incrementBy: 50
+            sequenceName: user_token_seq
+            startValue: 1000
+            cycle: true
+  - changeSet:
+      id: 1.0.0-user-token-create-constrains
+      author: Maksim Aminov
+      changes:
+        - addForeignKeyConstraint:
+            baseColumnNames: user_id
+            baseTableName: user_token
+            constraintName: FK_USER_TOKEN_ON_USER
+            referencedColumnNames: id
+            referencedTableName: user_profile
+        - addUniqueConstraint:
+            columnNames: token
+            constraintName: UQ_USER_TOKEN
+            tableName: user_token

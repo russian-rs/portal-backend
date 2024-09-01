@@ -37,6 +37,8 @@ dependencies {
 	implementation("org.liquibase:liquibase-core")
 	implementation("net.lbruun.springboot:preliquibase-spring-boot-starter:1.5.1")
 	implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.8.2")
+	implementation("net.javacrumbs.shedlock:shedlock-spring:5.15.1")
+	implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.15.1")
 
 	// Kotlin
 	implementation("org.jetbrains.kotlin:kotlin-reflect")

@@ -25,9 +25,9 @@ class JwtErrorFilter(
             filterChain.doFilter(request, response)
         } catch (e: ExpiredJwtException) {
             response.writer.write(objectMapper.writeValueAsString(ErrorResponse("Token expired")))
+            response.status = HttpStatus.UNAUTHORIZED.value()
         } catch (e: JwtException) {
             response.writer.write(objectMapper.writeValueAsString(ErrorResponse("Invalid token")))
-        } finally {
             response.status = HttpStatus.UNAUTHORIZED.value()
         }
     }

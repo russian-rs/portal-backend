@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.filter.OncePerRequestFilter
 import rs.russian.generated.model.ErrorResponse
 
-
 @ControllerAdvice
 class AuthenticationErrorHandler(private val objectMapper: ObjectMapper): OncePerRequestFilter() {
 
@@ -26,13 +25,15 @@ class AuthenticationErrorHandler(private val objectMapper: ObjectMapper): OncePe
             filterChain.doFilter(request, response)
         } catch (e: UsernameNotFoundException) {
             response.writer.write(objectMapper.writeValueAsString(ErrorResponse("User not found")))
+            response.status = HttpStatus.UNAUTHORIZED.value()
         } catch (e: AuthenticationFailed) {
             response.writer.write(objectMapper.writeValueAsString(ErrorResponse("Invalid authentication")))
+            response.status = HttpStatus.UNAUTHORIZED.value()
         } catch (e: AuthenticationException) {
             response.writer.write(objectMapper.writeValueAsString(ErrorResponse("Invalid authentication")))
+            response.status = HttpStatus.UNAUTHORIZED.value()
         } finally {
             response.addHeader("Content-Type", "application/json")
-            response.status = HttpStatus.UNAUTHORIZED.value()
         }
     }
 
