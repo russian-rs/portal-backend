@@ -17,7 +17,8 @@ data class UserProfile(
     override var version: LocalDateTime? = null,
     private var username: String,
     private var email: String,
-    private var password: String
+    private var password: String,
+    private var credentialsExpired: Boolean = false,
 ): JpaEntity<Long>(), UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = [CascadeType.ALL], orphanRemoval = true)
@@ -34,6 +35,8 @@ data class UserProfile(
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
         return mutableListOf(SimpleGrantedAuthority("ADMIN"))
     }
+
+    override fun isCredentialsNonExpired() = !credentialsExpired
 
     override fun equalityProperties() = setOf(UserProfile::username)
 

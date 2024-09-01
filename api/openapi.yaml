@@ -98,12 +98,21 @@ components:
       type: object
       description: Common object for error responses
       required:
+        - code
         - message
       properties:
+        code:
+          $ref: '#/components/schemas/ErrorCode'
         message:
           type: string
           description: Error description
           nullable: false
+    ErrorCode:
+      type: string
+      enum:
+        - AUTHENTICATION_FAILED
+        - BAD_CREDENTIALS
+        - CREDENTIALS_EXPIRED
     AuthenticationRequest:
       type: object
       description: Authentication request

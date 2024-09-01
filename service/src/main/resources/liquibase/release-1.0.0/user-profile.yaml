@@ -32,6 +32,12 @@ databaseChangeLog:
                     nullable: false
                   name: password
                   type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: credentials_expired
+                  defaultValue: false
+                  type: BOOLEAN
             tableName: user_profile
         - createSequence:
             dataType: BIGINT

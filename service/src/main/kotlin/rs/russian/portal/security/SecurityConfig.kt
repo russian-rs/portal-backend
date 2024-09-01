@@ -10,19 +10,19 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import rs.russian.portal.security.auth.AuthenticationErrorHandler
 import rs.russian.portal.security.jwt.JwtAuthenticationFilter
 import rs.russian.portal.security.jwt.JwtErrorFilter
-
+import rs.russian.portal.security.utils.CustomPasswordEncoder
 
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
     private val jwtErrorFilter: JwtErrorFilter,
     private val userDetailsService: UserDetailsService,
+    private val customPasswordEncoder: CustomPasswordEncoder,
     private val jwtAuthenticationFilter: JwtAuthenticationFilter,
     private val authenticationErrorHandler: AuthenticationErrorHandler,
     private val authenticationConfiguration: AuthenticationConfiguration
@@ -32,12 +32,10 @@ class SecurityConfig(
     fun authenticationManager(): AuthenticationManager = authenticationConfiguration.authenticationManager
 
     @Bean
-    fun authenticationProvider(): AuthenticationProvider =
-        DaoAuthenticationProvider()
-            .also {
-                it.setUserDetailsService(userDetailsService)
-                it.setPasswordEncoder(BCryptPasswordEncoder())
-            }
+    fun authenticationProvider(): AuthenticationProvider = DaoAuthenticationProvider().also {
+        it.setUserDetailsService(userDetailsService)
+        it.setPasswordEncoder(customPasswordEncoder)
+    }
 
     @Bean
     fun securityFilterChain(
@@ -48,9 +46,10 @@ class SecurityConfig(
             .csrf { it.disable() }
             .formLogin { it.disable() }
             .httpBasic { it.disable() }
-            .authorizeHttpRequests { it
-                .requestMatchers(*WHITELIST).permitAll()
-                .anyRequest().authenticated()
+            .authorizeHttpRequests {
+                it
+                    .requestMatchers(*WHITELIST).permitAll()
+                    .anyRequest().authenticated()
             }
             .sessionManagement {
                 it.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
