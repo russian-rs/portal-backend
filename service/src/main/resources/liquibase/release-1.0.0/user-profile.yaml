@@ -1,0 +1,40 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.0.0-user-profile-create-table
+      author: Maksim Aminov
+      changes:
+        - createTable:
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_user_profile
+                  name: id
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: version
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: username
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: email
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: password
+                  type: VARCHAR(255)
+            tableName: user_profile
+        - createSequence:
+            dataType: BIGINT
+            incrementBy: 50
+            sequenceName: user_profile_seq
+            startValue: 1000

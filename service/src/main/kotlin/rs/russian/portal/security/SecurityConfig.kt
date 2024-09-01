@@ -64,7 +64,8 @@ class SecurityConfig(
 
     companion object {
         private val WHITELIST = arrayOf(
-            "/auth/login"
+            "/auth/login",
+            "/auth/refresh"
         )
     }
 

@@ -11,7 +11,6 @@ import org.springframework.web.filter.OncePerRequestFilter
 import rs.russian.portal.security.auth.AuthenticationFailed
 import rs.russian.portal.user.UserService
 
-
 /**
  * JwtAuthenticationFilter is a class that handles JWT authentication for incoming requests.
  * It extracts the JWT token from the request header, validates the token,

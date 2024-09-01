@@ -33,3 +33,10 @@ app:
       jwt-signing-key: ${JWT_SIGNING_KEY}
       access-token-expiration: ${ACCESS_TOKEN_EXPIRATION}
       refresh-token-expiration: ${REFRESH_TOKEN_EXPIRATION}
+
+--- # Schedulers
+app:
+  scheduler:
+    delete-expired-tokens:
+      cron: 0 */1 * * * *
+      lock-at-most-for: PT14M59S

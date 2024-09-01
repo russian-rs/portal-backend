@@ -41,6 +41,33 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /auth/logout:
+    post:
+      operationId: logout
+      tags:
+        - auth
+      parameters:
+        - in: query
+          name: all_devices
+          schema:
+            type: boolean
+            default: false
+            description: Log out from all devices
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogoutRequest'
+      responses:
+        '200':
+          description: Success
+        '401':
+          description: Invalid credentials
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /auth/refresh:
     post:
       operationId: refresh
@@ -93,6 +120,21 @@ components:
           type: string
           minLength: 8
           maxLength: 500
+          nullable: false
+    LogoutRequest:
+      type: object
+      description: Logout request
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+          description: JWT Access Token
+          nullable: false
+        refreshToken:
+          type: string
+          description: JWT Refresh Token
           nullable: false
     RefreshTokenRequest:
       type: object
