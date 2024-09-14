@@ -3,6 +3,9 @@ server:
   error:
     include-message: always
 
+app:
+  frontend-uri: http://localhost:3000
+
 --- # Data
 spring:
   datasource:
@@ -14,15 +17,6 @@ spring:
     properties:
       hibernate:
         format_sql: true
-
---- # Security
-spring:
-  security:
-    oauth2:
-      client:
-        registration:
-          authentik:
-            redirect-uri: http://localhost:3000/api/oauth2/code
 
 --- # Logging
 logging:

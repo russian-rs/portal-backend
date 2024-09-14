@@ -10,6 +10,9 @@ server:
     include-message: never
     include-stacktrace: never
 
+app:
+  frontend-uri: ${FRONTEND_URL}
+
 --- # Data
 spring:
   datasource:
@@ -45,7 +48,7 @@ spring:
             client-secret: ${OAUTH2_CLIENT_SECRET}
             client-name: Authentik SSO
             provider: authentik
-            redirect-uri: ${FRONTEND_URL}/api/oauth2/code
+            redirect-uri: ${app.frontend-uri}/api/oauth2/code
             authorization-grant-type: authorization_code
             scope: openid, email, profile
 
