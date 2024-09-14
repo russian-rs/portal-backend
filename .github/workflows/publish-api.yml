@@ -22,7 +22,7 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
       - name: Test
-        run: echo ${{ env.GITHUB_REF_NAME }}
+        run: echo "${{ github.ref_name }}"
       - name: Generate API
         if: ${{ env.GITHUB_REF_NAME == 'main' }}
         run: ./gradlew clean axios-client:build -x test
