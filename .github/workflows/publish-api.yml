@@ -2,7 +2,8 @@ name: Publish API
 
 on:
   push:
-    branches: [ main ]
+    paths:
+      - api/**
 
 jobs:
   deploy:
@@ -20,8 +21,11 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
       - name: Generate API
-        run: |
-          ./gradlew clean build -x test
+        if: github.ref.name == 'main'
+        run: ./gradlew clean axios-client:build -x test
+      - name: Generate snapshot API
+        if: github.ref.name != 'main'
+        run: ./gradlew clean axios-client:build -x test -Psnapshot=${{ github.workflow.sha }}
       - name: Publish NPM package
         working-directory: ./api/axios-client/build
         run: |

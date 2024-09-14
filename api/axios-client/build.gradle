@@ -6,6 +6,14 @@ plugins {
 group = "rs.russian.api"
 
 def openApiPath = "$projectDir/../openapi.yaml"
+def npmName = "@russian-rs/portal-api-axios"
+def npmVersion = resolveApiVersion()
+def npmRepository = "https://npm.pkg.github.com"
+
+if (project.hasProperty('snapshot')) {
+    npmName = "@russian-rs/portal-api-axios-snapshot"
+    npmVersion = "${resolveApiVersion()}-${snapshot}"
+}
 
 openApiGenerate {
     generatorName = "typescript-axios"
@@ -16,9 +24,9 @@ openApiGenerate {
             "set": "Array"
     ]
     configOptions = [
-            "npmName"       : "@russian-rs/portal-api-axios",
-            "npmVersion"    : resolveApiVersion(),
-            "npmRepository" : "https://npm.pkg.github.com"
+            "npmName"      : npmName,
+            "npmVersion"   : npmVersion,
+            "npmRepository": npmRepository
     ]
 }
 
