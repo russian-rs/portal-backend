@@ -1,7 +1,7 @@
 --- # Common
 spring:
   application:
-    name: portal-backend
+    name: portal
 
 server:
   port: 8081
@@ -26,17 +26,31 @@ spring:
     default-schema: ${spring.datasource.hikari.schema}
     change-log: classpath:/liquibase/changelog-master.yaml
 
---- # App
-app:
+--- # Security
+spring:
   security:
-    auth:
-      jwt-signing-key: ${JWT_SIGNING_KEY}
-      access-token-expiration: ${ACCESS_TOKEN_EXPIRATION}
-      refresh-token-expiration: ${REFRESH_TOKEN_EXPIRATION}
+    oauth2:
+      client:
+        provider:
+          authentik:
+            issuer-uri: ${OAUTH2_SERVER}/application/o/${spring.application.name}/
+            authorization-uri: ${OAUTH2_SERVER}/application/o/authorize/
+            token-uri: ${OAUTH2_SERVER}/application/o/token/
+            user-info-uri: ${OAUTH2_SERVER}/application/o/userinfo/
+            jwk-set-uri: ${OAUTH2_SERVER}/application/o/${spring.application.name}/jwks/
+            user-name-attribute: nickname
+        registration:
+          authentik:
+            client-id: ${OAUTH2_CLIENT_ID}
+            client-secret: ${OAUTH2_CLIENT_SECRET}
+            client-name: Authentik SSO
+            provider: authentik
+            redirect-uri: ${FRONTEND_URL}/api/oauth2/code
+            authorization-grant-type: authorization_code
+            scope: openid, email, profile
 
---- # Schedulers
-app:
-  scheduler:
-    delete-expired-tokens:
-      cron: 0 */1 * * * *
-      lock-at-most-for: PT14M59S
+--- # Errors
+spring:
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
