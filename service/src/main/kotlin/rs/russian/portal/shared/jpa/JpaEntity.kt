@@ -19,7 +19,7 @@ import kotlin.reflect.full.declaredMemberProperties
 @Suppress("UNUSED")
 abstract class JpaEntity<ID_TYPE>: Serializable where ID_TYPE: Comparable<ID_TYPE> {
 
-    @get:[Access(AccessType.PROPERTY) Id GeneratedValue(strategy = GenerationType.AUTO)]
+    @get:[Access(AccessType.PROPERTY) Id]
     abstract var id: ID_TYPE?
 
     @get:[Access(AccessType.PROPERTY) Version]

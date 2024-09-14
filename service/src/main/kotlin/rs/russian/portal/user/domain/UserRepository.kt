@@ -4,7 +4,4 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface UserRepository: JpaRepository<UserProfile, Long> {
-
-    fun findByUsername(username: String): UserProfile?
-}
+interface UserRepository : JpaRepository<UserProfile, String>
