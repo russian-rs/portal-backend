@@ -9,9 +9,8 @@ env:
   ATTEMPTS: 60 # PERIOD * ATTEMPTS = 600 s = 10 min
 
 jobs:
-  deploy:
+  Build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
@@ -34,10 +33,15 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install jq
+        run: sudo apt-get install jq
       - name: Start deploy
         id: start_deploy
         run: |
-          sudo apt-get install jq
           response=$(curl -s --request GET '${{ vars.COOLIFY_API_URL }}/api/v1/deploy?uuid=${{ vars.COOLIFY_SERVICE_ID }}&force=false' --header 'Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}')
           deployment_uuid=$(echo $response | jq -r '.deployments[0].deployment_uuid')
           if [[ $deployment_uuid == "null" ]]; then
