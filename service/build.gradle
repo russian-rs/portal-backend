@@ -1,74 +1,76 @@
 plugins {
-	id("java")
-	id("org.springframework.boot")
-	id("org.jetbrains.kotlin.jvm")
-	id("io.spring.dependency-management")
-	id("org.jetbrains.kotlin.plugin.jpa")
-	id("org.jetbrains.kotlin.plugin.spring")
-	id("org.jetbrains.kotlin.plugin.allopen")
+    id("java")
+    id("kotlin-kapt")
+    id("org.springframework.boot")
+    id("org.jetbrains.kotlin.jvm")
+    id("io.spring.dependency-management")
+    id("org.jetbrains.kotlin.plugin.jpa")
+    id("org.jetbrains.kotlin.plugin.noarg")
+    id("org.jetbrains.kotlin.plugin.spring")
+    id("org.jetbrains.kotlin.plugin.allopen")
 }
 
 group = "rs.russian"
 version = "1.0.0"
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	// OpenAPI
-	implementation(project(":server-api"))
+    // OpenAPI
+    implementation(project(":server-api"))
 
-	// Spring
-	implementation("org.springframework.boot:spring-boot-starter")
-	implementation("org.springframework.boot:spring-boot-starter-web")
-	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("org.springframework.boot:spring-boot-starter-security")
+    // Spring
+    implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
 
-	// Data
-	implementation("org.postgresql:postgresql")
-	implementation("org.liquibase:liquibase-core")
-	implementation("net.lbruun.springboot:preliquibase-spring-boot-starter:1.5.1")
-	implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.8.2")
-	implementation("net.javacrumbs.shedlock:shedlock-spring:5.15.1")
-	implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.15.1")
+    // Data
+    implementation("org.postgresql:postgresql")
+    implementation("org.liquibase:liquibase-core")
+    implementation("net.lbruun.springboot:preliquibase-spring-boot-starter:1.5.1")
+    implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.8.2")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:5.15.1")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:5.15.1")
 
-	// Kotlin
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
+    // Kotlin
+    implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
 
-	// Security
-	implementation("org.mindrot:jbcrypt:0.4")
-	implementation("io.jsonwebtoken:jjwt:0.12.6")
-	implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.2")
+    // Mapstruct
+    implementation('org.mapstruct:mapstruct:1.5.5.Final')
+    kapt('org.mapstruct:mapstruct-processor:1.5.5.Final')
 
-	// Logging
-	implementation("ch.qos.logback:logback-classic:1.5.6")
-	implementation("net.logstash.logback:logstash-logback-encoder:8.0")
+    // Logging
+    implementation("ch.qos.logback:logback-classic:1.5.6")
+    implementation("net.logstash.logback:logstash-logback-encoder:8.0")
 
-	// Tests
-	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+    // Tests
+    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 kotlin {
-	compilerOptions {
-		freeCompilerArgs.addAll("-Xjsr305=strict")
-	}
+    compilerOptions {
+        freeCompilerArgs.addAll("-Xjsr305=strict")
+    }
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }
 
 jar {
-	enabled = false
+    enabled = false
 }

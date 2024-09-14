@@ -13,85 +13,22 @@ servers:
     description: Prod Environment
 
 tags:
-  - name: auth
-    'x-displayName': Authentication
+  - name: user
+    'x-displayName': User
 
 paths:
-  /auth/login:
-    post:
-      operationId: authenticate
+  /user/info:
+    get:
+      operationId: info
       tags:
-        - auth
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AuthenticationRequest'
+        - user
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AuthenticationResponse'
-        '401':
-          description: Invalid credentials
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /auth/logout:
-    post:
-      operationId: logout
-      tags:
-        - auth
-      parameters:
-        - in: query
-          name: all_devices
-          schema:
-            type: boolean
-            default: false
-            description: Log out from all devices
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/LogoutRequest'
-      responses:
-        '200':
-          description: Success
-        '401':
-          description: Invalid credentials
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /auth/refresh:
-    post:
-      operationId: refresh
-      tags:
-        - auth
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/RefreshTokenRequest'
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AuthenticationResponse'
-        '401':
-          description: Invalid credentials
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: '#/components/schemas/UserInfo'
 components:
   schemas:
     ErrorResponse:
@@ -113,60 +50,24 @@ components:
         - AUTHENTICATION_FAILED
         - BAD_CREDENTIALS
         - CREDENTIALS_EXPIRED
-    AuthenticationRequest:
+    UserInfo:
       type: object
-      description: Authentication request
+      description: User info
       required:
+        - id
         - username
-        - password
+        - email
+        - fullName
       properties:
+        id:
+          type: string
+          nullable: false
         username:
           type: string
-          minLength: 3
-          maxLength: 100
           nullable: false
-        password:
+        email:
           type: string
-          minLength: 8
-          maxLength: 500
           nullable: false
-    LogoutRequest:
-      type: object
-      description: Logout request
-      required:
-        - accessToken
-        - refreshToken
-      properties:
-        accessToken:
+        fullName:
           type: string
-          description: JWT Access Token
-          nullable: false
-        refreshToken:
-          type: string
-          description: JWT Refresh Token
-          nullable: false
-    RefreshTokenRequest:
-      type: object
-      description: Refresh request to obtain new access token
-      required:
-        - refreshToken
-      properties:
-        refreshToken:
-          type: string
-          description: JWT Refresh Token
-          nullable: false
-    AuthenticationResponse:
-      type: object
-      description: Authentication response
-      required:
-        - accessToken
-        - refreshToken
-      properties:
-        accessToken:
-          type: string
-          description: JWT Access Token
-          nullable: false
-        refreshToken:
-          type: string
-          description: JWT Refresh Token
           nullable: false
