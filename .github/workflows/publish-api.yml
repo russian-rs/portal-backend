@@ -21,11 +21,11 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
       - name: Generate API
-        if: github.ref.name == 'main'
+        if: ${{ GITHUB_REF_NAME == 'main' }}
         run: ./gradlew clean axios-client:build -x test
       - name: Generate snapshot API
-        if: github.ref.name != 'main'
-        run: ./gradlew clean axios-client:build -x test -Psnapshot=${{ github.workflow.sha }}
+        if: ${{ GITHUB_REF_NAME != 'main' }}
+        run: ./gradlew clean axios-client:build -x test -Psnapshot=${{ GITHUB_SHA }}
       - name: Publish NPM package
         working-directory: ./api/axios-client/build
         run: |
