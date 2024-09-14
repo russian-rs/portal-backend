@@ -15,15 +15,16 @@ spring:
       hibernate:
         format_sql: true
 
+--- # Security
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          authentik:
+            redirect-uri: http://localhost:3000/api/oauth2/code
+
 --- # Logging
 logging:
   level:
     org.hibernate: TRACE
-
---- # App
-app:
-  security:
-    auth:
-      jwt-signing-key: +K28+MDeDPJcofUH/aAoXoopqg/Ad5Wn9e5gqwkw+Ik0rH8cjwoeZ7sQmf8cDFrxZkc7OiZy3X/MS4kxZFdZQQ==
-      access-token-expiration: 3600000 # 60m
-      refresh-token-expiration: 86400000 # 24h

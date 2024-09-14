@@ -11,7 +11,7 @@ databaseChangeLog:
                     primaryKey: true
                     primaryKeyName: pk_user_profile
                   name: id
-                  type: BIGINT
+                  type: VARCHAR(255)
               - column:
                   constraints:
                     nullable: false
@@ -30,17 +30,6 @@ databaseChangeLog:
               - column:
                   constraints:
                     nullable: false
-                  name: password
+                  name: full_name
                   type: VARCHAR(255)
-              - column:
-                  constraints:
-                    nullable: false
-                  name: credentials_expired
-                  defaultValue: false
-                  type: BOOLEAN
             tableName: user_profile
-        - createSequence:
-            dataType: BIGINT
-            incrementBy: 50
-            sequenceName: user_profile_seq
-            startValue: 1000

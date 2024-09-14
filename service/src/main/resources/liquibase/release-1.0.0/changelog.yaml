@@ -3,5 +3,3 @@ databaseChangeLog:
       file: liquibase/release-1.0.0/shedlock.yaml
   - include:
       file: liquibase/release-1.0.0/user-profile.yaml
-  - include:
-      file: liquibase/release-1.0.0/user-token.yaml
