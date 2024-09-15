@@ -23,7 +23,9 @@ class SecurityConfig(
         httpSecurity: HttpSecurity
     ): SecurityFilterChain = httpSecurity
         .authorizeHttpRequests {
-            it.anyRequest().authenticated()
+            it
+                .requestMatchers(*WHITELIST).permitAll()
+                .anyRequest().authenticated()
         }
         .formLogin { it.disable() }
         .oauth2Login {
@@ -46,5 +48,11 @@ class SecurityConfig(
             }
         }
         .build()
+
+    companion object {
+        val WHITELIST = arrayOf(
+            "/actuator/health"
+        )
+    }
 
 }

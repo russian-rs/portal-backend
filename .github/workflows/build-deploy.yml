@@ -19,11 +19,6 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@v5
-        with:
-          images: ruskadijaspora/portal-backend
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@v5
@@ -31,8 +26,8 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+          tags: |
+            ruskadijaspora/portal-backend:latest
 
   Deploy:
     needs:
