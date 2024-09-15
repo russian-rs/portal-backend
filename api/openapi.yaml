@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.0.0
+  version: 1.1.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -29,6 +29,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserInfo'
+  /user/logout:
+    post:
+      operationId: logout
+      tags:
+        - user
+      parameters:
+        - name: all
+          in: query
+          schema:
+            type: boolean
+            default: false
+          description: Logout from all devices
+          required: false
+      responses:
+        '200':
+          description: Successfully logged out
 components:
   schemas:
     ErrorResponse:
