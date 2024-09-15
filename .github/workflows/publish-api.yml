@@ -25,7 +25,7 @@ jobs:
         run: ./gradlew clean axios-client:build -x test
       - name: Generate snapshot API
         if: ${{ github.ref_name != 'main' }}
-        run: ./gradlew clean axios-client:build -x test -Psnapshot=$(echo ${GITHUB_SHA} | cut -c1-8)
+        run: ./gradlew clean axios-client:build -x test -Psnapshot=$(echo ${GITHUB_SHA} | cut -c1-7)
       - name: Publish NPM package
         working-directory: ./api/axios-client/build
         run: |
