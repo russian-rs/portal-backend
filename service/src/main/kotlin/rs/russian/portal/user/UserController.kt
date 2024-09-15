@@ -1,7 +1,6 @@
 package rs.russian.portal.user
 
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
 import rs.russian.generated.api.UserApi
 import rs.russian.generated.model.UserInfo
@@ -17,6 +16,11 @@ class UserController(
     override fun info(): ResponseEntity<UserInfo> {
         val user = userService.getUser(currentUserId())
         return ResponseEntity.ok(userProfileMapper.map(user))
+    }
+
+    override fun logout(all: Boolean): ResponseEntity<Unit> {
+        sessionService.invalidate(all)
+        return ResponseEntity.ok(null)
     }
 
 }
