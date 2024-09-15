@@ -24,6 +24,9 @@ class SecurityConfig(
     fun securityFilterChain(
         httpSecurity: HttpSecurity
     ): SecurityFilterChain = httpSecurity
+        .csrf {
+            it.disable()
+        }
         .authorizeHttpRequests {
             it
                 .requestMatchers(*WHITELIST).permitAll()
