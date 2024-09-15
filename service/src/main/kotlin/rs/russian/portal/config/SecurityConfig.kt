@@ -9,10 +9,12 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisIndexedHttpSession
 import rs.russian.portal.user.UserService
 
 @Configuration
 @EnableWebSecurity
+@EnableRedisIndexedHttpSession(maxInactiveIntervalInSeconds = 3 * 24 * 60 * 30) // 3 days session idle
 class SecurityConfig(
     private val userService: UserService,
     private val appProperties: AppProperties
@@ -22,12 +24,17 @@ class SecurityConfig(
     fun securityFilterChain(
         httpSecurity: HttpSecurity
     ): SecurityFilterChain = httpSecurity
+        .csrf {
+            it.disable()
+        }
         .authorizeHttpRequests {
             it
                 .requestMatchers(*WHITELIST).permitAll()
                 .anyRequest().authenticated()
         }
-        .formLogin { it.disable() }
+        .sessionManagement {
+            it.maximumSessions(2)
+        }
         .oauth2Login {
             it
                 .authorizationEndpoint { endpoint ->

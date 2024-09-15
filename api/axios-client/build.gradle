@@ -11,8 +11,7 @@ def npmVersion = resolveApiVersion()
 def npmRepository = "https://npm.pkg.github.com"
 
 if (project.hasProperty('snapshot')) {
-    npmName = "@russian-rs/portal-api-axios-snapshot"
-    npmVersion = "${resolveApiVersion()}-${snapshot}"
+    npmVersion = "${resolveApiVersion()}-snapshot-${snapshot}"
 }
 
 openApiGenerate {

@@ -9,12 +9,18 @@ import rs.russian.portal.shared.security.currentUserId
 @RestController
 class UserController(
     private val userService: UserService,
+    private val sessionService: SessionService,
     private val userProfileMapper: UserProfileMapper
 ) : UserApi {
 
     override fun info(): ResponseEntity<UserInfo> {
         val user = userService.getUser(currentUserId())
         return ResponseEntity.ok(userProfileMapper.map(user))
+    }
+
+    override fun logout(all: Boolean): ResponseEntity<Unit> {
+        sessionService.invalidate(all)
+        return ResponseEntity.ok(null)
     }
 
 }
