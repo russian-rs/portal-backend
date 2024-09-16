@@ -25,15 +25,12 @@ class SecurityConfig(
         httpSecurity: HttpSecurity
     ): SecurityFilterChain = httpSecurity
         .csrf {
-            it.disable()
+            it.csrfTokenRepository(CookieSessionCsrfTokenRepository())
         }
         .authorizeHttpRequests {
             it
                 .requestMatchers(*WHITELIST).permitAll()
                 .anyRequest().authenticated()
-        }
-        .sessionManagement {
-            it.maximumSessions(2)
         }
         .oauth2Login {
             it
