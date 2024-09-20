@@ -2,6 +2,8 @@
 spring:
   application:
     name: portal
+  main:
+    banner-mode: off
 
 server:
   port: 8081
