@@ -2,11 +2,7 @@
 <configuration>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.classic.encoder.JsonEncoder">
-            <withFormattedMessage>true</withFormattedMessage>
-            <withMessage>false</withMessage>
-            <withArguments>false</withArguments>
-        </encoder>
+        <encoder class="ch.qos.logback.classic.encoder.JsonEncoder"/>
     </appender>
 
     <root level="INFO">
