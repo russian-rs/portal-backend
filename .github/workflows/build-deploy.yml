@@ -27,7 +27,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ruskadijaspora/portal-backend:latest
+            ruskadijaspora/docker:portal-backend
 
   Deploy:
     needs:
