@@ -2,10 +2,8 @@
 <configuration>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.classic.encoder.JsonEncoder">
-            <withFormattedMessage>true</withFormattedMessage>
-            <withMessage>false</withMessage>
-            <withArguments>false</withArguments>
+        <encoder>
+            <pattern>%boldMagenta(%d{dd MMM HH:mm:ss.SSS}) %highlight(%level) %cyan(%logger{10}:) %msg%n</pattern>
         </encoder>
     </appender>
 

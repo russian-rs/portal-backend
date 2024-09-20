@@ -27,3 +27,4 @@ spring:
 logging:
   level:
     org.hibernate: TRACE
+  config: classpath:logback-local.xml
