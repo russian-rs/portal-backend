@@ -11,6 +11,9 @@ server:
     whitelabel.enabled: false
     include-message: never
     include-stacktrace: never
+  servlet:
+    session:
+      timeout: 48h
 
 app:
   frontend-uri: ${FRONTEND_URL}
