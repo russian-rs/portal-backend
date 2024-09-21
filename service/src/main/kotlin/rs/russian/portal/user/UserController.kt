@@ -1,7 +1,5 @@
 package rs.russian.portal.user
 
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import rs.russian.generated.api.UserApi
@@ -22,12 +20,7 @@ class UserController(
 
     override fun logout(all: Boolean): ResponseEntity<Unit> {
         sessionService.invalidate(all)
-        return ResponseEntity(HttpHeaders().also {
-            it.add(
-                "Location",
-                "https://id.russian.rs/application/o/portal/end-session/"
-            )
-        }, HttpStatus.FOUND)
+        return ResponseEntity.ok(null)
     }
 
 }
