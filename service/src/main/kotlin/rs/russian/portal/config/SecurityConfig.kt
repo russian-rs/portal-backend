@@ -7,14 +7,13 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpHeaders.LOCATION
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisIndexedHttpSession
 import rs.russian.portal.user.UserService
 
 @Configuration
 @EnableWebSecurity
-@EnableRedisIndexedHttpSession(maxInactiveIntervalInSeconds = 3 * 24 * 60 * 30) // 3 days session idle
 class SecurityConfig(
     private val userService: UserService,
     private val appProperties: AppProperties
@@ -25,7 +24,7 @@ class SecurityConfig(
         httpSecurity: HttpSecurity
     ): SecurityFilterChain = httpSecurity
         .csrf {
-            it.csrfTokenRepository(CookieSessionCsrfTokenRepository())
+            it.disable()
         }
         .authorizeHttpRequests {
             it
@@ -50,6 +49,9 @@ class SecurityConfig(
             it.authenticationEntryPoint { _, res, _ ->
                 res.sendError(SC_UNAUTHORIZED)
             }
+        }
+        .sessionManagement {
+            it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
         }
         .build()
 
