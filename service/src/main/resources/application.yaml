@@ -16,7 +16,7 @@ server:
       timeout: 48h
 
 app:
-  frontend-uri: ${FRONTEND_URL}
+  frontend-uri: ${FRONTEND_URL}/profile
 
 --- # Data
 spring:
@@ -58,7 +58,7 @@ spring:
             client-secret: ${OAUTH2_CLIENT_SECRET}
             client-name: Authentik SSO
             provider: authentik
-            redirect-uri: ${app.frontend-uri}/api/oauth2/code
+            redirect-uri: ${FRONTEND_URL}/api/oauth2/code
             authorization-grant-type: authorization_code
             scope: openid, email, profile
 
