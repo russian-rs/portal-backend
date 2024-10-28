@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.1.0
+  version: 1.2.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -17,9 +17,9 @@ tags:
     'x-displayName': User
 
 paths:
-  /user/info:
+  /user/profile:
     get:
-      operationId: info
+      operationId: getProfile
       tags:
         - user
       responses:
@@ -28,7 +28,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfo'
+                $ref: '#/components/schemas/UserProfileDto'
+  /user/info:
+    get:
+      operationId: getInfo
+      tags:
+        - user
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
   /user/logout:
     post:
       operationId: logout
@@ -66,9 +78,9 @@ components:
         - AUTHENTICATION_FAILED
         - BAD_CREDENTIALS
         - CREDENTIALS_EXPIRED
-    UserInfo:
+    UserProfileDto:
       type: object
-      description: User info
+      description: User profile
       required:
         - id
         - username
@@ -87,3 +99,25 @@ components:
         fullName:
           type: string
           nullable: false
+    UserInfoDto:
+      type: object
+      description: User additional info
+      required:
+        - userId
+      properties:
+        userId:
+          type: string
+          nullable: false
+        city:
+          type: string
+        address:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        telegram:
+          type: string
+        phone:
+          type: string
+        program:
+          type: string
