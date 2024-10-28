@@ -3,6 +3,7 @@ package rs.russian.portal.user
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.domain.UserProfile
 import rs.russian.portal.user.domain.UserRepository
 
@@ -22,6 +23,7 @@ class UserService(
         }, {
             val userProfile = userProfileMapper.map(oidcUser.userInfo)
             userRepository.saveAndFlush(userProfile)
+            userProfile.info = UserInfo(user = userProfile)
         })
     }
 }
