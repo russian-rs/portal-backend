@@ -19,7 +19,7 @@ tags:
 paths:
   /user/profile:
     get:
-      operationId: getProfile
+      operationId: getCurrentProfile
       tags:
         - user
       responses:
@@ -28,12 +28,22 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserProfileDto'
-  /user/info:
+                $ref: '#/components/schemas/AccountDto'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /user/info/{login}:
     get:
       operationId: getInfo
       tags:
         - user
+      parameters:
+        - name: login
+          in: path
+          description: User login
+          required: true
+          schema:
+            type: string
+            minLength: 3
       responses:
         '200':
           description: Success
@@ -41,6 +51,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserInfoDto'
+        '500':
+          $ref: '#/components/responses/ServerError'
   /user/logout:
     post:
       operationId: logout
@@ -57,28 +69,28 @@ paths:
       responses:
         '200':
           description: Successfully logged out
+        '500':
+          $ref: '#/components/responses/ServerError'
 components:
+  responses:
+    ServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     ErrorResponse:
       type: object
       description: Common object for error responses
       required:
-        - code
         - message
       properties:
-        code:
-          $ref: '#/components/schemas/ErrorCode'
         message:
           type: string
           description: Error description
           nullable: false
-    ErrorCode:
-      type: string
-      enum:
-        - AUTHENTICATION_FAILED
-        - BAD_CREDENTIALS
-        - CREDENTIALS_EXPIRED
-    UserProfileDto:
+    AccountDto:
       type: object
       description: User profile
       required:
@@ -106,6 +118,15 @@ components:
         - userId
       properties:
         userId:
+          type: string
+          nullable: false
+        username:
+          type: string
+          nullable: false
+        email:
+          type: string
+          nullable: false
+        fullName:
           type: string
           nullable: false
         city:
