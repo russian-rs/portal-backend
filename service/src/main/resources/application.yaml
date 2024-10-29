@@ -4,6 +4,9 @@ spring:
     name: portal
   main:
     banner-mode: off
+  web:
+    resources:
+      add-mappings: false
 
 server:
   port: 8081
