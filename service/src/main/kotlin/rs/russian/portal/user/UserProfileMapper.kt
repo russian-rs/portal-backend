@@ -6,7 +6,7 @@ import org.mapstruct.MappingConstants.ComponentModel.SPRING
 import org.mapstruct.MappingTarget
 import org.mapstruct.ReportingPolicy.ERROR
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo
-import rs.russian.generated.model.UserProfileDto
+import rs.russian.generated.model.AccountDto
 import rs.russian.portal.user.domain.UserProfile
 
 @Mapper(componentModel = SPRING, unmappedTargetPolicy = ERROR)
@@ -18,7 +18,7 @@ interface UserProfileMapper {
     @Mapping(target = "username", source = "nickName")
     fun map(oidcUserInfo: OidcUserInfo): UserProfile
 
-    fun map(userProfile: UserProfile): UserProfileDto
+    fun map(userProfile: UserProfile): AccountDto
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "info", ignore = true)
