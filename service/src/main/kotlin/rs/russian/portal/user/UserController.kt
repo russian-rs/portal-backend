@@ -20,7 +20,7 @@ class UserController(
     }
 
     override fun getInfo(login: String): ResponseEntity<UserInfoDto> {
-        TODO("Not yet implemented")
+        TODO()
     }
 
     override fun logout(all: Boolean): ResponseEntity<Unit> {

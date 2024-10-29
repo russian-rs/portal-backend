@@ -12,7 +12,8 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception::class)
     fun handleAllExceptions(ex: Exception, request: WebRequest): ResponseEntity<ErrorResponse> {
-        val errorDetails = ErrorResponse(ex.message ?: "Unknown error")
-        return ResponseEntity(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR)
+        var message = ex.message ?: "Unknown error"
+        ex.cause?.message?.let { message = it }
+        return ResponseEntity(ErrorResponse(message), HttpStatus.INTERNAL_SERVER_ERROR)
     }
 }
