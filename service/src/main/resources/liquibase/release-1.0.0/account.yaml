@@ -1,15 +1,16 @@
 databaseChangeLog:
   - changeSet:
-      id: 1.0.0-user-profile-create-table
+      id: 1.0.0-account-create-table
       author: Maksim Aminov
       changes:
         - createTable:
+            tableName: account
             columns:
               - column:
                   constraints:
                     nullable: false
                     primaryKey: true
-                    primaryKeyName: pk_user_profile
+                    primaryKeyName: pk_account
                   name: id
                   type: VARCHAR(255)
               - column:
@@ -20,11 +21,13 @@ databaseChangeLog:
               - column:
                   constraints:
                     nullable: false
+                    unique: true
                   name: username
                   type: VARCHAR(255)
               - column:
                   constraints:
                     nullable: false
+                    unique: true
                   name: email
                   type: VARCHAR(255)
               - column:
@@ -32,4 +35,3 @@ databaseChangeLog:
                     nullable: false
                   name: full_name
                   type: VARCHAR(255)
-            tableName: user_profile
