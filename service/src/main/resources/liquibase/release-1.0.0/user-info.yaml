@@ -11,9 +11,9 @@ databaseChangeLog:
                     nullable: false
                     primaryKey: true
                     primaryKeyName: pk_user_info
-                    referencedTableName: user_profile
+                    referencedTableName: account
                     referencedColumnNames: id
-                    foreignKeyName: fk_user_info_profile
+                    foreignKeyName: fk_user_info_account
                   name: user_id
                   type: VARCHAR(255)
               - column:

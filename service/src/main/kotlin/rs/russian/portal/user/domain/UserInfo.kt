@@ -25,5 +25,5 @@ data class UserInfo(
     @MapsId
     @OneToOne(mappedBy = "info")
     @JoinColumn(name = "user_id")
-    var user: UserProfile
+    var account: Account
 ) : JpaEntity<String>()

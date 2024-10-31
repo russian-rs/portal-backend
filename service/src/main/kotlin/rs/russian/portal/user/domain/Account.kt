@@ -5,7 +5,7 @@ import rs.russian.portal.shared.jpa.JpaEntity
 import java.time.LocalDateTime
 
 @Entity
-data class UserProfile(
+data class Account(
     @Id
     override var id: String? = null,
     override var version: LocalDateTime? = null,
@@ -19,5 +19,5 @@ data class UserProfile(
     var info: UserInfo?
 ) : JpaEntity<String>() {
 
-    override fun equalityProperties() = setOf(UserProfile::email)
+    override fun equalityProperties() = setOf(Account::email)
 }
