@@ -17,9 +17,9 @@ tags:
     'x-displayName': User
 
 paths:
-  /user/profile:
+  /user/account:
     get:
-      operationId: getCurrentProfile
+      operationId: getCurrentAccount
       tags:
         - user
       responses:

@@ -11,16 +11,17 @@ import rs.russian.portal.shared.security.currentUserId
 class UserController(
     private val userService: UserService,
     private val sessionService: SessionService,
-    private val userProfileMapper: UserProfileMapper
+    private val userMapper: UserMapper
 ) : UserApi {
 
-    override fun getCurrentProfile(): ResponseEntity<AccountDto> {
-        val user = userService.getUser(currentUserId())
-        return ResponseEntity.ok(userProfileMapper.map(user))
+    override fun getCurrentAccount(): ResponseEntity<AccountDto> {
+        val user = userService.getAccount(currentUserId())
+        return ResponseEntity.ok(userMapper.map(user))
     }
 
     override fun getInfo(login: String): ResponseEntity<UserInfoDto> {
-        TODO()
+        val user = userService.getAccountByLogin(login)
+        return ResponseEntity.ok(userMapper.map(user.info))
     }
 
     override fun logout(all: Boolean): ResponseEntity<Unit> {

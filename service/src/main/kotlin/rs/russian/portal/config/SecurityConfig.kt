@@ -40,7 +40,7 @@ class SecurityConfig(
                     endpoint.baseUri("/oauth2/code")
                 }
                 .successHandler { _, res, authentication ->
-                    userService.createOrUpdateUser(authentication.principal as OidcUser)
+                    userService.createOrUpdateAccount(authentication.principal as OidcUser)
                     res.status = SC_MOVED_PERMANENTLY
                     res.setHeader(LOCATION, appProperties.frontendUri)
                 }
