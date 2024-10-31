@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.1.0
+  version: 1.2.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -17,9 +17,9 @@ tags:
     'x-displayName': User
 
 paths:
-  /user/info:
+  /user/account:
     get:
-      operationId: info
+      operationId: getCurrentAccount
       tags:
         - user
       responses:
@@ -28,7 +28,31 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfo'
+                $ref: '#/components/schemas/AccountDto'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /user/info/{login}:
+    get:
+      operationId: getInfo
+      tags:
+        - user
+      parameters:
+        - name: login
+          in: path
+          description: User login
+          required: true
+          schema:
+            type: string
+            minLength: 3
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
+        '500':
+          $ref: '#/components/responses/ServerError'
   /user/logout:
     post:
       operationId: logout
@@ -45,30 +69,30 @@ paths:
       responses:
         '200':
           description: Successfully logged out
+        '500':
+          $ref: '#/components/responses/ServerError'
 components:
+  responses:
+    ServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
   schemas:
     ErrorResponse:
       type: object
       description: Common object for error responses
       required:
-        - code
         - message
       properties:
-        code:
-          $ref: '#/components/schemas/ErrorCode'
         message:
           type: string
           description: Error description
           nullable: false
-    ErrorCode:
-      type: string
-      enum:
-        - AUTHENTICATION_FAILED
-        - BAD_CREDENTIALS
-        - CREDENTIALS_EXPIRED
-    UserInfo:
+    AccountDto:
       type: object
-      description: User info
+      description: User profile
       required:
         - id
         - username
@@ -87,3 +111,34 @@ components:
         fullName:
           type: string
           nullable: false
+    UserInfoDto:
+      type: object
+      description: User additional info
+      required:
+        - userId
+      properties:
+        userId:
+          type: string
+          nullable: false
+        username:
+          type: string
+          nullable: false
+        email:
+          type: string
+          nullable: false
+        fullName:
+          type: string
+          nullable: false
+        city:
+          type: string
+        address:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        telegram:
+          type: string
+        phone:
+          type: string
+        program:
+          type: string

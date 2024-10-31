@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.0.0-user-info-create-table
+      author: Maksim Aminov
+      changes:
+        - createTable:
+            tableName: user_info
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_user_info
+                    referencedTableName: account
+                    referencedColumnNames: id
+                    foreignKeyName: fk_user_info_account
+                  name: user_id
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: version
+                  type: DATETIME
+              - column:
+                  name: city
+                  type: VARCHAR(255)
+              - column:
+                  name: address
+                  type: VARCHAR(255)
+              - column:
+                  name: birth_date
+                  type: DATE
+              - column:
+                  name: telegram
+                  type: VARCHAR(255)
+              - column:
+                  name: phone
+                  type: VARCHAR(255)
+              - column:
+                  name: program
+                  type: VARCHAR(255)
