@@ -1,6 +1,8 @@
 package rs.russian.portal.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import net.javacrumbs.shedlock.core.LockProvider
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider
@@ -19,7 +21,10 @@ import javax.sql.DataSource
 class AppConfig {
 
     @Bean
-    fun objectMapper() = ObjectMapper().registerKotlinModule()
+    fun objectMapper(): ObjectMapper = ObjectMapper()
+        .registerModules(JavaTimeModule())
+        .registerKotlinModule()
+        .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     @Bean
     fun shedlockProvider(datasource: DataSource): LockProvider = JdbcTemplateLockProvider(
