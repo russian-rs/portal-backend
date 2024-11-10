@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.1.0-task-create-table
+      author: Maksim Aminov
+      changes:
+        - createTable:
+            tableName: task
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_task
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: version
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: date
+                  type: DATE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: TEXT
+              - column:
+                  name: description
+                  type: TEXT
+              - column:
+                  name: time_spent
+                  type: INTEGER
+              - column:
+                  name: result
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                    referencedTableName: report
+                    referencedColumnNames: id
+                    foreignKeyName: fk_report_task
+                  name: report_id
+                  type: UUID

@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.2.0
+  version: 1.3.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -71,6 +71,72 @@ paths:
           description: Successfully logged out
         '500':
           $ref: '#/components/responses/ServerError'
+
+  /report:
+    post:
+      operationId: createReport
+      tags:
+        - report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportDto'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportDto'
+        '500':
+          $ref: '#/components/responses/ServerError'
+  /report/{id}:
+    get:
+      operationId: getReport
+      tags:
+        - report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportDto'
+        '404':
+          $ref: '#/components/responses/ServerError'
+  /reports:
+    get:
+      operationId: getReports
+      tags:
+        - report
+      parameters:
+        - name: pageRequest
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/PageRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportFilter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportPageResponse'
 components:
   responses:
     ServerError:
@@ -80,6 +146,47 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
   schemas:
+    PageRequest:
+      type: object
+      description: Paging object
+      properties:
+        pageNumber:
+          type: integer
+          format: int32
+          default: 0
+          nullable: false
+        pageSize:
+          type: integer
+          format: int32
+          default: 10
+          nullable: false
+        sort:
+          type: array
+          default: [ ]
+          items:
+            type: string
+    PageResponse:
+      type: object
+      nullable: false
+      description: Page info
+      required:
+        - page
+        - size
+        - totalPages
+        - totalElements
+      properties:
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
     ErrorResponse:
       type: object
       description: Common object for error responses
@@ -142,3 +249,97 @@ components:
           type: string
         program:
           type: string
+    ReportFilter:
+      type: object
+      required:
+        - login
+        - dateFrom
+        - dateTo
+        - status
+        - program
+      properties:
+        login:
+          type: string
+          nullable: true
+        dateFrom:
+          type: string
+          format: date
+          nullable: true
+        dateTo:
+          type: string
+          format: date
+          nullable: true
+        status:
+          type: string
+          nullable: true
+        program:
+          type: string
+          nullable: true
+    ReportDto:
+      type: object
+      nullable: false
+      description: Report information
+      required:
+        - tasks
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+        createTime:
+          type: string
+          format: date-time
+          nullable: true
+        user:
+          type: string
+        status:
+          type: string
+          nullable: true
+        tasks:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/TaskDto'
+    TaskDto:
+      type: object
+      description: Task information
+      required:
+        - date
+        - name
+        - description
+        - timeSpent
+        - result
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: true
+        date:
+          type: string
+          format: date
+          description: When task was completed
+          nullable: true
+        name:
+          type: string
+        description:
+          type: string
+        timeSpent:
+          type: integer
+          default: Time spent in minutes
+        result:
+          type: string
+    ReportPageResponse:
+      type: object
+      nullable: false
+      required:
+        - page
+        - content
+      properties:
+        page:
+          $ref: '#/components/schemas/PageResponse'
+        content:
+          type: array
+          default: [ ]
+          nullable: false
+          items:
+            $ref: '#/components/schemas/ReportDto'

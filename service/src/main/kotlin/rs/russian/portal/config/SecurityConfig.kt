@@ -10,12 +10,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.web.SecurityFilterChain
-import rs.russian.portal.user.UserService
+import rs.russian.portal.user.service.AccountService
 
 @Configuration
 @EnableWebSecurity
 class SecurityConfig(
-    private val userService: UserService,
+    private val accountService: AccountService,
     private val appProperties: AppProperties
 ) {
 
@@ -40,7 +40,7 @@ class SecurityConfig(
                     endpoint.baseUri("/oauth2/code")
                 }
                 .successHandler { _, res, authentication ->
-                    userService.createOrUpdateAccount(authentication.principal as OidcUser)
+                    accountService.createOrUpdateAccount(authentication.principal as OidcUser)
                     res.status = SC_MOVED_PERMANENTLY
                     res.setHeader(LOCATION, appProperties.frontendUri)
                 }
