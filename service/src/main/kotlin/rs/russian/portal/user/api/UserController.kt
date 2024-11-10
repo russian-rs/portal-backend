@@ -1,4 +1,4 @@
-package rs.russian.portal.user
+package rs.russian.portal.user.api
 
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
@@ -6,21 +6,24 @@ import rs.russian.generated.api.UserApi
 import rs.russian.generated.model.AccountDto
 import rs.russian.generated.model.UserInfoDto
 import rs.russian.portal.shared.security.currentUserId
+import rs.russian.portal.user.mapper.UserMapper
+import rs.russian.portal.user.service.AccountService
+import rs.russian.portal.user.service.SessionService
 
 @RestController
 class UserController(
-    private val userService: UserService,
+    private val accountService: AccountService,
     private val sessionService: SessionService,
     private val userMapper: UserMapper
 ) : UserApi {
 
     override fun getCurrentAccount(): ResponseEntity<AccountDto> {
-        val user = userService.getAccount(currentUserId())
+        val user = accountService.getAccount(currentUserId())
         return ResponseEntity.ok(userMapper.map(user))
     }
 
     override fun getInfo(login: String): ResponseEntity<UserInfoDto> {
-        val user = userService.getAccountByLogin(login)
+        val user = accountService.getAccountByLogin(login)
         return ResponseEntity.ok(userMapper.map(user.info))
     }
 

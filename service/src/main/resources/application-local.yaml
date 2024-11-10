@@ -35,5 +35,5 @@ spring:
 --- # Logging
 logging:
   level:
-    org.hibernate: TRACE
+    org.hibernate.orm.jdbc.bind: TRACE
   config: classpath:logback-local.xml

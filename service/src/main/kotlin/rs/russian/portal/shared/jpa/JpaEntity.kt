@@ -17,7 +17,7 @@ import kotlin.reflect.full.declaredMemberProperties
 @MappedSuperclass
 @Access(AccessType.FIELD)
 @Suppress("UNUSED")
-abstract class JpaEntity<ID_TYPE>: Serializable where ID_TYPE: Comparable<ID_TYPE> {
+abstract class JpaEntity<ID_TYPE> : Serializable where ID_TYPE : Comparable<ID_TYPE> {
 
     @get:[Access(AccessType.PROPERTY) Id]
     abstract var id: ID_TYPE?
@@ -56,6 +56,6 @@ abstract class JpaEntity<ID_TYPE>: Serializable where ID_TYPE: Comparable<ID_TYP
     companion object {
         private fun <ID_TYPE> emptyPropertiesMap():
                 MutableMap<KClass<out JpaEntity<ID_TYPE>>, Collection<KProperty1<out JpaEntity<ID_TYPE>, Any?>>>
-        where ID_TYPE : Comparable<ID_TYPE> = mutableMapOf()
+                where ID_TYPE : Comparable<ID_TYPE> = mutableMapOf()
     }
 }

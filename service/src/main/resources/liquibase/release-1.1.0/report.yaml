@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.1.0-report-create-table
+      author: Maksim Aminov
+      changes:
+        - createTable:
+            tableName: report
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_report
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: version
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: create_time
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: status
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                    referencedTableName: account
+                    referencedColumnNames: id
+                    foreignKeyName: fk_report_account
+                  name: account_id
+                  type: VARCHAR(255)
