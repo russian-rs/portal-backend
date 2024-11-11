@@ -3,7 +3,6 @@ package rs.russian.portal.user.api
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import rs.russian.generated.api.UserApi
-import rs.russian.generated.model.AccountDto
 import rs.russian.generated.model.PageRequest
 import rs.russian.generated.model.UserInfoDto
 import rs.russian.generated.model.UserPageResponse
@@ -20,9 +19,9 @@ class UserController(
     private val userMapper: UserMapper
 ) : UserApi {
 
-    override fun getCurrentAccount(): ResponseEntity<AccountDto> {
+    override fun getCurrentAccount(): ResponseEntity<UserInfoDto> {
         val user = accountService.getAccount(currentUserId())
-        return ResponseEntity.ok(userMapper.map(user))
+        return ResponseEntity.ok(userMapper.map(user.info))
     }
 
     override fun getInfo(login: String): ResponseEntity<UserInfoDto> {
