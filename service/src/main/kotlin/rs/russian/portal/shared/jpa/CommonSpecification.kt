@@ -131,13 +131,13 @@ fun <T, V : Any> notContains(fieldName: String, values: Collection<V>): Specific
 
 fun <T> like(fieldName: String, value: String): Specification<T> {
     return Specification { root, _, builder ->
-        builder.like(root.get(fieldName), "%$value%")
+        builder.like(builder.lower(root.get(fieldName)), "%${value.lowercase()}%")
     }
 }
 
 fun <T> like(fieldName: String, subFieldName: String, value: String): Specification<T> {
     return Specification { root, _, builder ->
         val sub = root.join<T, Any>(fieldName, JoinType.LEFT)
-        builder.like(sub.get(subFieldName), "%$value%")
+        builder.like(builder.lower(sub.get(subFieldName)), "%${value.lowercase()}%")
     }
 }

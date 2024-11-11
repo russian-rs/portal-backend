@@ -23,6 +23,9 @@ repositories {
     mavenCentral()
 }
 
+var kotlinSdkVersion = "1.2.56"
+var smithyKotlinVersion = "1.3.0"
+
 dependencies {
     // OpenAPI
     implementation(project(":server-api"))
@@ -49,6 +52,18 @@ dependencies {
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
+
+    // S3
+    implementation("aws.sdk.kotlin:s3:$kotlinSdkVersion")
+    implementation("aws.sdk.kotlin:s3control:$kotlinSdkVersion")
+    implementation("aws.sdk.kotlin:sts:$kotlinSdkVersion")
+    implementation("aws.sdk.kotlin:secretsmanager:$kotlinSdkVersion")
+    implementation("aws.smithy.kotlin:http-client-engine-okhttp:$smithyKotlinVersion")
+    implementation("aws.smithy.kotlin:http-client-engine-crt:$smithyKotlinVersion")
+    implementation("aws.smithy.kotlin:aws-signing-crt:$smithyKotlinVersion")
+    implementation("aws.smithy.kotlin:http-auth-aws:$smithyKotlinVersion")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
+    implementation("commons-io:commons-io:2.17.0")
 
     // Security
     implementation('com.auth0:java-jwt:4.4.0')

@@ -1,12 +1,17 @@
 package rs.russian.portal.report.domain
 
 import jakarta.persistence.*
+import rs.russian.portal.file.domain.FileInfo
 import rs.russian.portal.shared.jpa.JpaEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
 @Entity
+@NamedEntityGraph(
+    name = Task.GRAPH_FILES,
+    attributeNodes = [NamedAttributeNode("files")]
+)
 data class Task(
     @Id
     @Column(name = "id")
@@ -21,9 +26,24 @@ data class Task(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "report_id")
-    var report: Report
+    var report: Report,
+
+    @Column(name = "customer_login")
+    var customer: String? = null,
+
+    @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
+    @JoinTable(
+        name = "task_to_file",
+        joinColumns = [JoinColumn(name = "task_id")],
+        inverseJoinColumns = [JoinColumn(name = "file_id")]
+    )
+    var files: List<FileInfo> = mutableListOf()
 
 ) : JpaEntity<UUID>() {
 
     override fun equalityProperties() = setOf(Task::id)
+
+    companion object {
+        const val GRAPH_FILES = "TaskFiles"
+    }
 }

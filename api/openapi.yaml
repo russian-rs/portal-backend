@@ -53,6 +53,29 @@ paths:
                 $ref: '#/components/schemas/UserInfoDto'
         '500':
           $ref: '#/components/responses/ServerError'
+  /user/search:
+    get:
+      operationId: searchUsers
+      tags:
+        - user
+      parameters:
+        - name: searchQuery
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: pageRequest
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/PageRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPageResponse'
   /user/logout:
     post:
       operationId: logout
@@ -71,6 +94,57 @@ paths:
           description: Successfully logged out
         '500':
           $ref: '#/components/responses/ServerError'
+
+  /files/upload:
+    post:
+      operationId: uploadFile
+      tags:
+        - files
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  nullable: false
+      responses:
+        '200':
+          description: Successfully uploaded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileInfoDto'
+  /files/{id}:
+    get:
+      operationId: getFileInfo
+      tags:
+        - files
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FileInfoDto'
+        '400':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 
   /report:
     post:
@@ -249,6 +323,46 @@ components:
           type: string
         program:
           type: string
+        avatar:
+          $ref: '#/components/schemas/FileInfoDto'
+    UserPageResponse:
+      type: object
+      nullable: false
+      required:
+        - page
+        - content
+      properties:
+        page:
+          $ref: '#/components/schemas/PageResponse'
+        content:
+          type: array
+          default: [ ]
+          nullable: false
+          items:
+            $ref: '#/components/schemas/UserInfoDto'
+    FileInfoDto:
+      type: object
+      nullable: true
+      required:
+        - id
+        - name
+        - link
+        - size
+      properties:
+        id:
+          type: string
+          nullable: false
+        name:
+          type: string
+          nullable: false
+        link:
+          type: string
+          nullable: false
+        contentLength:
+          type: integer
+          format: int64
+          nullable: false
+          description: Size (bytes)
     ReportFilter:
       type: object
       required:
@@ -309,6 +423,7 @@ components:
         - description
         - timeSpent
         - result
+        - files
       properties:
         id:
           type: string
@@ -323,11 +438,19 @@ components:
           type: string
         description:
           type: string
+        customer:
+          type: string
+          description: Login of customer
         timeSpent:
           type: integer
-          default: Time spent in minutes
+          description: Time spent in minutes
         result:
           type: string
+        files:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/FileInfoDto'
     ReportPageResponse:
       type: object
       nullable: false

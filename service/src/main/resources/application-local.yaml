@@ -5,6 +5,9 @@ server:
 
 app:
   frontend-uri: http://localhost:3000/profile
+  s3:
+    region: eu-central
+    endpoint: http://localhost:9000
 
 --- # Data
 spring:

@@ -32,6 +32,14 @@ databaseChangeLog:
                   name: description
                   type: TEXT
               - column:
+                  constraints:
+                    nullable: true
+                    referencedTableName: account
+                    referencedColumnNames: username
+                    foreignKeyName: fk_task_customer
+                  name: customer_login
+                  type: VARCHAR(255)
+              - column:
                   name: time_spent
                   type: INTEGER
               - column:
