@@ -26,7 +26,7 @@ class S3Service(
     suspend fun get(fileInfo: FileInfo): Url {
         val request = s3Client.presignGetObject(GetObjectRequest {
             key = fileInfo.getIdWithSuffix()
-            bucket = fileInfo.bucket.name.lowercase()
+            bucket = s3Properties.bucket
         }, s3Properties.presignDuration.toKotlinDuration())
         return request.url
     }
@@ -39,7 +39,7 @@ class S3Service(
         s3Client.putObject(
             PutObjectRequest {
                 key = fileInfo.getIdWithSuffix()
-                bucket = fileInfo.bucket.name.lowercase()
+                bucket = s3Properties.bucket
                 body = temp.asByteStream()
             }
         )
@@ -50,7 +50,7 @@ class S3Service(
         s3Client.deleteObject(
             DeleteObjectRequest {
                 key = fileInfo.getIdWithSuffix()
-                bucket = fileInfo.bucket.name.lowercase()
+                bucket = s3Properties.bucket
             }
         )
     }

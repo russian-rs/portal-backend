@@ -8,6 +8,7 @@ app:
   s3:
     region: eu-central
     endpoint: http://localhost:9000
+    bucket: portal-files
 
 --- # Data
 spring:

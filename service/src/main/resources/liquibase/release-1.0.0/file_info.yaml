@@ -36,11 +36,6 @@ databaseChangeLog:
               - column:
                   constraints:
                     nullable: false
-                  name: bucket
-                  type: VARCHAR(255)
-              - column:
-                  constraints:
-                    nullable: false
                     referencedTableName: account
                     referencedColumnNames: username
                     foreignKeyName: fk_file_info_account

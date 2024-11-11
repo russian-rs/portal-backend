@@ -14,5 +14,6 @@ data class S3Properties(
     val secretKey: String,
     val region: String,
     val endpoint: String,
-    val presignDuration: Duration
+    val presignDuration: Duration,
+    val bucket: String
 )

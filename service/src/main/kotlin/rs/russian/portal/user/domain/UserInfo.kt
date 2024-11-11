@@ -48,7 +48,7 @@ data class UserInfo(
         fun default(account: Account) = UserInfo(
             account = account,
             city = "Beograd",
-            birthDate = LocalDate.of(2000, 0, 0)
+            birthDate = LocalDate.of(2000, 1, 1)
         )
     }
 }
