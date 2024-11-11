@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.1.0-file-info-create-table
+      author: Maksim Aminov
+      changes:
+        - createTable:
+            tableName: file_info
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_file_info
+                  name: id
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: version
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: name
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: suffix
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: size
+                  type: BIGINT
+              - column:
+                  constraints:
+                    nullable: false
+                    referencedTableName: account
+                    referencedColumnNames: username
+                    foreignKeyName: fk_file_info_account
+                  name: author
+                  type: VARCHAR(255)

@@ -5,6 +5,10 @@ server:
 
 app:
   frontend-uri: http://localhost:3000/profile
+  s3:
+    region: eu-central
+    endpoint: http://localhost:9000
+    bucket: portal-files
 
 --- # Data
 spring:
@@ -35,5 +39,5 @@ spring:
 --- # Logging
 logging:
   level:
-    org.hibernate: TRACE
+    org.hibernate.orm.jdbc.bind: TRACE
   config: classpath:logback-local.xml

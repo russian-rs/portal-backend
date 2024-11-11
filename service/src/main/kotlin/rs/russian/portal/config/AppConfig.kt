@@ -1,5 +1,8 @@
 package rs.russian.portal.config
 
+import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
+import aws.sdk.kotlin.services.s3.S3Client
+import aws.smithy.kotlin.runtime.net.url.Url
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -16,7 +19,7 @@ import javax.sql.DataSource
 
 @Configuration
 @EnableScheduling
-@EnableConfigurationProperties(value = [AppProperties::class])
+@EnableConfigurationProperties(value = [AppProperties::class, S3Properties::class])
 @EnableSchedulerLock(defaultLockAtMostFor = "PT59S")
 class AppConfig {
 
@@ -33,4 +36,17 @@ class AppConfig {
             .usingDbTime()
             .build()
     )
+
+    @Bean
+    fun s3Client(props: S3Properties): S3Client {
+        return S3Client {
+            region = props.region
+            endpointUrl = Url.parse(props.endpoint)
+            forcePathStyle = true
+            credentialsProvider = StaticCredentialsProvider {
+                accessKeyId = props.accessKey
+                secretAccessKey = props.secretKey
+            }
+        }
+    }
 }

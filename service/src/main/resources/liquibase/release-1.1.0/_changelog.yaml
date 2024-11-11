@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/release-1.1.0/report.yaml
+  - include:
+      file: liquibase/release-1.1.0/task.yaml
+  - include:
+      file: liquibase/release-1.1.0/task_to_file.yaml

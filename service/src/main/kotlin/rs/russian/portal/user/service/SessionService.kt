@@ -1,4 +1,4 @@
-package rs.russian.portal.user
+package rs.russian.portal.user.service
 
 import jakarta.servlet.http.HttpSession
 import org.springframework.session.FindByIndexNameSessionRepository

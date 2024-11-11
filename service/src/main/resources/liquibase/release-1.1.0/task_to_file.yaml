@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.1.0-task-to-file-create-table
+      author: Maksim Aminov
+      changes:
+        - createTable:
+            tableName: task_to_file
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    referencedTableName: task
+                    referencedColumnNames: id
+                    foreignKeyName: fk_task_to_file_task
+                  name: task_id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                    referencedTableName: file_info
+                    referencedColumnNames: id
+                    foreignKeyName: fk_task_to_file_file
+                  name: file_id
+                  type: VARCHAR(255)
+        - addPrimaryKey:
+            clustered: true
+            columnNames: task_id, file_id
+            constraintName: pk_task_to_file
+            tableName: task_to_file
+            validate: true

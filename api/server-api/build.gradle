@@ -30,13 +30,14 @@ openApiGenerate {
     apiPackage = "rs.russian.generated.api"
     modelPackage = "rs.russian.generated.model"
     configOptions = [
-            "useTags"               : "true",
-            "useSwaggerUI"          : "false",
-            "interfaceOnly"         : "true",
-            "useSpringBoot3"        : "true",
-            "serializableModel"     : "true",
-            "skipDefaultInterface"  : "true",
-            "documentationProvider" : "none"
+            "useTags"              : "true",
+            "useSwaggerUI"         : "false",
+            "interfaceOnly"        : "true",
+            "useSpringBoot3"       : "true",
+            "serializableModel"    : "true",
+            "skipDefaultInterface" : "true",
+            "documentationProvider": "none",
+            "modelMutable"         : "true"
     ]
 }
 
