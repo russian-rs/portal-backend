@@ -4,4 +4,6 @@ databaseChangeLog:
   - include:
       file: liquibase/release-1.0.0/account.yaml
   - include:
+      file: liquibase/release-1.0.0/file_info.yaml
+  - include:
       file: liquibase/release-1.0.0/user-info.yaml
