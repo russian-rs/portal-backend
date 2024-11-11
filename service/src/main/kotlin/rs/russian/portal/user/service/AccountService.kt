@@ -1,11 +1,15 @@
 package rs.russian.portal.user.service
 
+import org.springframework.data.domain.Page
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import rs.russian.generated.model.PageRequest
+import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.currentUserId
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.UserInfo
+import rs.russian.portal.user.domain.specification.searchSpecification
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.repository.AccountRepository
 
@@ -36,5 +40,11 @@ class AccountService(
             accountRepository.saveAndFlush(account)
             account.info = UserInfo(account = account)
         })
+    }
+
+    @Transactional(readOnly = true)
+    fun search(query: String, pageRequest: PageRequest): Page<Account> {
+        val specification = searchSpecification(query)
+        return accountRepository.findAll(specification, convert(pageRequest))
     }
 }

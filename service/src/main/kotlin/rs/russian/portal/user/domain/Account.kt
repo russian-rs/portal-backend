@@ -9,7 +9,8 @@ import java.time.LocalDateTime
 @Entity
 @NamedEntityGraph(
     name = Account.GRAPH_INFO,
-    attributeNodes = [NamedAttributeNode("info")]
+    attributeNodes = [NamedAttributeNode("info", subgraph = UserInfo.GRAPH_AVATAR)],
+    subgraphs = [NamedSubgraph(name = UserInfo.GRAPH_AVATAR, attributeNodes = [NamedAttributeNode("avatar")])]
 )
 data class Account(
     @Id
@@ -32,6 +33,6 @@ data class Account(
     override fun equalityProperties() = setOf(Account::email)
 
     companion object {
-        const val GRAPH_INFO = "UserInfo"
+        const val GRAPH_INFO = "AccountUserInfo"
     }
 }

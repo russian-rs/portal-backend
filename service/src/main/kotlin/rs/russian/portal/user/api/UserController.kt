@@ -4,7 +4,10 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import rs.russian.generated.api.UserApi
 import rs.russian.generated.model.AccountDto
+import rs.russian.generated.model.PageRequest
 import rs.russian.generated.model.UserInfoDto
+import rs.russian.generated.model.UserPageResponse
+import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.currentUserId
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.service.AccountService
@@ -30,6 +33,16 @@ class UserController(
     override fun logout(all: Boolean): ResponseEntity<Unit> {
         sessionService.invalidate(all)
         return ResponseEntity.ok(null)
+    }
+
+    override fun searchUsers(searchQuery: String, pageRequest: PageRequest): ResponseEntity<UserPageResponse> {
+        val page = accountService.search(searchQuery, pageRequest)
+        return ResponseEntity.ok(
+            UserPageResponse(
+                page = convert(page),
+                content = page.map { userMapper.map(it.info) }.toMutableList()
+            )
+        )
     }
 
 }

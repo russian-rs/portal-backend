@@ -39,3 +39,11 @@ databaseChangeLog:
               - column:
                   name: program
                   type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: true
+                    referencedTableName: file_info
+                    referencedColumnNames: id
+                    foreignKeyName: fk_user_info_file_info
+                  name: avatar_file_id
+                  type: VARCHAR(255)
