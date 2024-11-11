@@ -34,10 +34,10 @@ abstract class JpaEntity<ID_TYPE> : Serializable where ID_TYPE : Comparable<ID_T
         publicProperties().filter { it.name != "id" && it.name != "version" }
 
     final override fun equals(other: Any?): Boolean =
-        if (equalityProperties.isEmpty()) super.equals(other) else propertyEquals(this, other, dataProperties)
+        if (equalityProperties.isEmpty()) super.equals(other) else propertyEquals(this, other, equalityProperties)
 
     final override fun hashCode(): Int =
-        if (equalityProperties.isEmpty()) super.hashCode() else propertyHashCode(this, dataProperties)
+        if (equalityProperties.isEmpty()) super.hashCode() else propertyHashCode(this, equalityProperties)
 
     final override fun toString(): String =
         "${this::class.simpleName}(${equalityProperties().joinToString(",") { "${it::name}=${it::get}" }})"
@@ -45,11 +45,7 @@ abstract class JpaEntity<ID_TYPE> : Serializable where ID_TYPE : Comparable<ID_T
     @get:Transient
     private val equalityProperties: Collection<KProperty1<out JpaEntity<ID_TYPE>, Any?>>
         get() = emptyPropertiesMap<ID_TYPE>().computeIfAbsent(this::class) { _ -> equalityProperties() }
-
-    @get:Transient
-    private val dataProperties: Collection<KProperty1<out JpaEntity<ID_TYPE>, Any?>>
-        get() = emptyPropertiesMap<ID_TYPE>().computeIfAbsent(this::class) { _ -> publicProperties() }
-
+    
     private fun publicProperties(): Collection<KProperty1<out JpaEntity<ID_TYPE>, Any?>> =
         this::class.declaredMemberProperties.filter { it.visibility === KVisibility.PUBLIC }
 

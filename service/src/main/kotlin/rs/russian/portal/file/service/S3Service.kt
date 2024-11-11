@@ -10,10 +10,12 @@ import aws.smithy.kotlin.runtime.net.url.Url
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
+import org.springframework.cache.annotation.Cacheable
 import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import rs.russian.portal.config.S3Properties
 import rs.russian.portal.file.domain.FileInfo
+import rs.russian.portal.shared.utils.CacheService
 import java.io.File
 import kotlin.time.toKotlinDuration
 
@@ -23,6 +25,7 @@ class S3Service(
     private val s3Properties: S3Properties
 ) {
 
+    @Cacheable(cacheNames = [CacheService.S3_FILE_CACHE], key = "#fileInfo")
     suspend fun get(fileInfo: FileInfo): Url {
         val request = s3Client.presignGetObject(GetObjectRequest {
             key = fileInfo.getIdWithSuffix()
