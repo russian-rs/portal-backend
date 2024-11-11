@@ -10,21 +10,19 @@ import rs.russian.portal.file.mapper.FileInfoMapper
 import rs.russian.portal.file.repository.FileInfoRepository
 import rs.russian.portal.shared.enums.Bucket
 import rs.russian.portal.shared.enums.FileExt
-import rs.russian.portal.user.service.AccountService
+import rs.russian.portal.user.domain.Account
 import java.util.*
 
 @Service
 class FileService(
     private val s3Service: S3Service,
-    private val accountService: AccountService,
     private val fileInfoMapper: FileInfoMapper,
     private val fileInfoRepository: FileInfoRepository
 ) {
 
     @Transactional(readOnly = true)
-    fun getFile(id: String): FileInfoDto {
-        val fileInfo = fileInfoRepository.findById(id).orElseThrow()
-        return fileInfoMapper.map(fileInfo)!!
+    fun getFile(id: String): FileInfo {
+        return fileInfoRepository.findById(id).orElseThrow()
     }
 
     @Transactional(readOnly = true)
@@ -33,7 +31,7 @@ class FileService(
     }
 
     @Transactional
-    fun createFile(file: Resource): FileInfoDto {
+    fun createFile(file: Resource, author: Account): FileInfoDto {
         val id = UUID.randomUUID().toString()
         val fileInfo = fileInfoRepository.saveAndFlush(
             FileInfo(
@@ -42,7 +40,7 @@ class FileService(
                 suffix = FileExt.of(getFileSuffix(file.filename)),
                 size = file.contentLength(),
                 bucket = Bucket.FILES,
-                author = accountService.getCurrentUser()
+                author = author
             )
         )
         val fileUrl = runBlocking { s3Service.upload(file, fileInfo) }

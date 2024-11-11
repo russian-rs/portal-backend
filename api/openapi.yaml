@@ -94,6 +94,24 @@ paths:
           description: Successfully logged out
         '500':
           $ref: '#/components/responses/ServerError'
+  /user/avatar:
+    post:
+      operationId: setAvatar
+      tags:
+        - user
+      parameters:
+        - name: avatarId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
 
   /files/upload:
     post:
