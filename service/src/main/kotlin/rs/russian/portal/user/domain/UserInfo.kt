@@ -33,7 +33,7 @@ data class UserInfo(
     @JoinColumn(name = "user_id")
     var account: Account,
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "avatar_file_id")
     var avatar: FileInfo? = null
 
@@ -44,5 +44,11 @@ data class UserInfo(
     companion object {
 
         const val GRAPH_AVATAR = "UserInfoAvatar"
+
+        fun default(account: Account) = UserInfo(
+            account = account,
+            city = "Beograd",
+            birthDate = LocalDate.of(2000, 0, 0)
+        )
     }
 }
