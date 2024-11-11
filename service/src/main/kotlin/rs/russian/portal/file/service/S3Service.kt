@@ -1,6 +1,7 @@
 package rs.russian.portal.file.service
 
 import aws.sdk.kotlin.services.s3.S3Client
+import aws.sdk.kotlin.services.s3.model.DeleteObjectRequest
 import aws.sdk.kotlin.services.s3.model.GetObjectRequest
 import aws.sdk.kotlin.services.s3.model.PutObjectRequest
 import aws.sdk.kotlin.services.s3.presigners.presignGetObject
@@ -43,5 +44,14 @@ class S3Service(
             }
         )
         return get(fileInfo)
+    }
+
+    suspend fun remove(fileInfo: FileInfo) {
+        s3Client.deleteObject(
+            DeleteObjectRequest {
+                key = fileInfo.getIdWithSuffix()
+                bucket = fileInfo.bucket.name.lowercase()
+            }
+        )
     }
 }

@@ -1,6 +1,7 @@
 package rs.russian.portal.file.domain
 
 import jakarta.persistence.*
+import rs.russian.portal.file.domain.listener.FileInfoListener
 import rs.russian.portal.shared.enums.Bucket
 import rs.russian.portal.shared.enums.FileExt
 import rs.russian.portal.shared.jpa.JpaEntity
@@ -13,6 +14,7 @@ import java.util.*
     name = FileInfo.GRAPH_AUTHOR,
     attributeNodes = [NamedAttributeNode("author")]
 )
+@EntityListeners(FileInfoListener::class)
 data class FileInfo(
     @Id
     override var id: String? = UUID.randomUUID().toString(),

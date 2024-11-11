@@ -35,12 +35,12 @@ class AccountService(
         accountRepository.findById(oidcUser.userInfo.subject).ifPresentOrElse({
             userMapper.update(oidcUser.userInfo, it)
             if (it.info === null) {
-                it.info = UserInfo(account = it)
+                it.info = UserInfo.default(it)
             }
         }, {
             val account = userMapper.map(oidcUser.userInfo)
             accountRepository.saveAndFlush(account)
-            account.info = UserInfo(account = account)
+            account.info = UserInfo.default(account)
         })
     }
 
