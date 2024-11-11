@@ -51,6 +51,7 @@ dependencies {
 
     // Kotlin
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$kotlinxCoroutines")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.17.2")
 
     // S3
@@ -64,6 +65,9 @@ dependencies {
     implementation("aws.smithy.kotlin:http-auth-aws:$smithyKotlinVersion")
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.14")
     implementation("commons-io:commons-io:2.17.0")
+
+    // Cache
+    implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
     // Security
     implementation('com.auth0:java-jwt:4.4.0')
