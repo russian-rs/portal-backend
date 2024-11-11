@@ -8,7 +8,6 @@ import rs.russian.generated.model.FileInfoDto
 import rs.russian.portal.file.domain.FileInfo
 import rs.russian.portal.file.mapper.FileInfoMapper
 import rs.russian.portal.file.repository.FileInfoRepository
-import rs.russian.portal.shared.enums.Bucket
 import rs.russian.portal.shared.enums.FileExt
 import rs.russian.portal.user.domain.Account
 import java.util.*
@@ -39,7 +38,6 @@ class FileService(
                 name = file.filename ?: id,
                 suffix = FileExt.of(getFileSuffix(file.filename)),
                 size = file.contentLength(),
-                bucket = Bucket.FILES,
                 author = author
             )
         )

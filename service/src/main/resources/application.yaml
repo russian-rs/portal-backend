@@ -29,6 +29,7 @@ app:
     secret-key: ${S3_SECRET_KEY}
     region: ${S3_REGION}
     endpoint: ${S3_ENDPOINT}
+    bucket: ${S3_BUCKET}
     presign-duration: PT12H
 
 --- # Data
