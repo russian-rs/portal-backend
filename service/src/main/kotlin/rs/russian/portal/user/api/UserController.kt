@@ -44,4 +44,8 @@ class UserController(
         )
     }
 
+    override fun setAvatar(avatarId: String): ResponseEntity<UserInfoDto> {
+        return ResponseEntity.ok(userMapper.map(accountService.setAvatar(avatarId).info))
+    }
+
 }
