@@ -412,21 +412,22 @@ components:
       nullable: false
       description: Report information
       required:
+        - id
+        - createTime
+        - user
+        - status
         - tasks
       properties:
         id:
           type: string
           format: uuid
-          nullable: true
         createTime:
           type: string
           format: date-time
-          nullable: true
         user:
           type: string
         status:
           type: string
-          nullable: true
         tasks:
           type: array
           default: [ ]
@@ -440,6 +441,7 @@ components:
         - date
         - name
         - description
+        - customer
         - timeSpent
         - result
         - files
@@ -447,12 +449,10 @@ components:
         id:
           type: string
           format: uuid
-          nullable: true
         date:
           type: string
           format: date
           description: When task was completed
-          nullable: true
         name:
           type: string
         description:
@@ -460,11 +460,13 @@ components:
         customer:
           type: string
           description: Login of customer
+          nullable: true
         timeSpent:
           type: integer
           description: Time spent in minutes
         result:
           type: string
+          nullable: true
         files:
           type: array
           default: [ ]
