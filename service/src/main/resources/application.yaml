@@ -39,7 +39,7 @@ spring:
     username: ${DB_USER}
     password: ${DB_PASS}
     hikari:
-      schema: portal
+      schema: public
   jpa:
     hibernate:
       ddl-auto: validate
