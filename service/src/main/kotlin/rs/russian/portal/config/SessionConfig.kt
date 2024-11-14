@@ -10,7 +10,10 @@ import org.springframework.security.jackson2.SecurityJackson2Modules
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisIndexedHttpSession
 
 @Configuration
-@EnableRedisIndexedHttpSession(maxInactiveIntervalInSeconds = 172800) // 2 * 24 * 60 * 60 = 48 hours
+@EnableRedisIndexedHttpSession(
+    maxInactiveIntervalInSeconds = 172800, // 2 * 24 * 60 * 60 = 48 hours
+    redisNamespace = "portal-backend-sessions"
+)
 class SessionConfig : BeanClassLoaderAware {
 
     private lateinit var loader: ClassLoader
