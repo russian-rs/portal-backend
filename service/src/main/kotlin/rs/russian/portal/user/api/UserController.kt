@@ -34,6 +34,11 @@ class UserController(
         return ResponseEntity.ok(null)
     }
 
+    override fun resolveUsers(requestBody: List<String>): ResponseEntity<List<UserInfoDto>> {
+        val accounts = accountService.resolve(requestBody)
+        return ResponseEntity.ok(accounts.map { userMapper.map(it.info) })
+    }
+
     override fun searchUsers(searchQuery: String, pageRequest: PageRequest): ResponseEntity<UserPageResponse> {
         val page = accountService.search(searchQuery, pageRequest)
         return ResponseEntity.ok(

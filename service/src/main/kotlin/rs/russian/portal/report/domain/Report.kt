@@ -14,11 +14,14 @@ import java.util.*
 @NamedEntityGraph(
     name = Report.GRAPH_TASKS_ACCOUNT,
     attributeNodes = [
-        NamedAttributeNode("tasks", subgraph = Task.GRAPH_FILES),
+        NamedAttributeNode("tasks", subgraph = Task.GRAPH_FULL),
         NamedAttributeNode("account", subgraph = Account.GRAPH_INFO)],
     subgraphs = [
         NamedSubgraph(name = Account.GRAPH_INFO, attributeNodes = [NamedAttributeNode("info")]),
-        NamedSubgraph(name = Task.GRAPH_FILES, attributeNodes = [NamedAttributeNode("files")])
+        NamedSubgraph(
+            name = Task.GRAPH_FULL,
+            attributeNodes = [NamedAttributeNode("customer"), NamedAttributeNode("files")]
+        )
     ]
 )
 data class Report(

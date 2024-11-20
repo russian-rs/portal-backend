@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.3.3
+  version: 1.4.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -112,6 +112,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserInfoDto'
+  /user/resolve:
+    post:
+      operationId: resolveUsers
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              default: [ ]
+              items:
+                type: string
+                maxLength: 100
+                minLength: 1
+                nullable: false
+                description: username
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                default: [ ]
+                items:
+                  $ref: '#/components/schemas/UserInfoDto'
 
   /files/upload:
     post:
