@@ -28,6 +28,12 @@ class AccountService(
     fun getAccountByLogin(login: String): Account = accountRepository.findByUsername(login).orElseThrow()
 
     @Transactional(readOnly = true)
+    fun findAccountByLogin(login: String?): Account? {
+        if (login.isNullOrBlank()) return null
+        return accountRepository.findByUsername(login).orElse(null)
+    }
+
+    @Transactional(readOnly = true)
     fun getCurrentUser(): Account = accountRepository.findById(currentUserId()).orElseThrow()
 
     @Transactional
@@ -48,6 +54,11 @@ class AccountService(
     fun search(query: String, pageRequest: PageRequest): Page<Account> {
         val specification = searchSpecification(query)
         return accountRepository.findAll(specification, convert(pageRequest))
+    }
+
+    @Transactional(readOnly = true)
+    fun resolve(usernames: List<String>): List<Account> {
+        return accountRepository.findAllByUsernameIn(usernames)
     }
 
     @Transactional

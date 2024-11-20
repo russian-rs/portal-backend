@@ -3,14 +3,15 @@ package rs.russian.portal.report.domain
 import jakarta.persistence.*
 import rs.russian.portal.file.domain.FileInfo
 import rs.russian.portal.shared.jpa.JpaEntity
+import rs.russian.portal.user.domain.Account
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
 @Entity
 @NamedEntityGraph(
-    name = Task.GRAPH_FILES,
-    attributeNodes = [NamedAttributeNode("files")]
+    name = Task.GRAPH_FULL,
+    attributeNodes = [NamedAttributeNode("customer"), NamedAttributeNode("files")],
 )
 data class Task(
     @Id
@@ -28,8 +29,9 @@ data class Task(
     @JoinColumn(name = "report_id")
     var report: Report,
 
-    @Column(name = "customer_login")
-    var customer: String? = null,
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "customer_login", referencedColumnName = "username")
+    var customer: Account? = null,
 
     @OneToMany(cascade = [CascadeType.ALL], orphanRemoval = true)
     @JoinTable(
@@ -44,6 +46,6 @@ data class Task(
     override fun equalityProperties() = setOf(Task::id)
 
     companion object {
-        const val GRAPH_FILES = "TaskFiles"
+        const val GRAPH_FULL = "TaskCustomerFiles"
     }
 }

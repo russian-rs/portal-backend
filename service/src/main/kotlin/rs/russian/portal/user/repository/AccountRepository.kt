@@ -20,5 +20,8 @@ interface AccountRepository : JpaRepository<Account, String> {
     fun findByUsername(username: String): Optional<Account>
 
     @EntityGraph(value = GRAPH_INFO)
+    fun findAllByUsernameIn(usernames: List<String>): List<Account>
+
+    @EntityGraph(value = GRAPH_INFO)
     fun findAll(specification: Specification<Account>, pageable: Pageable): Page<Account>
 }
