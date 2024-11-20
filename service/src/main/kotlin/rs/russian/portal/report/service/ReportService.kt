@@ -32,7 +32,7 @@ class ReportService(
         val report = Report(account = accountService.getCurrentUser())
         val tasks = reportDto.tasks.map { taskDto ->
             reportMapper.map(taskDto, report).also { task ->
-                task.files = fileService.findAllByIds(taskDto.files.map { it.id })
+                task.files = fileService.findAllByIds(taskDto.files?.map { it.id } ?: emptyList())
             }
         }
         return reportRepository.save(report.also { it.tasks = tasks })
