@@ -13,7 +13,7 @@ app:
 --- # Data
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/volunteer_portal?ApplicationName=${spring.application.name}&targetServerType=master
+    url: jdbc:postgresql://localhost:5432/portal?ApplicationName=${spring.application.name}&targetServerType=master
     username: admin
     password: 123456
   jpa:
