@@ -2,6 +2,7 @@ package rs.russian.portal.shared.exception
 
 import jakarta.persistence.EntityNotFoundException
 import org.slf4j.LoggerFactory
+import org.springframework.beans.TypeMismatchException
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -40,6 +41,14 @@ class GlobalExceptionHandler {
     @ExceptionHandler(UnsupportedFileFormat::class)
     fun handleUnsupportedFileFormat(ex: UnsupportedFileFormat, request: WebRequest): ResponseEntity<ErrorResponse> {
         return ResponseEntity(ErrorResponse(UNSUPPORTED_MEDIA_TYPE.reasonPhrase), UNSUPPORTED_MEDIA_TYPE)
+    }
+
+    @ExceptionHandler(TypeMismatchException::class)
+    fun handleIllegalArgumentException(
+        ex: TypeMismatchException,
+        request: WebRequest
+    ): ResponseEntity<ErrorResponse> {
+        return ResponseEntity(ErrorResponse(BAD_REQUEST.reasonPhrase), BAD_REQUEST)
     }
 
     companion object {
