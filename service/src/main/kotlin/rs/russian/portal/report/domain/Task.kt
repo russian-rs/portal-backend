@@ -20,9 +20,9 @@ data class Task(
 
     var date: LocalDate,
     var name: String,
-    var description: String? = null,
+    var description: String,
     var timeSpent: Int,
-    var result: String,
+    var result: String? = null,
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "report_id")
