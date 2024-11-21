@@ -443,6 +443,7 @@ components:
       nullable: false
       description: Report information
       required:
+        - id
         - tasks
       properties:
         id:
@@ -464,6 +465,7 @@ components:
       type: object
       description: Task information
       required:
+        - id
         - date
         - name
         - description
