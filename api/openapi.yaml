@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.4.1
+  version: 1.4.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -209,7 +209,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/to'
+                $ref: '#/components/schemas/ReportDto'
         '500':
           $ref: '#/components/responses/ServerError'
   /report/{id}:
@@ -436,14 +436,13 @@ components:
           type: string
           nullable: true
         program:
-          type: stringReportD
+          type: string
           nullable: true
     ReportDto:
       type: object
       nullable: false
       description: Report information
       required:
-        - id
         - tasks
       properties:
         id:
@@ -465,7 +464,6 @@ components:
       type: object
       description: Task information
       required:
-        - id
         - date
         - name
         - description
