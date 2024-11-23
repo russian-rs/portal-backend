@@ -8,6 +8,9 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializer
 import org.springframework.security.jackson2.SecurityJackson2Modules
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisIndexedHttpSession
+import org.springframework.session.web.http.CookieSerializer
+import org.springframework.session.web.http.DefaultCookieSerializer
+
 
 @Configuration
 @EnableRedisIndexedHttpSession(
@@ -27,6 +30,14 @@ class SessionConfig : BeanClassLoaderAware {
         return GenericJackson2JsonRedisSerializer(ObjectMapper().also {
             it.registerModules(SecurityJackson2Modules.getModules(this.loader))
         })
+    }
+
+    @Bean
+    fun cookieSerializer(): CookieSerializer {
+        val cookieSerializer = DefaultCookieSerializer()
+        cookieSerializer.setCookieMaxAge(2 * 24 * 60 * 60) // 48 hours in seconds
+        cookieSerializer.setUseSecureCookie(true)
+        return cookieSerializer
     }
 
 }

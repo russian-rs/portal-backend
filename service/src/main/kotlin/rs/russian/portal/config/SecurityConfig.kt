@@ -51,7 +51,7 @@ class SecurityConfig(
             }
         }
         .sessionManagement {
-            it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+            it.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
         }
         .build()
 
