@@ -11,6 +11,7 @@ import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.specification.from
 import rs.russian.portal.report.mapper.ReportMapper
 import rs.russian.portal.report.repository.ReportRepository
+import rs.russian.portal.shared.enums.ReportStatus
 import rs.russian.portal.user.service.AccountService
 import java.util.*
 
@@ -29,7 +30,7 @@ class ReportService(
 
     @Transactional
     fun createReport(reportDto: ReportDto): Report {
-        val report = Report(account = accountService.getCurrentUser())
+        val report = Report(account = accountService.getCurrentUser(), status = ReportStatus.ACCEPTED)
         val tasks = reportDto.tasks.map { taskDto ->
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
