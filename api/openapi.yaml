@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.4.2
+  version: 1.4.3
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -234,7 +234,7 @@ paths:
         '404':
           $ref: '#/components/responses/ServerError'
   /reports:
-    get:
+    post:
       operationId: getReports
       tags:
         - report
