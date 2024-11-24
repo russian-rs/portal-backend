@@ -16,7 +16,7 @@ import java.util.*
 @Mapper(
     componentModel = SPRING,
     unmappedTargetPolicy = ERROR,
-    imports = [UUID::class, LocalDateTime::class, ArrayList::class],
+    imports = [UUID::class, LocalDateTime::class, HashSet::class],
     uses = [FileInfoMapper::class]
 )
 abstract class ReportMapper {
@@ -28,7 +28,7 @@ abstract class ReportMapper {
     abstract fun map(report: Report): ReportDto
 
     @Mapping(target = "customer", ignore = true) // fulfilled in the code
-    @Mapping(target = "files", expression = "java(new ArrayList())") // fulfilled in the code
+    @Mapping(target = "files", expression = "java(new HashSet())") // fulfilled in the code
     @Mapping(target = "id", expression = "java(UUID.randomUUID())")
     @Mapping(target = "version", expression = "java(LocalDateTime.now())")
     abstract fun map(taskDto: TaskDto, report: Report): Task

@@ -39,7 +39,7 @@ data class Task(
         joinColumns = [JoinColumn(name = "task_id")],
         inverseJoinColumns = [JoinColumn(name = "file_id")]
     )
-    var files: List<FileInfo> = mutableListOf()
+    var files: Set<FileInfo> = mutableSetOf()
 
 ) : JpaEntity<UUID>() {
 

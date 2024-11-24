@@ -25,7 +25,10 @@ class FileService(
     }
 
     @Transactional(readOnly = true)
-    fun findAllByIds(ids: List<String>): List<FileInfo> {
+    fun findAllByIds(ids: Set<String>?): Set<FileInfo> {
+        if (ids.isNullOrEmpty()) {
+            return mutableSetOf()
+        }
         return fileInfoRepository.findAllByIdIn(ids)
     }
 
