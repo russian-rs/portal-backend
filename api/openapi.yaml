@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.4.1
+  version: 1.4.2
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -414,12 +414,6 @@ components:
           description: Size (bytes)
     ReportFilter:
       type: object
-      required:
-        - login
-        - dateFrom
-        - dateTo
-        - status
-        - program
       properties:
         login:
           type: string
