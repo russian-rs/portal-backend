@@ -4,34 +4,43 @@ import io.authentik.api.CoreAuthentikApi
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
 class ApiConfig {
-    
+
     @Bean
     fun coreAuthentikApi(authentikProperties: AuthentikProperties): CoreAuthentikApi {
-        return CoreAuthentikApi(client = authentikApiClient(authentikProperties.baseUrl, authentikProperties.apiKey))
+        return CoreAuthentikApi(
+            client = authentikApiClient(
+                authentikProperties.baseUrl,
+                authentikProperties.apiKey,
+                CoreAuthentikApi::class.simpleName
+            )
+        )
     }
 
-    fun authentikApiClient(baseUrl: String, apiKey: String): OkHttpClient {
+    fun authentikApiClient(baseUrl: String, apiKey: String, name: String?): OkHttpClient {
+        val logger = LoggerFactory.getLogger(name ?: "OkHttpClient")
         val interceptor = Interceptor { chain ->
             val originalRequest = chain.request()
             val originalUrl = originalRequest.url
 
-            val newUrl = baseUrl.toHttpUrl().newBuilder()
-                .addPathSegments(originalUrl.encodedPath)
+
+            val url = originalUrl.newBuilder()
+                .host(baseUrl.toHttpUrl().host)
                 .build()
 
-            val newRequest = originalRequest.newBuilder()
-                .url(newUrl)
+            val request = originalRequest.newBuilder()
+                .url(url)
                 .addHeader("Authorization", "Bearer $apiKey")
                 .build()
 
-            println(newUrl)
+            logger.info("${originalRequest.method} $url")
 
-            chain.proceed(newRequest)
+            chain.proceed(request)
         }
 
         return OkHttpClient.Builder()

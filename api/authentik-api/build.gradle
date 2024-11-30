@@ -40,7 +40,7 @@ openApiGenerate {
             "packageName"          : "io.authentik",
             "apiSuffix"            : "AuthentikApi",
             "serializationLibrary" : "jackson",
-            "modelMutable"         : "false",
+            "modelMutable"         : "true",
             "documentationProvider": "none",
             "idea"                 : "true",
     ]
