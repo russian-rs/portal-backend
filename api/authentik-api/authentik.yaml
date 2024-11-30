@@ -318,26 +318,25 @@ components:
       properties:
         next:
           type: number
+          format: int32
         previous:
           type: number
+          format: int32
         count:
           type: number
+          format: int32
         current:
           type: number
+          format: int32
         total_pages:
           type: number
+          format: int32
         start_index:
           type: number
+          format: int32
         end_index:
           type: number
-      required:
-        - next
-        - previous
-        - count
-        - current
-        - total_pages
-        - start_index
-        - end_index
+          format: int32
     ValidationError:
       type: object
       description: Validation Error
@@ -357,8 +356,6 @@ components:
           type: string
         code:
           type: string
-      required:
-        - detail
     PaginatedUserList:
       type: object
       properties:
