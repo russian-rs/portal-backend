@@ -25,10 +25,10 @@ class S3Service(
     private val s3Properties: S3Properties
 ) {
 
-    @Cacheable(cacheNames = [CacheService.S3_FILE_CACHE], key = "#fileInfo")
-    suspend fun get(fileInfo: FileInfo): Url {
+    @Cacheable(cacheNames = [CacheService.S3_FILE_CACHE], key = "#idWithSuffix")
+    suspend fun get(idWithSuffix: String): Url {
         val request = s3Client.presignGetObject(GetObjectRequest {
-            key = fileInfo.getIdWithSuffix()
+            key = idWithSuffix
             bucket = s3Properties.bucket
         }, s3Properties.presignDuration.toKotlinDuration())
         return request.url
@@ -46,7 +46,7 @@ class S3Service(
                 body = temp.asByteStream()
             }
         )
-        return get(fileInfo)
+        return get(fileInfo.getIdWithSuffix())
     }
 
     suspend fun remove(fileInfo: FileInfo) {

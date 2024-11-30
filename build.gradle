@@ -1,12 +1,8 @@
 import org.yaml.snakeyaml.Yaml
 
-def openApiPath = "${projectDir}/api/openapi.yaml"
-
-ext {
-    springBootVersion = "3.3.3"
-    kotlinxCoroutines = "1.8.1"
-    jakartaValidation = "3.1.0"
-}
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption
 
 buildscript {
     dependencies {
@@ -17,8 +13,30 @@ buildscript {
     }
 }
 
-ext.resolveApiVersion = {
+ext {
+    SPRING_VERSION = "3.3.6"
+    KOTLINX_VERSION = "1.8.1"
+    OKHTTP_VERSION = "5.0.0-alpha.14"
+    JACKSON_KOTLIN_VERSION = "2.18.2"
+    JAKARTA_VALIDATION_VERSION = "3.1.0"
+}
+
+ext.resolveApiVersion = { String openApiPath ->
     def file = new File(openApiPath).newInputStream()
     def yaml = new Yaml().load(file)
     return "${yaml.info.version}"
+}
+
+ext.downloadOpenApiFile = { String openApiUrl, String outputPath ->
+    // Ensure the directory exists
+    def outputDir = new File(outputPath).parentFile
+    if (!outputDir.exists()) {
+        outputDir.mkdirs()
+    }
+
+    println "Downloading OpenAPI file from: $openApiUrl"
+    new URI(openApiUrl).toURL().withInputStream { inputStream ->
+        Files.copy(inputStream, Paths.get(outputPath), StandardCopyOption.REPLACE_EXISTING)
+    }
+    println "File saved to: $outputPath"
 }

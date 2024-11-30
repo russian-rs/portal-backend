@@ -27,7 +27,7 @@ import java.util.*
 data class Report(
     @Id
     override var id: UUID? = UUID.randomUUID(),
-    override var version: LocalDateTime? = LocalDateTime.now(),
+    override var version: LocalDateTime? = null,
 
     var createTime: OffsetDateTime = OffsetDateTime.now(),
 

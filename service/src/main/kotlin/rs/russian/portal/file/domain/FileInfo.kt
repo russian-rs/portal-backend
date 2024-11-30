@@ -6,7 +6,6 @@ import rs.russian.portal.shared.enums.FileExt
 import rs.russian.portal.shared.jpa.JpaEntity
 import rs.russian.portal.user.domain.Account
 import java.time.LocalDateTime
-import java.util.*
 
 @Entity
 @NamedEntityGraph(
@@ -16,8 +15,8 @@ import java.util.*
 @EntityListeners(FileInfoListener::class)
 data class FileInfo(
     @Id
-    override var id: String? = UUID.randomUUID().toString(),
-    override var version: LocalDateTime? = LocalDateTime.now(),
+    override var id: String? = null,
+    override var version: LocalDateTime? = null,
 
     var name: String,
     var size: Long,

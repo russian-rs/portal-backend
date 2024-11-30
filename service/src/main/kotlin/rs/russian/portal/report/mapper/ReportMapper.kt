@@ -28,9 +28,9 @@ abstract class ReportMapper {
     abstract fun map(report: Report): ReportDto
 
     @Mapping(target = "customer", ignore = true) // fulfilled in the code
+    @Mapping(target = "version", ignore = true)
     @Mapping(target = "files", expression = "java(new HashSet())") // fulfilled in the code
     @Mapping(target = "id", expression = "java(UUID.randomUUID())")
-    @Mapping(target = "version", expression = "java(LocalDateTime.now())")
     abstract fun map(taskDto: TaskDto, report: Report): Task
 
     @Mapping(target = "customer", source = "customer.username")
