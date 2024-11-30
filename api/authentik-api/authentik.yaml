@@ -1,0 +1,562 @@
+openapi: 3.0.3
+info:
+  title: volunteer-portal-api
+  version: 1.4.3
+  contact:
+    email: dev@russian.rs
+    url: https://russian.rs
+servers:
+  - url: https://id.russian.rs/api/v3/
+security:
+  - bearerAuth: [ ]
+paths:
+  /core/users/:
+    get:
+      operationId: core_users_list
+      description: User Viewset
+      parameters:
+        - in: query
+          name: attributes
+          schema:
+            type: string
+          description: Attributes
+        - in: query
+          name: email
+          schema:
+            type: string
+        - in: query
+          name: groups_by_name
+          schema:
+            type: array
+            items:
+              type: string
+          explode: true
+          style: form
+        - in: query
+          name: groups_by_pk
+          schema:
+            type: array
+            items:
+              type: string
+              format: uuid
+          explode: true
+          style: form
+        - in: query
+          name: include_groups
+          schema:
+            type: boolean
+            default: true
+        - in: query
+          name: is_active
+          schema:
+            type: boolean
+        - in: query
+          name: is_superuser
+          schema:
+            type: boolean
+        - in: query
+          name: name
+          schema:
+            type: string
+        - name: ordering
+          required: false
+          in: query
+          description: Which field to use when ordering the results.
+          schema:
+            type: string
+        - name: page
+          required: false
+          in: query
+          description: A page number within the paginated result set.
+          schema:
+            type: integer
+        - name: page_size
+          required: false
+          in: query
+          description: Number of results to return per page.
+          schema:
+            type: integer
+        - in: query
+          name: path
+          schema:
+            type: string
+        - in: query
+          name: path_startswith
+          schema:
+            type: string
+        - name: search
+          required: false
+          in: query
+          description: A search term.
+          schema:
+            type: string
+        - in: query
+          name: type
+          schema:
+            type: array
+            items:
+              type: string
+              enum:
+                - external
+                - internal
+                - internal_service_account
+                - service_account
+          explode: true
+          style: form
+        - in: query
+          name: username
+          schema:
+            type: string
+        - in: query
+          name: uuid
+          schema:
+            type: string
+            format: uuid
+      tags:
+        - core
+      security:
+        - authentik: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedUserList'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericError'
+          description: ''
+    post:
+      operationId: core_users_create
+      description: User Viewset
+      tags:
+        - core
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+        - authentik: [ ]
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericError'
+          description: ''
+  /core/users/{id}/:
+    get:
+      operationId: core_users_retrieve
+      description: User Viewset
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this User.
+          required: true
+      tags:
+        - core
+      security:
+        - authentik: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericError'
+          description: ''
+    put:
+      operationId: core_users_update
+      description: User Viewset
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this User.
+          required: true
+      tags:
+        - core
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+        required: true
+      security:
+        - authentik: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericError'
+          description: ''
+    patch:
+      operationId: core_users_partial_update
+      description: User Viewset
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this User.
+          required: true
+      tags:
+        - core
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedUserRequest'
+      security:
+        - authentik: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericError'
+          description: ''
+    delete:
+      operationId: core_users_destroy
+      description: User Viewset
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: integer
+          description: A unique integer value identifying this User.
+          required: true
+      tags:
+        - core
+      security:
+        - authentik: [ ]
+      responses:
+        '204':
+          description: No response body
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+          description: ''
+        '403':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericError'
+          description: ''
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Pagination:
+      type: object
+      properties:
+        next:
+          type: number
+        previous:
+          type: number
+        count:
+          type: number
+        current:
+          type: number
+        total_pages:
+          type: number
+        start_index:
+          type: number
+        end_index:
+          type: number
+      required:
+        - next
+        - previous
+        - count
+        - current
+        - total_pages
+        - start_index
+        - end_index
+    ValidationError:
+      type: object
+      description: Validation Error
+      properties:
+        non_field_errors:
+          type: array
+          items:
+            type: string
+        code:
+          type: string
+      additionalProperties: { }
+    GenericError:
+      type: object
+      description: Generic API Error
+      properties:
+        detail:
+          type: string
+        code:
+          type: string
+      required:
+        - detail
+    PaginatedUserList:
+      type: object
+      properties:
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+      required:
+        - pagination
+        - results
+    UserRequest:
+      type: object
+      description: User Serializer
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 150
+        name:
+          type: string
+          description: User's display name.
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+        groups:
+          type: array
+          items:
+            type: string
+            format: uuid
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        attributes:
+          type: object
+          additionalProperties: { }
+        path:
+          type: string
+          minLength: 1
+        type:
+          $ref: '#/components/schemas/UserTypeEnum'
+      required:
+        - name
+        - username
+    UserTypeEnum:
+      enum:
+        - internal
+        - external
+        - service_account
+        - internal_service_account
+      type: string
+    User:
+      type: object
+      description: User Serializer
+      properties:
+        pk:
+          type: integer
+          readOnly: true
+          title: ID
+        username:
+          type: string
+          maxLength: 150
+        name:
+          type: string
+          description: User's display name.
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+        is_superuser:
+          type: boolean
+          readOnly: true
+        groups:
+          type: array
+          items:
+            type: string
+            format: uuid
+        groups_obj:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserGroup'
+          readOnly: true
+          nullable: true
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        avatar:
+          type: string
+          description: User's avatar, either a http/https URL or a data URI
+          readOnly: true
+        attributes:
+          type: object
+          additionalProperties: { }
+        uid:
+          type: string
+          readOnly: true
+        path:
+          type: string
+        type:
+          $ref: '#/components/schemas/UserTypeEnum'
+        uuid:
+          type: string
+          format: uuid
+          readOnly: true
+      required:
+        - avatar
+        - groups_obj
+        - is_superuser
+        - name
+        - pk
+        - uid
+        - username
+        - uuid
+    UserGroup:
+      type: object
+      description: Simplified Group Serializer for user's groups
+      properties:
+        pk:
+          type: string
+          format: uuid
+          readOnly: true
+          title: Group uuid
+        num_pk:
+          type: integer
+          description: Get a numerical, int32 ID for the group
+          readOnly: true
+        name:
+          type: string
+        is_superuser:
+          type: boolean
+          description: Users added to this group will be superusers.
+        parent:
+          type: string
+          format: uuid
+          nullable: true
+        parent_name:
+          type: string
+          readOnly: true
+          nullable: true
+        attributes:
+          type: object
+          additionalProperties: { }
+      required:
+        - name
+        - num_pk
+        - parent_name
+        - pk
+    PatchedUserRequest:
+      type: object
+      description: User Serializer
+      properties:
+        username:
+          type: string
+          minLength: 1
+          maxLength: 150
+        name:
+          type: string
+          description: User's display name.
+        is_active:
+          type: boolean
+          title: Active
+          description: Designates whether this user should be treated as active. Unselect
+            this instead of deleting accounts.
+        last_login:
+          type: string
+          format: date-time
+          nullable: true
+        groups:
+          type: array
+          items:
+            type: string
+            format: uuid
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        attributes:
+          type: object
+          additionalProperties: { }
+        path:
+          type: string
+          minLength: 1
+        type:
+          $ref: '#/components/schemas/UserTypeEnum'

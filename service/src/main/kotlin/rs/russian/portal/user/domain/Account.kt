@@ -22,7 +22,7 @@ data class Account(
     var fullName: String,
 
     @PrimaryKeyJoinColumn
-    @OneToOne(cascade = [ALL], fetch = FetchType.LAZY)
+    @OneToOne(cascade = [ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     var info: UserInfo?,
 
     @OneToMany(mappedBy = "account", cascade = [ALL], orphanRemoval = true)

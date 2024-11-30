@@ -25,8 +25,8 @@ import javax.sql.DataSource
 @Configuration
 @EnableCaching
 @EnableScheduling
-@EnableConfigurationProperties(value = [AppProperties::class, S3Properties::class])
 @EnableSchedulerLock(defaultLockAtMostFor = "PT59S")
+@EnableConfigurationProperties(value = [AppProperties::class, S3Properties::class, AuthentikProperties::class])
 class AppConfig {
 
     @Bean

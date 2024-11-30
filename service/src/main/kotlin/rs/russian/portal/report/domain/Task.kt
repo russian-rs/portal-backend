@@ -17,7 +17,7 @@ data class Task(
     @Id
     @Column(name = "id")
     override var id: UUID? = UUID.randomUUID(),
-    override var version: LocalDateTime? = LocalDateTime.now(),
+    override var version: LocalDateTime? = null,
 
     var date: LocalDate,
     var name: String,

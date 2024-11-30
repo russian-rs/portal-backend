@@ -317,27 +317,6 @@ components:
           type: string
           description: Error description
           nullable: false
-    AccountDto:
-      type: object
-      description: User profile
-      required:
-        - id
-        - username
-        - email
-        - fullName
-      properties:
-        id:
-          type: string
-          nullable: false
-        username:
-          type: string
-          nullable: false
-        email:
-          type: string
-          nullable: false
-        fullName:
-          type: string
-          nullable: false
     UserInfoDto:
       type: object
       description: User additional info

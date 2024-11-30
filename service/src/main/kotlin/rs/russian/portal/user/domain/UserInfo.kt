@@ -1,7 +1,9 @@
 package rs.russian.portal.user.domain
 
 import jakarta.persistence.*
+import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.EnumType.STRING
+import jakarta.persistence.FetchType.LAZY
 import rs.russian.portal.file.domain.FileInfo
 import rs.russian.portal.shared.enums.Program
 import rs.russian.portal.shared.jpa.JpaEntity
@@ -33,7 +35,7 @@ data class UserInfo(
     @JoinColumn(name = "user_id")
     var account: Account,
 
-    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(fetch = LAZY, cascade = [ALL], orphanRemoval = true)
     @JoinColumn(name = "avatar_file_id")
     var avatar: FileInfo? = null
 

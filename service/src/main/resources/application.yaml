@@ -11,6 +11,9 @@ spring:
     multipart:
       max-file-size: 5MB
       max-request-size: 5MB
+  cloud:
+    compatibility-verifier:
+      enabled: false
 
 server:
   port: 8081
@@ -31,6 +34,9 @@ app:
     endpoint: ${S3_ENDPOINT}
     bucket: ${S3_BUCKET}
     presign-duration: PT12H
+  authentik:
+    base-url: ${OAUTH2_SERVER}
+    api-key: ${AUTHENTIK_API_KEY}
 
 --- # Data
 spring:

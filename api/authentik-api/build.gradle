@@ -4,23 +4,24 @@ plugins {
     id("org.jetbrains.kotlin.jvm")
 }
 
-def openApiPath = "$projectDir/../openapi.yaml"
+kotlin {
+    jvmToolchain(21)
+}
 
-group = "rs.russian.api"
+def openApiPath = "$projectDir/authentik.yaml"
+
+group = "io.authentik"
 version = resolveApiVersion(openApiPath)
 
 repositories {
     mavenCentral()
 }
 
-kotlin {
-    jvmToolchain(21)
-}
-
 dependencies {
     compileOnly("jakarta.validation:jakarta.validation-api:$JAKARTA_VALIDATION_VERSION")
-    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_VERSION")
     compileOnly("org.springframework.boot:spring-boot-starter-web:$SPRING_VERSION")
+    compileOnly("com.fasterxml.jackson.module:jackson-module-kotlin:$JACKSON_KOTLIN_VERSION")
+    compileOnly("com.squareup.okhttp3:okhttp:$OKHTTP_VERSION")
 }
 
 openApiValidate {
@@ -28,20 +29,20 @@ openApiValidate {
 }
 
 openApiGenerate {
-    generatorName = "kotlin-spring"
+    generatorName = "kotlin"
     inputSpec = openApiPath
-    outputDir = "${projectDir}/build/openapi"
-    apiPackage = "rs.russian.generated.api"
-    modelPackage = "rs.russian.generated.model"
+    outputDir = "$projectDir/build/openapi"
+    apiPackage = "io.authentik.api"
+    modelPackage = "io.authentik.model"
     configOptions = [
-            "useTags"              : "true",
-            "useSwaggerUI"         : "false",
-            "interfaceOnly"        : "true",
-            "useSpringBoot3"       : "true",
-            "serializableModel"    : "true",
-            "skipDefaultInterface" : "true",
+            "artifactId"           : "authentik-client",
+            "groupId"              : "io.authentik",
+            "packageName"          : "io.authentik",
+            "apiSuffix"            : "AuthentikApi",
+            "serializationLibrary" : "jackson",
+            "modelMutable"         : "false",
             "documentationProvider": "none",
-            "modelMutable"         : "true"
+            "idea"                 : "true",
     ]
 }
 

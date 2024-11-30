@@ -7,7 +7,6 @@ import org.mapstruct.MappingTarget
 import org.mapstruct.ReportingPolicy.ERROR
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo
-import rs.russian.generated.model.AccountDto
 import rs.russian.generated.model.UserInfoDto
 import rs.russian.portal.file.mapper.FileInfoMapper
 import rs.russian.portal.user.domain.Account
@@ -30,8 +29,6 @@ abstract class UserMapper {
     @Mapping(target = "reports", expression = "java(new ArrayList<>())")
     @Mapping(target = "username", source = "nickName")
     abstract fun map(oidcUserInfo: OidcUserInfo): Account
-
-    abstract fun map(account: Account): AccountDto
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "info", ignore = true)
