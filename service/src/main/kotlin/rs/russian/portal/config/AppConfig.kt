@@ -31,8 +31,8 @@ class AppConfig {
 
     @Bean
     fun objectMapper(): ObjectMapper = ObjectMapper()
-        .registerModules(JavaTimeModule())
         .registerKotlinModule()
+        .registerModules(JavaTimeModule())
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     @Bean

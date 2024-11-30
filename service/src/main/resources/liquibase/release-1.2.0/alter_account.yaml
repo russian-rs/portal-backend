@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.2.0-add-groups-column-to-account
+      author: Maksim Aminov
+      changes:
+        - addColumn:
+            tableName: account
+            columns:
+              - column:
+                  name: groups
+                  type: jsonb
+                  defaultValue: '[]'
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 1.2.0-add-disabled-column-to-account
+      author: Maksim Aminov
+      changes:
+        - addColumn:
+            tableName: account
+            columns:
+              - column:
+                  name: disabled
+                  type: boolean
+                  defaultValue: false
+                  constraints:
+                    nullable: false

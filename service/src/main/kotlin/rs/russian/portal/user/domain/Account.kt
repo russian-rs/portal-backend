@@ -2,8 +2,12 @@ package rs.russian.portal.user.domain
 
 import jakarta.persistence.*
 import jakarta.persistence.CascadeType.ALL
+import org.hibernate.annotations.JdbcTypeCode
+import org.hibernate.type.SqlTypes
 import rs.russian.portal.report.domain.Report
+import rs.russian.portal.shared.enums.UserGroup
 import rs.russian.portal.shared.jpa.JpaEntity
+import rs.russian.portal.shared.jpa.converter.UserGroupSetConverter
 import java.time.LocalDateTime
 
 @Entity
@@ -25,8 +29,14 @@ data class Account(
     @OneToOne(cascade = [ALL], fetch = FetchType.LAZY, orphanRemoval = true)
     var info: UserInfo?,
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Convert(converter = UserGroupSetConverter::class)
+    var groups: Set<UserGroup> = mutableSetOf(),
+
     @OneToMany(mappedBy = "account", cascade = [ALL], orphanRemoval = true)
-    var reports: List<Report> = ArrayList()
+    var reports: List<Report> = ArrayList(),
+
+    var disabled: Boolean = false
 
 ) : JpaEntity<String>() {
 
