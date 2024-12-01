@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.scheduling.annotation.EnableScheduling
 import rs.russian.portal.shared.utils.CacheService
+import rs.russian.portal.shared.utils.LongMixin
 import java.util.concurrent.TimeUnit
 import javax.sql.DataSource
 
@@ -35,6 +36,7 @@ class AppConfig {
         .registerKotlinModule()
         .registerModules(JavaTimeModule())
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        .addMixIn(java.lang.Long::class.java, LongMixin::class.java)
 
     @Bean
     fun csvMapper(): CsvMapper = CsvMapper().apply {
