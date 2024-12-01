@@ -50,7 +50,8 @@ class UserController(
     }
 
     override fun setAvatar(avatarId: String): ResponseEntity<UserInfoDto> {
-        return ResponseEntity.ok(userMapper.map(accountService.setAvatar(avatarId).info))
+        val currentUser = accountService.getAccount(currentUserId())
+        return ResponseEntity.ok(userMapper.map(accountService.setAvatar(currentUser, avatarId).info))
     }
 
 }

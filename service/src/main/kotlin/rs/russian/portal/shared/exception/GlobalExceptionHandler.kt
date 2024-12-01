@@ -51,6 +51,11 @@ class GlobalExceptionHandler {
         return ResponseEntity(ErrorResponse(BAD_REQUEST.reasonPhrase), BAD_REQUEST)
     }
 
+    @ExceptionHandler(NotAuthorizedException::class)
+    fun handleUnsupportedFileFormat(ex: NotAuthorizedException, request: WebRequest): ResponseEntity<ErrorResponse> {
+        return ResponseEntity(ErrorResponse(FORBIDDEN.reasonPhrase), FORBIDDEN)
+    }
+
     companion object {
         private val log = LoggerFactory.getLogger(GlobalExceptionHandler::class.java)
     }

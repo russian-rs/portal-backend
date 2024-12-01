@@ -5,6 +5,7 @@ import aws.sdk.kotlin.services.s3.S3Client
 import aws.smithy.kotlin.runtime.net.url.Url
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
+import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.github.benmanes.caffeine.cache.Caffeine
@@ -25,7 +26,7 @@ import javax.sql.DataSource
 @Configuration
 @EnableCaching
 @EnableScheduling
-@EnableSchedulerLock(defaultLockAtMostFor = "PT59S")
+@EnableSchedulerLock(defaultLockAtLeastFor = "PT1M", defaultLockAtMostFor = "PT59M")
 @EnableConfigurationProperties(value = [AppProperties::class, S3Properties::class, AuthentikProperties::class])
 class AppConfig {
 
@@ -34,6 +35,11 @@ class AppConfig {
         .registerKotlinModule()
         .registerModules(JavaTimeModule())
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+
+    @Bean
+    fun csvMapper(): CsvMapper = CsvMapper().apply {
+        registerKotlinModule()
+    }
 
     @Bean
     fun shedlockProvider(datasource: DataSource): LockProvider = JdbcTemplateLockProvider(

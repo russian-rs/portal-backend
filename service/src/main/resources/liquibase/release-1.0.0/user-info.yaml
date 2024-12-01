@@ -12,9 +12,9 @@ databaseChangeLog:
                     primaryKey: true
                     primaryKeyName: pk_user_info
                     referencedTableName: account
-                    referencedColumnNames: id
+                    referencedColumnNames: username
                     foreignKeyName: fk_user_info_account
-                  name: user_id
+                  name: username
                   type: VARCHAR(255)
               - column:
                   constraints:

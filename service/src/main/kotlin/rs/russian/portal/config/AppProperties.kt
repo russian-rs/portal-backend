@@ -15,7 +15,8 @@ data class S3Properties(
     val region: String,
     val endpoint: String,
     val presignDuration: Duration,
-    val bucket: String
+    val bucket: String,
+    val bucketService: String
 )
 
 @ConfigurationProperties(prefix = "app.authentik")

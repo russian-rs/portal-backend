@@ -33,6 +33,7 @@ app:
     region: ${S3_REGION}
     endpoint: ${S3_ENDPOINT}
     bucket: ${S3_BUCKET}
+    bucket-service: ${S3_BUCKET_SERVICE}
     presign-duration: PT12H
   authentik:
     base-url: ${OAUTH2_SERVER}

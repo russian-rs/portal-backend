@@ -25,9 +25,8 @@ data class Account(
     var email: String,
     var fullName: String,
 
-    @PrimaryKeyJoinColumn
-    @OneToOne(cascade = [ALL], fetch = FetchType.LAZY, orphanRemoval = true)
-    var info: UserInfo?,
+    @OneToOne(mappedBy = "account", cascade = [ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    var info: UserInfo? = null,
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Convert(converter = UserGroupSetConverter::class)
@@ -36,9 +35,11 @@ data class Account(
     @OneToMany(mappedBy = "account", cascade = [ALL], orphanRemoval = true)
     var reports: List<Report> = ArrayList(),
 
-    var disabled: Boolean = false
+    var active: Boolean = true,
 
-) : JpaEntity<String>() {
+    var lastSynced: LocalDateTime? = null,
+
+    ) : JpaEntity<String>() {
 
     override fun equalityProperties() = setOf(Account::email)
 

@@ -35,3 +35,18 @@ databaseChangeLog:
                     nullable: false
                   name: full_name
                   type: VARCHAR(255)
+              - column:
+                  name: groups
+                  type: jsonb
+                  defaultValue: '[]'
+                  constraints:
+                    nullable: false
+              - column:
+                  name: active
+                  type: boolean
+                  defaultValue: 'true'
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_synced
+                  type: timestamp
