@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.4.3
+  version: 1.5.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -325,6 +325,8 @@ components:
         - username
         - email
         - fullName
+        - groups
+        - active
       properties:
         userId:
           type: string
@@ -353,6 +355,14 @@ components:
           type: string
         avatar:
           $ref: '#/components/schemas/FileInfoDto'
+        groups:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+        active:
+          type: boolean
+          nullable: false
     UserPageResponse:
       type: object
       nullable: false

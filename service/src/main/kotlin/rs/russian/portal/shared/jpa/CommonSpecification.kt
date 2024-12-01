@@ -22,6 +22,18 @@ fun <T> isNull(fieldName: String): Specification<T> {
     }
 }
 
+fun <T> isTrue(fieldName: String): Specification<T> {
+    return Specification { root, _, builder ->
+        builder.isTrue(root.get(fieldName))
+    }
+}
+
+fun <T> isFalse(fieldName: String): Specification<T> {
+    return Specification { root, _, builder ->
+        builder.isFalse(root.get(fieldName))
+    }
+}
+
 fun <T, V : Any> equal(fieldName: String, value: V): Specification<T> {
     return Specification { root, _, builder ->
         builder.equal(root.get<Any>(fieldName), value)

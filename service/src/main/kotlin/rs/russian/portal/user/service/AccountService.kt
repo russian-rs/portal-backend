@@ -1,5 +1,6 @@
 package rs.russian.portal.user.service
 
+import io.authentik.model.User
 import org.springframework.data.domain.Page
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
@@ -37,6 +38,11 @@ class AccountService(
     fun getCurrentUser(): Account = accountRepository.findById(currentUserId()).orElseThrow()
 
     @Transactional
+    fun save(account: Account): Account {
+        return accountRepository.saveAndFlush(account)
+    }
+
+    @Transactional
     fun createOrUpdateAccount(oidcUser: OidcUser) {
         accountRepository.findById(oidcUser.userInfo.subject).ifPresentOrElse({
             userMapper.update(oidcUser.userInfo, it)
@@ -48,6 +54,21 @@ class AccountService(
             accountRepository.saveAndFlush(account)
             account.info = UserInfo.default(account)
         })
+    }
+
+    @Transactional
+    fun createOrUpdateAccount(ssoUser: User): Account {
+        accountRepository.findById(ssoUser.uid).ifPresentOrElse({
+            userMapper.update(ssoUser, it)
+            if (it.info === null) {
+                it.info = UserInfo.default(it)
+            }
+        }, {
+            val account = userMapper.map(ssoUser)
+            accountRepository.saveAndFlush(account)
+            account.info = UserInfo.default(account)
+        })
+        return getAccount(ssoUser.uid)
     }
 
     @Transactional(readOnly = true)
@@ -62,10 +83,9 @@ class AccountService(
     }
 
     @Transactional
-    fun setAvatar(fileId: String): Account {
-        val user = accountRepository.findById(currentUserId()).orElseThrow()
+    fun setAvatar(account: Account, fileId: String): Account {
         val file = fileService.getFile(fileId)
-        user.info?.avatar = file
-        return user
+        account.info?.avatar = file
+        return accountRepository.saveAndFlush(account)
     }
 }

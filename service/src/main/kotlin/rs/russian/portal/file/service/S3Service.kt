@@ -6,7 +6,9 @@ import aws.sdk.kotlin.services.s3.model.GetObjectRequest
 import aws.sdk.kotlin.services.s3.model.PutObjectRequest
 import aws.sdk.kotlin.services.s3.presigners.presignGetObject
 import aws.smithy.kotlin.runtime.content.asByteStream
+import aws.smithy.kotlin.runtime.content.toInputStream
 import aws.smithy.kotlin.runtime.net.url.Url
+import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
@@ -17,11 +19,13 @@ import rs.russian.portal.config.S3Properties
 import rs.russian.portal.file.domain.FileInfo
 import rs.russian.portal.shared.utils.CacheService
 import java.io.File
+import kotlin.reflect.KClass
 import kotlin.time.toKotlinDuration
 
 @Service
 class S3Service(
     private val s3Client: S3Client,
+    private val csvMapper: CsvMapper,
     private val s3Properties: S3Properties
 ) {
 
@@ -56,5 +60,26 @@ class S3Service(
                 bucket = s3Properties.bucket
             }
         )
+    }
+
+    suspend fun <T : Any> csv(key: String, clazz: KClass<T>, delimiter: Char = ','): List<T> {
+        val request = GetObjectRequest {
+            this.bucket = s3Properties.bucketService
+            this.key = key
+        }
+
+        val schema = csvMapper.schemaFor(clazz.java)
+            .withHeader()
+            .withColumnReordering(true)
+            .withColumnSeparator(delimiter)
+
+        return s3Client.getObject(request) { resp ->
+            return@getObject resp.body?.toInputStream().use {
+                csvMapper.readerFor(clazz.java)
+                    .with(schema)
+                    .readValues<T>(it)
+                    .readAll()
+            }
+        }
     }
 }

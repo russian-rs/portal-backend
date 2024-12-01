@@ -11,6 +11,8 @@ fun currentUserId(): String = currentUser().subject
 
 fun currentUserLogin(): String = currentUser().nickName
 
+fun currentUserRoles(): Set<UserGroup> = currentUser().userInfo.userGroups()
+
 fun OidcUserInfo.userGroups(): Set<UserGroup> {
     val groups = mutableSetOf<UserGroup>()
     if (claims["groups"] is Collection<*>) {

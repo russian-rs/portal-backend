@@ -9,6 +9,7 @@ app:
     region: eu-central
     endpoint: http://localhost:9000
     bucket: portal-files
+    bucket-service: portal-data
 
 --- # Data
 spring:

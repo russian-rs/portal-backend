@@ -24,4 +24,7 @@ interface AccountRepository : JpaRepository<Account, String> {
 
     @EntityGraph(value = GRAPH_INFO)
     fun findAll(specification: Specification<Account>, pageable: Pageable): Page<Account>
+
+    @EntityGraph(value = GRAPH_INFO)
+    fun findAll(specification: Specification<Account>): List<Account>
 }

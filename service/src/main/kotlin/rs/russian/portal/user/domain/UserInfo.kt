@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 )
 data class UserInfo(
     @Id
-    @Column(name = "user_id")
+    @Column(name = "username")
     override var id: String? = null,
     override var version: LocalDateTime? = null,
 
@@ -30,9 +30,9 @@ data class UserInfo(
     @Enumerated(STRING)
     var program: Program? = null,
 
-    @MapsId
-    @OneToOne(mappedBy = "info")
-    @JoinColumn(name = "user_id")
+    @OneToOne
+    @MapsId("id")
+    @JoinColumn(name = "username", referencedColumnName = "username")
     var account: Account,
 
     @OneToOne(fetch = LAZY, cascade = [ALL], orphanRemoval = true)
@@ -48,6 +48,7 @@ data class UserInfo(
         const val GRAPH_AVATAR = "UserInfoAvatar"
 
         fun default(account: Account) = UserInfo(
+            id = account.username,
             account = account,
             city = "Beograd",
             birthDate = LocalDate.of(2000, 1, 1)
