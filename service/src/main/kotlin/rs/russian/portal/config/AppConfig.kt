@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.security.jackson2.CoreJackson2Module
 import org.springframework.security.jackson2.SecurityJackson2Modules
 import rs.russian.portal.shared.utils.CacheService
 import rs.russian.portal.shared.utils.LongMixin
@@ -38,6 +39,7 @@ class AppConfig {
         .registerModules(JavaTimeModule())
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         .registerModules(SecurityJackson2Modules.getModules(this.javaClass.classLoader))
+        .registerModules(CoreJackson2Module())
         .addMixIn(java.lang.Long::class.java, LongMixin::class.java)
 
     @Bean
