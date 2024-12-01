@@ -19,4 +19,7 @@ project(":axios-client").projectDir = file("api/axios-client")
 include(":authentik-api")
 project(":authentik-api").projectDir = file("api/authentik-api")
 
+include(":wordpress-api")
+project(":wordpress-api").projectDir = file("api/wordpress-api")
+
 include(":service")

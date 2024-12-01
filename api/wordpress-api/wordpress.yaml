@@ -1,0 +1,194 @@
+openapi: 3.0.3
+info:
+  title: wordpress-api
+  version: 6.7.1
+  contact:
+    email: dev@russian.rs
+    url: https://russian.rs
+
+servers:
+  - url: https://russian.rs/wp-json
+
+security:
+  - bearerAuth: [ ]
+
+paths:
+  /jwt-auth/v1/token:
+    post:
+      operationId: getToken
+      tags:
+        - token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WpTokenRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WpTokenResponse'
+  /wp/v2/users:
+    get:
+      operationId: searchUsers
+      tags:
+        - users
+      parameters:
+        - in: query
+          name: context
+          required: true
+          schema:
+            type: string
+            default: edit
+            nullable: false
+        - in: query
+          name: search
+          required: false
+          schema:
+            type: string
+            nullable: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                default: [ ]
+                items:
+                  $ref: '#/components/schemas/WpUser'
+    post:
+      operationId: createUser
+      tags:
+        - users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WpUser'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WpUser'
+  /wp/v2/users/{id}:
+    post:
+      operationId: updateUser
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            nullable: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WpUser'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WpUser'
+    delete:
+      operationId: deleteUser
+      tags:
+        - users
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            nullable: false
+        - in: query
+          name: force
+          required: true
+          schema:
+            type: boolean
+            nullable: false
+            default: true
+        - in: query
+          name: reassign
+          required: true
+          schema:
+            type: integer
+            nullable: false
+            default: 1
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    WpTokenRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          nullable: false
+        password:
+          type: string
+          nullable: false
+    WpTokenResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          nullable: false
+    WpUser:
+      type: object
+      required:
+        - id
+        - username
+        - email
+        - roles
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        name:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        nickname:
+          type: string
+        slug:
+          type: string
+        roles:
+          type: array
+          default: [ ]
+          items:
+            type: string
+        password:
+          type: string

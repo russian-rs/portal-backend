@@ -24,3 +24,10 @@ data class AuthentikProperties(
     val baseUrl: String,
     val apiKey: String
 )
+
+@ConfigurationProperties(prefix = "app.wordpress")
+data class WordpressProperties(
+    val baseUrl: String,
+    val username: String,
+    val password: String
+)

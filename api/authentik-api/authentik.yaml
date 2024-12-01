@@ -1,10 +1,10 @@
 openapi: 3.0.3
 info:
-  title: volunteer-portal-api
-  version: 1.4.3
+  title: authentik-api
+  version: 2024.10.2
   contact:
     email: dev@russian.rs
-    url: https://russian.rs
+    url: https://id.russian.rs
 servers:
   - url: https://id.russian.rs/api/v3/
 security:

@@ -1,0 +1,65 @@
+plugins {
+    id("java-library")
+    id("org.openapi.generator")
+    id("org.jetbrains.kotlin.jvm")
+}
+
+kotlin {
+    jvmToolchain(21)
+}
+
+def openApiPath = "$projectDir/wordpress.yaml"
+
+group = "org.wordpress"
+version = resolveApiVersion(openApiPath)
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly("jakarta.validation:jakarta.validation-api:$JAKARTA_VALIDATION_VERSION")
+    compileOnly("org.springframework.boot:spring-boot-starter-web:$SPRING_VERSION")
+    compileOnly("com.fasterxml.jackson.module:jackson-module-kotlin:$JACKSON_KOTLIN_VERSION")
+    compileOnly("com.squareup.okhttp3:okhttp:$OKHTTP_VERSION")
+}
+
+openApiValidate {
+    inputSpec = openApiPath
+}
+
+openApiGenerate {
+    generatorName = "kotlin"
+    inputSpec = openApiPath
+    outputDir = "$projectDir/build/openapi"
+    apiPackage = "org.wordpress.api"
+    modelPackage = "org.wordpress.model"
+    configOptions = [
+            "artifactId"           : "wordpress-client",
+            "groupId"              : "org.wordpress",
+            "packageName"          : "org.wordpress",
+            "apiSuffix"            : "WordpressApi",
+            "serializationLibrary" : "jackson",
+            "modelMutable"         : "true",
+            "documentationProvider": "none",
+            "idea"                 : "true",
+    ]
+}
+
+sourceSets {
+    main {
+        java.srcDir("build/openapi/src/main/kotlin")
+    }
+}
+
+tasks.named("openApiGenerate") {
+    dependsOn(tasks.named("openApiValidate"))
+}
+
+tasks.named("compileKotlin") {
+    dependsOn(tasks.named("openApiGenerate"))
+}
+
+tasks.named("compileJava") {
+    dependsOn(tasks.named("openApiGenerate"))
+}

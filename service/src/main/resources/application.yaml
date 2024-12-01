@@ -38,6 +38,10 @@ app:
   authentik:
     base-url: ${OAUTH2_SERVER}
     api-key: ${AUTHENTIK_API_KEY}
+  wordpress:
+    base-url: ${WP_BASE_URL}
+    username: ${WP_USERNAME}
+    password: ${WP_PASSWORD}
 
 --- # Data
 spring:
