@@ -49,10 +49,11 @@ class AccountService(
             if (it.info === null) {
                 it.info = UserInfo.default(it)
             }
+            accountRepository.saveAndFlush(it)
         }, {
             val account = userMapper.map(oidcUser.userInfo)
-            accountRepository.saveAndFlush(account)
             account.info = UserInfo.default(account)
+            accountRepository.saveAndFlush(account)
         })
     }
 
@@ -63,10 +64,11 @@ class AccountService(
             if (it.info === null) {
                 it.info = UserInfo.default(it)
             }
+            accountRepository.saveAndFlush(it)
         }, {
             val account = userMapper.map(ssoUser)
-            accountRepository.saveAndFlush(account)
             account.info = UserInfo.default(account)
+            accountRepository.saveAndFlush(account)
         })
         return getAccount(ssoUser.uid)
     }

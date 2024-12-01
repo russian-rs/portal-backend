@@ -10,6 +10,8 @@ app:
     endpoint: http://localhost:9000
     bucket: portal-files
     bucket-service: portal-data
+  wordpress:
+    base-url: https://wp.russian.rs/wp-json
 
 --- # Data
 spring:

@@ -1,6 +1,6 @@
 package rs.russian.portal.shared.enums
 
-enum class UserGroup(private val oauthGroup: String) {
+enum class UserGroup(val oauthGroup: String) {
 
     ADMIN("administrator"),
     ADMIN_VOLUNTEER("admin_of_volunteer"),
