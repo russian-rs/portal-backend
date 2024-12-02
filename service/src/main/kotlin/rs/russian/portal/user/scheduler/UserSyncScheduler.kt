@@ -63,10 +63,7 @@ class UserSyncScheduler(
 
     private fun deleteWpUserIfExists(account: Account) {
         try {
-            val wpUser = wordpressUserService.getUser(account.username)
-            if (wpUser != null) {
-                wordpressUserService.deleteUser(wpUser)
-            }
+            wordpressUserService.deleteUser(account.username)
         } catch (e: Exception) {
             log.error("Failed to delete WordPress user - ${account.username}", e)
         }

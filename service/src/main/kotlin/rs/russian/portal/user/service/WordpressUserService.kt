@@ -35,8 +35,10 @@ class WordpressUserService(
         return apiClient.updateUser(user.id, user)
     }
 
-    fun deleteUser(user: WpUser) {
-        apiClient.deleteUser(user.id)
+    fun deleteUser(username: String) {
+        getUser(username)?.let {
+            apiClient.deleteUser(it.id)
+        }
     }
 
     @Scheduled(cron = "0 0 */12 * * *")

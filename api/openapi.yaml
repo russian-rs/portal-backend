@@ -31,6 +31,61 @@ paths:
                 $ref: '#/components/schemas/UserInfoDto'
         '500':
           $ref: '#/components/responses/ServerError'
+    post:
+      operationId: createUser
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
+  /user/account/{id}/deactivate:
+    post:
+      operationId: deactivateAccount
+      tags:
+        - user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            nullable: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
+  /user/account/{id}/activate:
+    post:
+      operationId: activateAccount
+      tags:
+        - user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            nullable: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
   /user/info/{login}:
     get:
       operationId: getInfo
@@ -317,6 +372,19 @@ components:
           type: string
           description: Error description
           nullable: false
+    UserCreateRequest:
+      type: object
+      required:
+        - email
+        - username
+        - fullName
+      properties:
+        email:
+          type: string
+        username:
+          type: string
+        fullName:
+          type: string
     UserInfoDto:
       type: object
       description: User additional info

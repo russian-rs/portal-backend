@@ -39,8 +39,8 @@ abstract class UserMapper {
     @Mapping(target = "groups", source = "oidcUserInfo", qualifiedByName = ["mapGroups"])
     abstract fun map(oidcUserInfo: OidcUserInfo): Account
 
-    @Mapping(target = "info", ignore = true)
     @Mapping(target = "id", source = "pk")
+    @Mapping(target = "info", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "reports", expression = "java(new ArrayList<>())")
     @Mapping(target = "fullName", source = "ssoUser", qualifiedByName = ["nameSso"])
