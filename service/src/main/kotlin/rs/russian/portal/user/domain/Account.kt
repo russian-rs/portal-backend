@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 )
 data class Account(
     @Id
-    override var id: String? = null,
+    override var id: Int? = null,
     override var version: LocalDateTime? = null,
 
     var username: String,
@@ -39,7 +39,7 @@ data class Account(
 
     var lastSynced: LocalDateTime? = null,
 
-    ) : JpaEntity<String>() {
+    ) : JpaEntity<Int>() {
 
     override fun equalityProperties() = setOf(Account::email)
 

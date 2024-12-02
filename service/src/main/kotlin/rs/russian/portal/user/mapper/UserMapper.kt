@@ -28,8 +28,8 @@ abstract class UserMapper {
     @Autowired
     private lateinit var fileInfoMapper: FileInfoMapper
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "info", ignore = true)
-    @Mapping(target = "id", source = "subject")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "active", constant = "true")
     @Mapping(target = "username", source = "nickName")
@@ -40,7 +40,7 @@ abstract class UserMapper {
     abstract fun map(oidcUserInfo: OidcUserInfo): Account
 
     @Mapping(target = "info", ignore = true)
-    @Mapping(target = "id", source = "uid")
+    @Mapping(target = "id", source = "pk")
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "reports", expression = "java(new ArrayList<>())")
     @Mapping(target = "fullName", source = "ssoUser", qualifiedByName = ["nameSso"])

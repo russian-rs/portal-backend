@@ -7,8 +7,6 @@ import rs.russian.portal.shared.enums.UserGroup
 
 fun currentUser() = SecurityContextHolder.getContext().authentication.principal as OidcUser
 
-fun currentUserId(): String = currentUser().subject
-
 fun currentUserLogin(): String = currentUser().nickName
 
 fun currentUserRoles(): Set<UserGroup> = currentUser().userInfo.userGroups()
