@@ -16,7 +16,6 @@ fun searchSpecification(query: String): Specification<Account> {
     val like = like<Account>(Account_.FULL_NAME, query)
         .or(like(Account_.USERNAME, query))
         .or(like(Account_.EMAIL, query))
-        .or(like(Account_.ID, query))
         .or(like(Account_.INFO, UserInfo_.TELEGRAM, query))
         .or(like(Account_.INFO, UserInfo_.PHONE, query))
     return active.and(like)
