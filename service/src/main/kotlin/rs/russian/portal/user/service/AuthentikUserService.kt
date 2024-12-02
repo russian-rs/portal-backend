@@ -1,6 +1,7 @@
 package rs.russian.portal.user.service
 
 import io.authentik.api.CoreAuthentikApi
+import io.authentik.model.PatchedUserRequest
 import io.authentik.model.User
 import io.authentik.model.UserRequest
 import org.springframework.stereotype.Service
@@ -37,12 +38,16 @@ class AuthentikUserService(
         return users
     }
 
-    fun createUser(account: Account): User {
+    fun createUser(username: String, name: String, email: String): User {
         val request = UserRequest(
-            username = account.username,
-            name = account.fullName,
-            email = account.email
+            username = username,
+            name = name,
+            email = email
         )
         return coreAuthentikApi.coreUsersCreate(request)
+    }
+
+    fun switchActiveState(account: Account, isActive: Boolean) {
+        coreAuthentikApi.coreUsersPartialUpdate(account.id!!, PatchedUserRequest(isActive = isActive))
     }
 }
