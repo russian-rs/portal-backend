@@ -7,8 +7,7 @@ import rs.russian.generated.model.PageRequest
 import rs.russian.generated.model.UserCreateRequest
 import rs.russian.generated.model.UserInfoDto
 import rs.russian.generated.model.UserPageResponse
-import rs.russian.portal.shared.enums.UserGroup.ADMIN
-import rs.russian.portal.shared.enums.UserGroup.ADMIN_SSO
+import rs.russian.portal.shared.enums.UserGroup.*
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.Authorized
 import rs.russian.portal.user.mapper.UserMapper
@@ -22,7 +21,7 @@ class UserController(
     private val userMapper: UserMapper
 ) : UserApi {
 
-    @Authorized(allowed = [ADMIN_SSO])
+    @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])
     override fun createUser(userCreateRequest: UserCreateRequest): ResponseEntity<UserInfoDto> {
         val account = accountService.create(userCreateRequest)
         return ResponseEntity.ok(userMapper.map(account.info))
@@ -63,13 +62,13 @@ class UserController(
         return ResponseEntity.ok(userMapper.map(accountService.setAvatar(currentUser, avatarId).info))
     }
 
-    @Authorized(allowed = [ADMIN])
+    @Authorized(allowed = [ADMIN, ADMIN_VOLUNTEER])
     override fun activateAccount(id: Int): ResponseEntity<UserInfoDto> {
         val account = accountService.getAccount(id)
         return ResponseEntity.ok(userMapper.map(accountService.switchActiveState(account, true).info))
     }
 
-    @Authorized(allowed = [ADMIN])
+    @Authorized(allowed = [ADMIN, ADMIN_VOLUNTEER])
     override fun deactivateAccount(id: Int): ResponseEntity<UserInfoDto> {
         val account = accountService.getAccount(id)
         return ResponseEntity.ok(userMapper.map(accountService.switchActiveState(account, false).info))
