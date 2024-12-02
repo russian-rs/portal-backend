@@ -30,7 +30,7 @@ class ReportService(
 
     @Transactional
     fun createReport(reportDto: ReportDto): Report {
-        val report = Report(account = accountService.getCurrentUser(), status = ReportStatus.ACCEPTED)
+        val report = Report(account = accountService.getCurrentAccount(), status = ReportStatus.ACCEPTED)
         val tasks = reportDto.tasks.map { taskDto ->
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)

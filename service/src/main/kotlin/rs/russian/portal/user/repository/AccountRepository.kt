@@ -11,10 +11,10 @@ import rs.russian.portal.user.domain.Account.Companion.GRAPH_INFO
 import java.util.*
 
 @Repository
-interface AccountRepository : JpaRepository<Account, String> {
+interface AccountRepository : JpaRepository<Account, Int> {
 
     @EntityGraph(value = GRAPH_INFO)
-    override fun findById(id: String): Optional<Account>
+    override fun findById(id: Int): Optional<Account>
 
     @EntityGraph(value = GRAPH_INFO)
     fun findByUsername(username: String): Optional<Account>

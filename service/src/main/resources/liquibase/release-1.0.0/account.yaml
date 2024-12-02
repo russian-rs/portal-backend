@@ -12,7 +12,7 @@ databaseChangeLog:
                     primaryKey: true
                     primaryKeyName: pk_account
                   name: id
-                  type: VARCHAR(255)
+                  type: INT
               - column:
                   constraints:
                     nullable: false

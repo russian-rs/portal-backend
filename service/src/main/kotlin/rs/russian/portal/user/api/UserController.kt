@@ -7,7 +7,6 @@ import rs.russian.generated.model.PageRequest
 import rs.russian.generated.model.UserInfoDto
 import rs.russian.generated.model.UserPageResponse
 import rs.russian.portal.shared.jpa.convert
-import rs.russian.portal.shared.security.currentUserId
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.service.AccountService
 import rs.russian.portal.user.service.SessionService
@@ -20,7 +19,7 @@ class UserController(
 ) : UserApi {
 
     override fun getCurrentAccount(): ResponseEntity<UserInfoDto> {
-        val user = accountService.getAccount(currentUserId())
+        val user = accountService.getCurrentAccount()
         return ResponseEntity.ok(userMapper.map(user.info))
     }
 
@@ -50,7 +49,7 @@ class UserController(
     }
 
     override fun setAvatar(avatarId: String): ResponseEntity<UserInfoDto> {
-        val currentUser = accountService.getAccount(currentUserId())
+        val currentUser = accountService.getCurrentAccount()
         return ResponseEntity.ok(userMapper.map(accountService.setAvatar(currentUser, avatarId).info))
     }
 

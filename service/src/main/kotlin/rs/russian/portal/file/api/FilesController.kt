@@ -22,6 +22,6 @@ class FilesController(
     }
 
     override fun uploadFile(file: Resource): ResponseEntity<FileInfoDto> {
-        return ResponseEntity.ok(fileService.createFile(file, accountService.getCurrentUser()))
+        return ResponseEntity.ok(fileService.createFile(file, accountService.getCurrentAccount()))
     }
 }

@@ -8,7 +8,7 @@ import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.PageRequest
 import rs.russian.portal.file.service.FileService
 import rs.russian.portal.shared.jpa.convert
-import rs.russian.portal.shared.security.currentUserId
+import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.domain.specification.searchSpecification
@@ -20,10 +20,11 @@ class AccountService(
     private val userMapper: UserMapper,
     private val fileService: FileService,
     private val accountRepository: AccountRepository,
+    private val authentikUserService: AuthentikUserService
 ) {
 
     @Transactional(readOnly = true)
-    fun getAccount(id: String): Account = accountRepository.findById(id).orElseThrow()
+    fun getAccount(id: Int): Account = accountRepository.findById(id).orElseThrow()
 
     @Transactional(readOnly = true)
     fun getAccountByLogin(login: String): Account = accountRepository.findByUsername(login).orElseThrow()
@@ -35,7 +36,7 @@ class AccountService(
     }
 
     @Transactional(readOnly = true)
-    fun getCurrentUser(): Account = accountRepository.findById(currentUserId()).orElseThrow()
+    fun getCurrentAccount(): Account = getAccountByLogin(currentUserLogin())
 
     @Transactional
     fun save(account: Account): Account {
@@ -44,14 +45,15 @@ class AccountService(
 
     @Transactional
     fun createOrUpdateAccount(oidcUser: OidcUser) {
-        accountRepository.findById(oidcUser.userInfo.subject).ifPresentOrElse({
+        val email = oidcUser.userInfo.email
+        val id = authentikUserService.getUser(email)!!.pk
+        accountRepository.findById(id).ifPresentOrElse({
             userMapper.update(oidcUser.userInfo, it)
-            if (it.info === null) {
-                it.info = UserInfo.default(it)
-            }
+            it.info = it.info ?: UserInfo.default(it)
             accountRepository.saveAndFlush(it)
         }, {
             val account = userMapper.map(oidcUser.userInfo)
+            account.id = id
             account.info = UserInfo.default(account)
             accountRepository.saveAndFlush(account)
         })
@@ -59,18 +61,16 @@ class AccountService(
 
     @Transactional
     fun createOrUpdateAccount(ssoUser: User): Account {
-        accountRepository.findById(ssoUser.uid).ifPresentOrElse({
+        accountRepository.findById(ssoUser.pk).ifPresentOrElse({
             userMapper.update(ssoUser, it)
-            if (it.info === null) {
-                it.info = UserInfo.default(it)
-            }
+            it.info = it.info ?: UserInfo.default(it)
             accountRepository.saveAndFlush(it)
         }, {
             val account = userMapper.map(ssoUser)
             account.info = UserInfo.default(account)
             accountRepository.saveAndFlush(account)
         })
-        return getAccount(ssoUser.uid)
+        return getAccount(ssoUser.pk)
     }
 
     @Transactional(readOnly = true)

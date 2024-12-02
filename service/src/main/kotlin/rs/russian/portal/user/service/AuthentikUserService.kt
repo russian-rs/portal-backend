@@ -2,12 +2,19 @@ package rs.russian.portal.user.service
 
 import io.authentik.api.CoreAuthentikApi
 import io.authentik.model.User
+import io.authentik.model.UserRequest
 import org.springframework.stereotype.Service
+import rs.russian.portal.user.domain.Account
 
 @Service
 class AuthentikUserService(
     private val coreAuthentikApi: CoreAuthentikApi
 ) {
+
+    fun getUser(email: String): User? {
+        val pageResult = coreAuthentikApi.coreUsersList(email = email)
+        return pageResult.results.find { it.email == email }
+    }
 
     /**
      * Retrieves a list of all users from the Authentik
@@ -28,5 +35,14 @@ class AuthentikUserService(
             users.addAll(page.results)
         }
         return users
+    }
+
+    fun createUser(account: Account): User {
+        val request = UserRequest(
+            username = account.username,
+            name = account.fullName,
+            email = account.email
+        )
+        return coreAuthentikApi.coreUsersCreate(request)
     }
 }
