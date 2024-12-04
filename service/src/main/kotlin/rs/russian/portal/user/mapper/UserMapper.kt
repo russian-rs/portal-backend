@@ -68,6 +68,7 @@ abstract class UserMapper {
     @Mapping(target = "groups", source = "groupsObj", qualifiedByName = ["mapGroupsSso"])
     abstract fun update(ssoUser: User, @MappingTarget account: Account)
 
+    @Mapping(target = "id", source = "account.id")
     @Mapping(target = "email", source = "account.email")
     @Mapping(target = "username", source = "account.username")
     @Mapping(target = "fullName", source = "account.fullName")
