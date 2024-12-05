@@ -42,6 +42,8 @@ class AppConfig {
     @Bean
     fun csvMapper(): CsvMapper = CsvMapper().apply {
         registerKotlinModule()
+        registerModules(JavaTimeModule())
+        disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     }
 
     @Bean

@@ -10,9 +10,12 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import rs.russian.portal.file.service.FileService
 import rs.russian.portal.file.service.S3Service
+import rs.russian.portal.shared.enums.Gender
+import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.service.AccountService
 import java.io.ByteArrayInputStream
 import java.io.InputStream
+import java.time.LocalDate
 
 @Component
 class UploadInfoScheduler(
@@ -27,14 +30,37 @@ class UploadInfoScheduler(
         val users = s3Service.csv("/users/info.csv", UserUploadInfo::class)
         users.forEach { user ->
             try {
-                val account = accountService.getAccountByLogin(user.login)
+                var account = accountService.findAccountByLogin(user.login) ?: return@forEach
                 if (!user.avatar.isNullOrBlank()) {
                     val avatarResource = downloadAvatar(user.avatar)
                     if (avatarResource != null) {
                         val file = fileService.createFile(avatarResource, account)
-                        accountService.setAvatar(account, file.id)
+                        account = accountService.setAvatar(account, file.id)
                     }
                 }
+                val userInfo = account.info ?: UserInfo.default(account)
+                if (!user.city.isNullOrBlank()) {
+                    userInfo.city = user.city
+                }
+                if (user.birthDate != null) {
+                    userInfo.birthDate = user.birthDate
+                }
+                if (!user.gender.isNullOrBlank()) {
+                    if (user.gender == "Мужчина") {
+                        userInfo.gender = Gender.MALE
+                    }
+                    if (user.gender == "Женщина") {
+                        userInfo.gender = Gender.FEMALE
+                    }
+                }
+                if (!user.telegram.isNullOrBlank()) {
+                    val paths = user.telegram.split("/")
+                    if (paths.size > 1) {
+                        userInfo.telegram = paths.last().replace("@", "")
+                    }
+                }
+                account.info = userInfo
+                accountService.save(account)
             } catch (e: Exception) {
                 log.error("Failed to upload user (${user.login})", e)
             }
@@ -64,7 +90,11 @@ class UploadInfoScheduler(
 
     data class UserUploadInfo(
         val login: String,
-        val avatar: String?
+        val avatar: String?,
+        val city: String?,
+        val birthDate: LocalDate?,
+        val gender: String?,
+        val telegram: String?
     )
 
     class NamedByteArrayResource(

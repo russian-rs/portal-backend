@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.1.0-task-create-table
+      author: Maksim Aminov
+      changes:
+        - addColumn:
+            tableName: user_info
+            columns:
+              - column:
+                  name: gender
+                  type: varchar(50)

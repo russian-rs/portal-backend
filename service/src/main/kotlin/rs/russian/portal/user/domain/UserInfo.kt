@@ -5,6 +5,7 @@ import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.EnumType.STRING
 import jakarta.persistence.FetchType.LAZY
 import rs.russian.portal.file.domain.FileInfo
+import rs.russian.portal.shared.enums.Gender
 import rs.russian.portal.shared.enums.Program
 import rs.russian.portal.shared.jpa.JpaEntity
 import java.time.LocalDate
@@ -29,6 +30,9 @@ data class UserInfo(
 
     @Enumerated(STRING)
     var program: Program? = null,
+
+    @Enumerated(STRING)
+    var gender: Gender? = null,
 
     @OneToOne
     @MapsId("id")
