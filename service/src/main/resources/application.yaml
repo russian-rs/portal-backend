@@ -88,6 +88,19 @@ spring:
             authorization-grant-type: authorization_code
             scope: openid, email, profile
 
+--- # Mail
+spring:
+  mail:
+    host: ${SMTP_SERVER}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail.smtp:
+        auth: true
+        starttls.enable: true
+    default-encoding: UTF-8
+
 --- # Errors
 spring:
   autoconfigure:

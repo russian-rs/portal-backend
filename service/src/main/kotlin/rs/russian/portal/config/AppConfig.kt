@@ -19,6 +19,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.scheduling.annotation.EnableScheduling
+import org.thymeleaf.spring6.SpringTemplateEngine
+import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import rs.russian.portal.shared.utils.CacheService
 import java.util.concurrent.TimeUnit
 import javax.sql.DataSource
@@ -78,5 +80,17 @@ class AppConfig {
         )
 
         return cacheManager
+    }
+
+    @Bean("emailTemplateEngine")
+    fun emailTemplateEngine(): SpringTemplateEngine {
+        val templateResolver = ClassLoaderTemplateResolver()
+        templateResolver.prefix = "templates/email/"
+        templateResolver.suffix = ".html"
+        templateResolver.setTemplateMode("HTML")
+        templateResolver.characterEncoding = "UTF-8"
+        val templateEngine = SpringTemplateEngine()
+        templateEngine.setTemplateResolver(templateResolver)
+        return templateEngine
     }
 }
