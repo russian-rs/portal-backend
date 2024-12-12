@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.6.1
+  version: 1.7.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -378,6 +378,7 @@ components:
         - email
         - username
         - fullName
+        - contract
       properties:
         email:
           type: string
@@ -385,6 +386,8 @@ components:
           type: string
         fullName:
           type: string
+        contract:
+          $ref: '#/components/schemas/ContractDto'
     UserInfoDto:
       type: object
       description: User additional info
@@ -431,6 +434,11 @@ components:
         active:
           type: boolean
           nullable: false
+        contracts:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/ContractDto'
     UserPageResponse:
       type: object
       nullable: false
@@ -563,3 +571,27 @@ components:
           nullable: false
           items:
             $ref: '#/components/schemas/ReportDto'
+    ContractDto:
+      type: object
+      required:
+        - id
+        - startDate
+        - endDate
+        - type
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        startDate:
+          type: string
+          format: date
+          nullable: false
+        endDate:
+          type: string
+          format: date
+          nullable: false
+        type:
+          type: string
+          example: ASSOCIATED
+          nullable: false

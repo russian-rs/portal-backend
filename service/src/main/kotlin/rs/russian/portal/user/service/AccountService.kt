@@ -53,6 +53,7 @@ class AccountService(
         val ssoUser = authentikUserService.createUser(request.username, request.fullName, request.email)
         var account = userMapper.map(ssoUser)
         account.info = UserInfo.default(account)
+        account.contracts = mutableListOf(userMapper.map(request.contract, account))
         account = accountRepository.saveAndFlush(account)
         wordpressUserService.createUser(wordpressUserMapper.map(account))
         return account
