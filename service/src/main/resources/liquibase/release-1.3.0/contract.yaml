@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.3.0-contract-create-table
+      author: Maksim Aminov
+      changes:
+        - createTable:
+            tableName: contract
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_contract
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: version
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                    referencedTableName: account
+                    referencedColumnNames: username
+                    foreignKeyName: fk_contract_account
+                  name: username
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: start_date
+                  type: DATE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: end_date
+                  type: DATE
+              - column:
+                  constraints:
+                    nullable: false
+                  name: type
+                  type: VARCHAR(255)

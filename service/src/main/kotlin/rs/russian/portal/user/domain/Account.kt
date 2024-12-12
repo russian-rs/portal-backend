@@ -12,8 +12,11 @@ import java.time.LocalDateTime
 
 @Entity
 @NamedEntityGraph(
-    name = Account.GRAPH_INFO,
-    attributeNodes = [NamedAttributeNode("info", subgraph = UserInfo.GRAPH_AVATAR)],
+    name = Account.GRAPH_FULL,
+    attributeNodes = [
+        NamedAttributeNode("info", subgraph = UserInfo.GRAPH_AVATAR),
+        NamedAttributeNode("contracts"),
+    ],
     subgraphs = [NamedSubgraph(name = UserInfo.GRAPH_AVATAR, attributeNodes = [NamedAttributeNode("avatar")])]
 )
 data class Account(
@@ -35,6 +38,9 @@ data class Account(
     @OneToMany(mappedBy = "account", cascade = [ALL], orphanRemoval = true)
     var reports: List<Report> = ArrayList(),
 
+    @OneToMany(mappedBy = "account", cascade = [ALL], orphanRemoval = true)
+    var contracts: List<Contract> = ArrayList(),
+
     var active: Boolean = true,
 
     var lastSynced: LocalDateTime? = null,
@@ -44,6 +50,6 @@ data class Account(
     override fun equalityProperties() = setOf(Account::email)
 
     companion object {
-        const val GRAPH_INFO = "AccountUserInfo"
+        const val GRAPH_FULL = "AccountUserInfoContracts"
     }
 }

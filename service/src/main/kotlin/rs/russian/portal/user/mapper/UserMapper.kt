@@ -9,18 +9,21 @@ import org.mapstruct.Named
 import org.mapstruct.ReportingPolicy.ERROR
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo
+import rs.russian.generated.model.ContractDto
 import rs.russian.generated.model.UserInfoDto
 import rs.russian.portal.file.mapper.FileInfoMapper
 import rs.russian.portal.shared.enums.UserGroup
 import rs.russian.portal.shared.security.userGroups
 import rs.russian.portal.user.domain.Account
+import rs.russian.portal.user.domain.Contract
 import rs.russian.portal.user.domain.UserInfo
 import java.time.LocalDateTime
+import java.util.*
 
 @Mapper(
     componentModel = SPRING,
     unmappedTargetPolicy = ERROR,
-    imports = [ArrayList::class, LocalDateTime::class],
+    imports = [ArrayList::class, LocalDateTime::class, UUID::class],
     uses = [FileInfoMapper::class]
 )
 abstract class UserMapper {
@@ -34,6 +37,7 @@ abstract class UserMapper {
     @Mapping(target = "active", constant = "true")
     @Mapping(target = "username", source = "nickName")
     @Mapping(target = "reports", expression = "java(new ArrayList<>())")
+    @Mapping(target = "contracts", expression = "java(new ArrayList<>())")
     @Mapping(target = "lastSynced", expression = "java(LocalDateTime.now())")
     @Mapping(target = "fullName", source = "oidcUserInfo", qualifiedByName = ["nameOidc"])
     @Mapping(target = "groups", source = "oidcUserInfo", qualifiedByName = ["mapGroups"])
@@ -43,6 +47,7 @@ abstract class UserMapper {
     @Mapping(target = "info", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "reports", expression = "java(new ArrayList<>())")
+    @Mapping(target = "contracts", expression = "java(new ArrayList<>())")
     @Mapping(target = "fullName", source = "ssoUser", qualifiedByName = ["nameSso"])
     @Mapping(target = "lastSynced", expression = "java(LocalDateTime.now())")
     @Mapping(target = "groups", source = "groupsObj", qualifiedByName = ["mapGroupsSso"])
@@ -52,6 +57,7 @@ abstract class UserMapper {
     @Mapping(target = "info", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "reports", ignore = true)
+    @Mapping(target = "contracts", ignore = true)
     @Mapping(target = "active", constant = "true")
     @Mapping(target = "username", source = "nickName")
     @Mapping(target = "lastSynced", expression = "java(LocalDateTime.now())")
@@ -63,6 +69,7 @@ abstract class UserMapper {
     @Mapping(target = "info", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "reports", ignore = true)
+    @Mapping(target = "contracts", ignore = true)
     @Mapping(target = "lastSynced", expression = "java(LocalDateTime.now())")
     @Mapping(target = "fullName", source = "ssoUser", qualifiedByName = ["nameSso"])
     @Mapping(target = "groups", source = "groupsObj", qualifiedByName = ["mapGroupsSso"])
@@ -74,7 +81,12 @@ abstract class UserMapper {
     @Mapping(target = "fullName", source = "account.fullName")
     @Mapping(target = "groups", source = "account.groups")
     @Mapping(target = "active", source = "account.active")
+    @Mapping(target = "contracts", source = "account.contracts")
     abstract fun map(userInfo: UserInfo?): UserInfoDto
+
+    @Mapping(target = "account", source = "account")
+    @Mapping(target = "id", expression = "java(UUID.randomUUID())")
+    abstract fun map(contactDto: ContractDto, account: Account): Contract
 
     @Named("mapGroups")
     fun mapGroups(oidcUserInfo: OidcUserInfo): Set<UserGroup> {
