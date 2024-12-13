@@ -26,7 +26,7 @@ server:
       timeout: 48h
 
 app:
-  frontend-uri: ${FRONTEND_URL}/profile
+  frontend-uri: ${FRONTEND_URL}
   s3:
     access-key: ${S3_ACCESS_KEY}
     secret-key: ${S3_SECRET_KEY}

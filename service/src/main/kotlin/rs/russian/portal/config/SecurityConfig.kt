@@ -42,7 +42,7 @@ class SecurityConfig(
                 .successHandler { _, res, authentication ->
                     accountService.createOrUpdateAccount(authentication.principal as OidcUser)
                     res.status = SC_MOVED_PERMANENTLY
-                    res.setHeader(LOCATION, appProperties.frontendUri)
+                    res.setHeader(LOCATION, "${appProperties.frontendUri}/login")
                 }
         }
         .exceptionHandling {
