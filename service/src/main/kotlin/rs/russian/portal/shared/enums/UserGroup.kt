@@ -5,6 +5,7 @@ enum class UserGroup(val oauthGroup: String) {
     ADMIN("administrator"),
     ADMIN_VOLUNTEER("admin_of_volunteer"),
     ADMIN_SSO("administrator_sso"),
+    DEVELOPER("developer"),
     GUIDES("um_guidesman"),
     INSIDE_VOLUNTEER("um_inside_volounteer"),
     MAIN_VOLUNTEER("um_main_volounteer"),
