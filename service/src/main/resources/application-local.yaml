@@ -4,7 +4,7 @@ server:
     include-message: always
 
 app:
-  frontend-uri: http://localhost:3000/profile
+  frontend-uri: http://localhost:3000
   s3:
     region: eu-central
     endpoint: http://localhost:9000
