@@ -71,6 +71,7 @@ dependencies {
 
     // Security
     implementation('com.auth0:java-jwt:4.4.0')
+    implementation('com.digitalsanctuary:ds-spring-cf-turnstile:1.1.5')
 
     // Mapstruct
     implementation('org.mapstruct:mapstruct:1.6.3')

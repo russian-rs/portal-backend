@@ -88,6 +88,13 @@ spring:
             authorization-grant-type: authorization_code
             scope: openid, email, profile
 
+# Cloudflare Turnstile Captcha
+ds:
+  cf:
+    turnstile:
+      sitekey: ${TURNSTILE_SITE_KEY}
+      secret: ${TURNSTILE_SECRET}
+
 --- # Mail
 spring:
   mail:
