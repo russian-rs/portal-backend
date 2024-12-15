@@ -1,0 +1,48 @@
+package rs.russian.portal.application.api
+
+import com.digitalsanctuary.cf.turnstile.service.TurnstileValidationService
+import jakarta.servlet.http.HttpServletRequest
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.RestController
+import rs.russian.generated.api.ApplicationApi
+import rs.russian.generated.model.ApplicationDto
+import rs.russian.generated.model.ApplicationStatusDto
+import rs.russian.portal.application.mapper.ApplicationMapper
+import rs.russian.portal.application.service.ApplicationService
+import rs.russian.portal.shared.exception.CaptchaInvalidException
+import java.util.*
+
+@RestController
+class ApplicationController(
+    private val applicationMapper: ApplicationMapper,
+    private val applicationService: ApplicationService,
+    private val captchaService: TurnstileValidationService,
+    private val httpServletRequest: HttpServletRequest
+) : ApplicationApi {
+
+    override fun createApplication(
+        captchaToken: String,
+        applicationDto: ApplicationDto,
+    ): ResponseEntity<ApplicationStatusDto> {
+        val captchaValid = captchaService.validateTurnstileResponse(
+            captchaToken,
+            captchaService.getClientIpAddress(httpServletRequest)
+        )
+        if (!captchaValid) {
+            throw CaptchaInvalidException()
+        }
+        val application = applicationService.create(applicationDto)
+        return ResponseEntity.ok(applicationMapper.mapStatus(application))
+    }
+
+    override fun getApplicationStatus(id: UUID): ResponseEntity<ApplicationStatusDto> {
+        val application = applicationService.get(id)
+        return ResponseEntity.ok(applicationMapper.mapStatus(application))
+    }
+
+    override fun searchApplicationByEmail(email: String): ResponseEntity<ApplicationStatusDto> {
+        val application = applicationService.findByEmail(email)
+        return ResponseEntity.ok(applicationMapper.mapStatus(application))
+    }
+
+}

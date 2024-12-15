@@ -44,7 +44,7 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TypeMismatchException::class)
-    fun handleIllegalArgumentException(
+    fun handleTypeMismatchException(
         ex: TypeMismatchException,
         request: WebRequest
     ): ResponseEntity<ErrorResponse> {
@@ -53,6 +53,11 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(NotAuthorizedException::class)
     fun handleUnsupportedFileFormat(ex: NotAuthorizedException, request: WebRequest): ResponseEntity<ErrorResponse> {
+        return ResponseEntity(ErrorResponse(FORBIDDEN.reasonPhrase), FORBIDDEN)
+    }
+
+    @ExceptionHandler(CaptchaInvalidException::class)
+    fun handleCaptchaInvalidException(ex: CaptchaInvalidException, request: WebRequest): ResponseEntity<ErrorResponse> {
         return ResponseEntity(ErrorResponse(FORBIDDEN.reasonPhrase), FORBIDDEN)
     }
 
