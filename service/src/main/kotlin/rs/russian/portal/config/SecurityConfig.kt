@@ -57,7 +57,10 @@ class SecurityConfig(
 
     companion object {
         val WHITELIST = arrayOf(
-            "/actuator/health"
+            "/actuator/health",
+            "/application/create",
+            "/application/status/{id}",
+            "/application/searchByEmail"
         )
     }
 

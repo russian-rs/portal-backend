@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.7.0
+  version: 1.8.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -312,6 +312,73 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportPageResponse'
+
+  /application/create:
+    post:
+      operationId: createApplication
+      tags:
+        - application
+      parameters:
+        - name: captchaToken
+          in: query
+          required: true
+          schema:
+            type: string
+            nullable: false
+            description: Turnstile Captcha Token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationDto'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationStatusDto'
+  /application/status/{id}:
+    get:
+      operationId: getApplicationStatus
+      tags:
+        - application
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+            nullable: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationStatusDto'
+  /application/searchByEmail:
+    get:
+      operationId: searchApplicationByEmail
+      tags:
+        - application
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+            nullable: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationStatusDto'
+
 components:
   responses:
     ServerError:
@@ -594,4 +661,87 @@ components:
         type:
           type: string
           example: ASSOCIATED
+          nullable: false
+    ApplicationDto:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          format: uuid
+        status:
+          type: string
+        type:
+          type: string
+        created:
+          type: string
+          format: date-time
+        email:
+          type: string
+        name:
+          type: string
+        patronymic:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        passport:
+          type: string
+        citizenship:
+          type: string
+        telegram:
+          type: string
+        inSerbia:
+          type: boolean
+        enterDate:
+          type: string
+          format: date
+        address:
+          type: string
+        phone:
+          type: string
+        residenceRequired:
+          type: boolean
+        occupation:
+          type: string
+        hasExperience:
+          type: boolean
+        experience:
+          type: string
+        languages:
+          type: string
+        skills:
+          type: string
+        goal:
+          type: string
+        bio:
+          type: string
+        refuseReason:
+          type: string
+    ApplicationStatusDto:
+      type: object
+      required:
+        - id
+        - status
+        - progress
+        - terminated
+        - lastUpdate
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        status:
+          type: string
+          nullable: false
+        progress:
+          type: integer
+        terminated:
+          type: boolean
+        refuseReason:
+          type: string
+        lastUpdate:
+          type: string
+          format: date
           nullable: false
