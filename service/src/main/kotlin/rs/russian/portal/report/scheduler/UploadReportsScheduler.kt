@@ -39,6 +39,20 @@ class UploadReportsScheduler(
         }
     }
 
+    @Scheduled(cron = "-")
+    fun uploadPlaygrounds(): Unit = runBlocking {
+        val text = s3Service.file("/reports/playgrounds.json")
+        val customer = accountService.findAccountByLogin("ruskadijaspora")!!
+        val reports = objectMapper.readValue(text, object : TypeReference<List<Map<String, String>>>() {})
+        reports.forEach { report ->
+            try {
+                createPlaygroundReport(report, customer, reports)
+            } catch (e: Exception) {
+                log.error("Failed to create report ${report["Эл.почта"]} - ${report["Неделя"]}", e)
+            }
+        }
+    }
+
     private fun createReport(data: Map<String, String>, customer: Account) {
         val account = accountService.findAccountByEmail(data["Эл.почта"]) ?: return
         if (data["Тип отчета"] != "Факт") {
@@ -91,6 +105,67 @@ class UploadReportsScheduler(
         report.createTime = OffsetDateTime.of(LocalDateTime.of(tasks[0].date, LocalTime.now()), ZoneOffset.UTC)
         report.tasks = tasks
         reportService.save(report)
+    }
+
+    private fun createPlaygroundReport(
+        data: Map<String, String>,
+        customer: Account,
+        reports: List<Map<String, String>>
+    ) {
+        val account = accountService.findAccountByEmail(data["Эл.почта"]) ?: return
+
+        val week = data["Неделя"]!!.toInt()
+        val existReport = reportService.findByAccountAndHash(account, week)
+        if (existReport != null) {
+            return
+        }
+        val report = Report(account = account, status = ReportStatus.ACCEPTED, hash = week)
+
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val playgrounds = findAnotherWeekPlaygrounds(data["Эл.почта"]!!, week, reports)
+        val tasks = mutableListOf<Task>()
+
+        if (playgrounds.isEmpty()) {
+            return
+        }
+
+        val defaultDate = LocalDate.ofYearDay(2024, 1)
+            .with(WeekFields.ISO.weekOfYear(), week.toLong())
+            .with(WeekFields.ISO.dayOfWeek(), 1)
+
+        playgrounds.forEach { playgroundData ->
+            var date = defaultDate
+            try {
+                date = LocalDate.parse(playgroundData["Дата мониторинга"]!!.substringBefore('T'), formatter)
+            } catch (e: Exception) {
+            }
+            val result = playgroundData["Адрес (геометка)"]
+            val name = "Мониторинг площадки"
+            val description = playgroundData["Итоговый комментарий"] ?: ""
+            val timeSpent = Math.round(600.0 / playgrounds.size).toInt()
+            val task = Task(
+                date = date,
+                name = name,
+                description = description,
+                timeSpent = timeSpent,
+                report = report,
+                customer = customer,
+                result = result
+            )
+            tasks.add(task)
+        }
+
+        report.createTime = OffsetDateTime.of(LocalDateTime.of(defaultDate, LocalTime.now()), ZoneOffset.UTC)
+        report.tasks = tasks
+        reportService.save(report)
+    }
+
+    private fun findAnotherWeekPlaygrounds(
+        email: String,
+        week: Int,
+        reports: List<Map<String, String>>
+    ): List<Map<String, String>> {
+        return reports.filter { it["Эл.почта"]!! == email && it["Неделя"]!!.toInt() == week }
     }
 
     companion object {
