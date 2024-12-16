@@ -41,6 +41,12 @@ class AccountService(
     }
 
     @Transactional(readOnly = true)
+    fun findAccountByEmail(email: String?): Account? {
+        if (email.isNullOrBlank()) return null
+        return accountRepository.findByEmail(email).orElse(null)
+    }
+
+    @Transactional(readOnly = true)
     fun getCurrentAccount(): Account = getAccountByLogin(currentUserLogin())
 
     @Transactional

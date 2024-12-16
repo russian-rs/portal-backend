@@ -39,7 +39,9 @@ data class Report(
 
     @ManyToOne
     @JoinColumn(name = "user_login", referencedColumnName = "username")
-    var account: Account
+    var account: Account,
+
+    var hash: Int? = null
 
 ) : JpaEntity<UUID>() {
 

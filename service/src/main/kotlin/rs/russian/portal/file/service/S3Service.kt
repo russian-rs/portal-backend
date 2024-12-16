@@ -82,4 +82,17 @@ class S3Service(
             }
         }
     }
+
+    suspend fun file(key: String): String {
+        val request = GetObjectRequest {
+            this.bucket = s3Properties.bucketService
+            this.key = key
+        }
+
+        return s3Client.getObject(request) { resp ->
+            return@getObject resp.body!!.toInputStream().use {
+                String(it.readAllBytes(), Charsets.UTF_8)
+            }
+        }
+    }
 }
