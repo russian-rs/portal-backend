@@ -12,6 +12,7 @@ import rs.russian.portal.report.domain.specification.from
 import rs.russian.portal.report.mapper.ReportMapper
 import rs.russian.portal.report.repository.ReportRepository
 import rs.russian.portal.shared.enums.ReportStatus
+import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.service.AccountService
 import java.util.*
 
@@ -43,5 +44,15 @@ class ReportService(
     @Transactional(readOnly = true)
     fun getReports(reportFilter: ReportFilter, pageable: Pageable): Page<Report> {
         return reportRepository.findAll(from(reportFilter), pageable)
+    }
+
+    @Transactional(readOnly = true)
+    fun findByAccountAndHash(account: Account, hash: Int): Report? {
+        return reportRepository.findByAccountUsernameAndHash(account.username, hash).orElseGet { null }
+    }
+
+    @Transactional
+    fun save(report: Report): Report {
+        return reportRepository.save(report)
     }
 }

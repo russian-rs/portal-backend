@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.3.0-report-alter-table
+      author: Maksim Aminov
+      changes:
+        - addColumn:
+            tableName: report
+            columns:
+              - column:
+                  name: hash
+                  type: INT

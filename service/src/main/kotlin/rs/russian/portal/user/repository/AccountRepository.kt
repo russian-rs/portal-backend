@@ -20,6 +20,9 @@ interface AccountRepository : JpaRepository<Account, Int> {
     fun findByUsername(username: String): Optional<Account>
 
     @EntityGraph(value = GRAPH_FULL)
+    fun findByEmail(email: String): Optional<Account>
+
+    @EntityGraph(value = GRAPH_FULL)
     fun findAllByUsernameIn(usernames: List<String>): List<Account>
 
     @EntityGraph(value = GRAPH_FULL)
