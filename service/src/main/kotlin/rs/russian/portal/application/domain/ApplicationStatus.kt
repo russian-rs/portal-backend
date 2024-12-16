@@ -12,6 +12,5 @@ enum class ApplicationStatus(
     DOCS_RECEIVED(90, false),
 
     DONE(100, true),
-    DENY(0, true),
-    DOUBLE(0, true)
+    DENY(0, true)
 }

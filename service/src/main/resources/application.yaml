@@ -107,6 +107,10 @@ spring:
         auth: true
         starttls.enable: true
     default-encoding: UTF-8
+management:
+  health:
+    mail:
+      enabled: false
 
 --- # Errors
 spring:
