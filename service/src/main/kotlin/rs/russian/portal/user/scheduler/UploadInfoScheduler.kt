@@ -1,7 +1,8 @@
 package rs.russian.portal.user.scheduler
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
 import kotlinx.coroutines.runBlocking
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.AbstractResource
@@ -16,16 +17,17 @@ import rs.russian.portal.user.service.AccountService
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 @Component
 class UploadInfoScheduler(
     private val s3Service: S3Service,
     private val fileService: FileService,
+    private val objectMapper: ObjectMapper,
     private val accountService: AccountService,
 ) {
 
     @Scheduled(cron = "-")
-    @SchedulerLock(name = "uploadUserInfo")
     fun upload(): Unit = runBlocking {
         val users = s3Service.csv("/users/info.csv", UserUploadInfo::class)
         users.forEach { user ->
@@ -65,6 +67,52 @@ class UploadInfoScheduler(
                 log.error("Failed to upload user (${user.login})", e)
             }
         }
+    }
+
+    @Scheduled(cron = "-")
+    fun enrich(): Unit = runBlocking {
+        val text = s3Service.file("/users/applications.json")
+        val applications = objectMapper.readValue(text, object : TypeReference<List<Map<String, String>>>() {})
+        applications.forEach { application ->
+            try {
+                enrichUser(application)
+            } catch (e: Exception) {
+                log.error("Failed to enrich user ${application["Эл.почта"]}", e)
+            }
+        }
+    }
+
+    private fun enrichUser(data: Map<String, String>) = runBlocking {
+        val email = data["E-mail"] ?: return@runBlocking
+        val account = accountService.findAccountByEmail(email) ?: return@runBlocking
+        val userInfo = account.info
+        if (!data["Дата рождения"].isNullOrBlank()) {
+            try {
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                userInfo?.birthDate = LocalDate.parse(data["Дата рождения"]!!.substringBefore('T'), formatter)
+            } catch (e: Exception) {
+            }
+        }
+        if (!data["Почтовый адрес"].isNullOrBlank()) {
+            userInfo?.address = data["Почтовый адрес"]
+        }
+        if (!data["Telegram"].isNullOrBlank() && data["Telegram"] != "#ERROR!") {
+            userInfo?.telegram = data["Telegram"]!!
+                .replace("@", "")
+                .replace("https://t.me/", "")
+                .lowercase()
+        }
+        if (!data["Телефон"].isNullOrBlank() && data["Телефон"] != "#ERROR!") {
+            val str = data["Телефон"]!!
+            if (str.length < 6) {
+                return@runBlocking
+            }
+            if (str.startsWith("381")) {
+                userInfo?.phone = "+$str"
+            }
+        }
+        account.info = userInfo
+        accountService.save(account)
     }
 
     private fun downloadAvatar(imageUrl: String): Resource? {
