@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.8.0
+  version: 1.8.1
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -339,6 +339,47 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicationStatusDto'
+  /application/update:
+    put:
+      operationId: updateApplication
+      tags:
+        - application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationDto'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationDto'
+  /applications:
+    post:
+      operationId: getApplications
+      tags:
+        - application
+      parameters:
+        - name: pageRequest
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/PageRequest'
+        - name: searchQuery
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationPageResponse'
   /application/status/{id}:
     get:
       operationId: getApplicationStatus
@@ -719,6 +760,8 @@ components:
           type: string
         refuseReason:
           type: string
+        comment:
+          type: string
     ApplicationStatusDto:
       type: object
       required:
@@ -745,3 +788,18 @@ components:
           type: string
           format: date
           nullable: false
+    ApplicationPageResponse:
+      type: object
+      nullable: false
+      required:
+        - page
+        - content
+      properties:
+        page:
+          $ref: '#/components/schemas/PageResponse'
+        content:
+          type: array
+          default: [ ]
+          nullable: false
+          items:
+            $ref: '#/components/schemas/ApplicationDto'

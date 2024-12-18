@@ -97,3 +97,13 @@ databaseChangeLog:
               - column:
                   name: refuse_reason
                   type: TEXT
+  - changeSet:
+      id: 1.3.0-application-add-column-comment
+      author: Maksim Aminov
+      changes:
+        - addColumn:
+            tableName: application
+            columns:
+              - column:
+                  name: comment
+                  type: TEXT
