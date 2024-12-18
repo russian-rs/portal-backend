@@ -35,7 +35,7 @@ data class Report(
     var status: ReportStatus = ReportStatus.CREATED,
 
     @OneToMany(mappedBy = "report", cascade = [ALL], orphanRemoval = true)
-    var tasks: List<Task> = ArrayList<Task>(),
+    var tasks: Set<Task> = HashSet(),
 
     @ManyToOne
     @JoinColumn(name = "user_login", referencedColumnName = "username")

@@ -15,5 +15,4 @@ fun searchSpecification(query: String?): Specification<Application> {
         .or(like(Application_.EMAIL, query))
         .or(like(Application_.PHONE, query))
         .or(like(Application_.TELEGRAM, query))
-        .or(like(Application_.ID, query))
 }
