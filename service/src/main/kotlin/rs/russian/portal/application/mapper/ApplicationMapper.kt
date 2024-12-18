@@ -25,6 +25,10 @@ abstract class ApplicationMapper {
     @Mapping(target = "refuseReason", ignore = true)
     abstract fun map(applicationDto: ApplicationDto, @MappingTarget application: Application)
 
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "created", ignore = true)
+    abstract fun update(applicationDto: ApplicationDto, @MappingTarget application: Application)
+
     abstract fun map(application: Application): ApplicationDto
 
     @Mapping(target = "progress", source = "status")

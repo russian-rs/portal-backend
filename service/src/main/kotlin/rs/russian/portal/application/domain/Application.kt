@@ -43,6 +43,7 @@ class Application(
     var goal: String? = null,
     var bio: String? = null,
 
-    var refuseReason: String? = null
+    var refuseReason: String? = null,
+    var comment: String? = null
 
 ) : JpaEntity<UUID>()

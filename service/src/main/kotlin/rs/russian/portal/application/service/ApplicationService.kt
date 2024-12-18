@@ -1,11 +1,15 @@
 package rs.russian.portal.application.service
 
+import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.ApplicationDto
+import rs.russian.generated.model.PageRequest
 import rs.russian.portal.application.domain.Application
+import rs.russian.portal.application.domain.specification.searchSpecification
 import rs.russian.portal.application.mapper.ApplicationMapper
 import rs.russian.portal.application.repository.ApplicationRepository
+import rs.russian.portal.shared.jpa.convert
 import java.util.*
 
 @Service
@@ -41,5 +45,18 @@ class ApplicationService(
     @Transactional(readOnly = true)
     fun findByEmail(email: String): Application {
         return applicationRepository.findByEmail(email).orElseThrow()
+    }
+
+    @Transactional(readOnly = true)
+    fun getAll(searchQuery: String?, pageRequest: PageRequest): Page<Application> {
+        val specification = searchSpecification(searchQuery)
+        return applicationRepository.findAll(specification, convert(pageRequest))
+    }
+
+    @Transactional
+    fun update(applicationDto: ApplicationDto): Application {
+        val application = get(applicationDto.id)
+        applicationMapper.update(applicationDto, application)
+        return applicationRepository.save(application)
     }
 }
