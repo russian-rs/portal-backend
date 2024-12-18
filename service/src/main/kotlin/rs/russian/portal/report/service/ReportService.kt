@@ -38,7 +38,7 @@ class ReportService(
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toSet())
             }
         }
-        return reportRepository.save(report.also { it.tasks = tasks })
+        return reportRepository.save(report.also { it.tasks = tasks.toSet() })
     }
 
     @Transactional(readOnly = true)
