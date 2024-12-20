@@ -41,6 +41,11 @@ class ApplicationController(
         return ResponseEntity.ok(applicationMapper.mapStatus(application))
     }
 
+    override fun getApplication(id: UUID): ResponseEntity<ApplicationDto> {
+        val application = applicationService.get(id)
+        return ResponseEntity.ok(applicationMapper.map(application))
+    }
+
     override fun getApplicationStatus(id: UUID): ResponseEntity<ApplicationStatusDto> {
         val application = applicationService.get(id)
         return ResponseEntity.ok(applicationMapper.mapStatus(application))
