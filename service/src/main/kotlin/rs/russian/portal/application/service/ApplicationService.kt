@@ -6,14 +6,19 @@ import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.ApplicationDto
 import rs.russian.generated.model.PageRequest
 import rs.russian.portal.application.domain.Application
+import rs.russian.portal.application.domain.ApplicationStatus.DENY
+import rs.russian.portal.application.domain.ApplicationStatus.DONE
+import rs.russian.portal.application.domain.ApplicationType
 import rs.russian.portal.application.domain.specification.searchSpecification
 import rs.russian.portal.application.mapper.ApplicationMapper
 import rs.russian.portal.application.repository.ApplicationRepository
 import rs.russian.portal.shared.jpa.convert
+import rs.russian.portal.user.service.AccountService
 import java.util.*
 
 @Service
 class ApplicationService(
+    private val accountService: AccountService,
     private val applicationMapper: ApplicationMapper,
     private val applicationRepository: ApplicationRepository
 ) {
@@ -22,7 +27,7 @@ class ApplicationService(
     fun create(request: ApplicationDto): Application {
         val email = request.email!!
         val name = request.name!!
-        val existByEmail = applicationRepository.findByEmail(email)
+        val existByEmail = applicationRepository.findByEmailAndStatusNotIn(email, listOf(DONE, DENY))
         if (existByEmail.isPresent) {
             return existByEmail.get()
         }
@@ -34,6 +39,10 @@ class ApplicationService(
         }
         val application = Application(email = email, name = name)
         applicationMapper.map(request, application)
+        val existUser = accountService.findAccountByEmail(email)
+        if (existUser != null) {
+            application.type = ApplicationType.PROLONGATION
+        }
         return applicationRepository.save(application)
     }
 
