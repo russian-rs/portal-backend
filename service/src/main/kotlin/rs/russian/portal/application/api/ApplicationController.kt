@@ -41,11 +41,6 @@ class ApplicationController(
         return ResponseEntity.ok(applicationMapper.mapStatus(application))
     }
 
-    override fun getApplication(id: UUID): ResponseEntity<ApplicationDto> {
-        val application = applicationService.get(id)
-        return ResponseEntity.ok(applicationMapper.map(application))
-    }
-
     override fun getApplicationStatus(id: UUID): ResponseEntity<ApplicationStatusDto> {
         val application = applicationService.get(id)
         return ResponseEntity.ok(applicationMapper.mapStatus(application))
@@ -54,6 +49,12 @@ class ApplicationController(
     override fun searchApplicationByEmail(email: String): ResponseEntity<ApplicationStatusDto> {
         val application = applicationService.findByEmail(email)
         return ResponseEntity.ok(applicationMapper.mapStatus(application))
+    }
+
+    @Authorized(allowed = [ADMIN, ADMIN_VOLUNTEER])
+    override fun getApplication(id: UUID): ResponseEntity<ApplicationDto> {
+        val application = applicationService.get(id)
+        return ResponseEntity.ok(applicationMapper.map(application))
     }
 
     @Authorized(allowed = [ADMIN, ADMIN_VOLUNTEER])
