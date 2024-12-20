@@ -59,4 +59,9 @@ class ApplicationService(
         applicationMapper.update(applicationDto, application)
         return applicationRepository.save(application)
     }
+
+    @Transactional
+    fun save(application: Application): Application {
+        return applicationRepository.save(application)
+    }
 }
