@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.8.1
+  version: 1.8.2
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -339,6 +339,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicationStatusDto'
+  /application/{id}:
+    get:
+      operationId: getApplication
+      tags:
+        - application
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationDto'
   /application/update:
     put:
       operationId: updateApplication
