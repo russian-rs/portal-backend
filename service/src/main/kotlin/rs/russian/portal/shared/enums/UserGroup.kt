@@ -11,6 +11,7 @@ enum class UserGroup(val oauthGroup: String) {
     MAIN_VOLUNTEER("um_main_volounteer"),
     LAWYERS("um_lawyers"),
     MEDIA("um_media"),
+    TEACHER("stm_lms_instructor"),
     MEMBER("um_member_of_diaspora");
 
     companion object {
