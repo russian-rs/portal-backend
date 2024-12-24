@@ -17,6 +17,8 @@ import rs.russian.portal.user.domain.specification.searchSpecification
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.mapper.WordpressUserMapper
 import rs.russian.portal.user.repository.AccountRepository
+import rs.russian.portal.user.service.authentik.AuthentikService
+import rs.russian.portal.user.service.wordpress.WordpressUserService
 
 @Service
 class AccountService(
@@ -25,7 +27,7 @@ class AccountService(
     private val accountRepository: AccountRepository,
     private val wordpressUserMapper: WordpressUserMapper,
     private val wordpressUserService: WordpressUserService,
-    private val authentikUserService: AuthentikUserService
+    private val authentikUserService: AuthentikService
 ) {
 
     @Transactional(readOnly = true)

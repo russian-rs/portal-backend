@@ -42,6 +42,9 @@ app:
     base-url: ${WP_BASE_URL}
     username: ${WP_USERNAME}
     password: ${WP_PASSWORD}
+  schedulers:
+    email-outbox: "*/15 * * * * *"
+    user-sync: "0 0 */1 * * *"
 
 --- # Data
 spring:

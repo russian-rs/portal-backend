@@ -1,18 +1,20 @@
-package rs.russian.portal.user.service
+package rs.russian.portal.user.service.authentik
 
 import io.authentik.api.CoreAuthentikApi
 import io.authentik.model.PatchedUserRequest
 import io.authentik.model.User
 import io.authentik.model.UserRequest
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import rs.russian.portal.user.domain.Account
 
 @Service
-class AuthentikUserService(
+@Profile("!no-auth")
+class AuthentikServiceImpl(
     private val coreAuthentikApi: CoreAuthentikApi
-) {
+) : AuthentikService {
 
-    fun getUser(email: String): User? {
+    override fun getUser(email: String): User? {
         val pageResult = coreAuthentikApi.coreUsersList(email = email)
         return pageResult.results.find { it.email == email }
     }
@@ -26,7 +28,7 @@ class AuthentikUserService(
      *
      * @return A list of all users retrieved from the CoreAuthentik API.
      */
-    fun getAllUsers(): List<User> {
+    override fun getAllUsers(): List<User> {
         val users = mutableListOf<User>()
         val firstPage = coreAuthentikApi.coreUsersList()
         users.addAll(firstPage.results)
@@ -38,7 +40,7 @@ class AuthentikUserService(
         return users
     }
 
-    fun createUser(username: String, name: String, email: String): User {
+    override fun createUser(username: String, name: String, email: String): User {
         val request = UserRequest(
             username = username,
             name = name,
@@ -47,7 +49,7 @@ class AuthentikUserService(
         return coreAuthentikApi.coreUsersCreate(request)
     }
 
-    fun switchActiveState(account: Account, isActive: Boolean) {
+    override fun switchActiveState(account: Account, isActive: Boolean) {
         coreAuthentikApi.coreUsersPartialUpdate(account.id!!, PatchedUserRequest(isActive = isActive))
     }
 }

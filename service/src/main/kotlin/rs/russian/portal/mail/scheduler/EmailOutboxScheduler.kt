@@ -13,7 +13,7 @@ class EmailOutboxScheduler(
     private val emailOutboxService: EmailOutboxService
 ) {
 
-    @Scheduled(cron = "*/15 * * * * *")
+    @Scheduled(cron = "\${app.schedulers.email-outbox}")
     @SchedulerLock(
         name = "email_outbox",
         lockAtLeastFor = "PT14S",

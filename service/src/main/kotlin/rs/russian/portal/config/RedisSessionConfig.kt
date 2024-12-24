@@ -17,7 +17,7 @@ import org.springframework.session.web.http.DefaultCookieSerializer
     maxInactiveIntervalInSeconds = 172800, // 2 * 24 * 60 * 60 = 48 hours
     redisNamespace = "portal-backend-sessions"
 )
-class SessionConfig : BeanClassLoaderAware {
+class RedisSessionConfig : BeanClassLoaderAware {
 
     private lateinit var loader: ClassLoader
 

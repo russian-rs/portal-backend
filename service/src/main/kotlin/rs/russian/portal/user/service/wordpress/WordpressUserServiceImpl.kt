@@ -1,11 +1,11 @@
-package rs.russian.portal.user.service
+package rs.russian.portal.user.service.wordpress
 
-import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.InitializingBean
+import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import org.wordpress.api.TokenWordpressApi
@@ -15,34 +15,34 @@ import org.wordpress.model.WpUser
 import rs.russian.portal.config.WordpressProperties
 
 @Service
-class WordpressUserService(
+@Profile("!local")
+class WordpressUserServiceImpl(
     private val wpProps: WordpressProperties,
     private val tokenWordpressApi: TokenWordpressApi
-) : InitializingBean {
+) : WordpressUserService, InitializingBean {
 
     private lateinit var apiClient: UsersWordpressApi
 
-    fun getUser(username: String): WpUser? {
+    override fun getUser(username: String): WpUser? {
         val users = apiClient.searchUsers(search = username.replace("@", ""))
         return users.find { it.username == username }
     }
 
-    fun createUser(user: WpUser): WpUser {
+    override fun createUser(user: WpUser): WpUser {
         return apiClient.createUser(user)
     }
 
-    fun updateUser(user: WpUser): WpUser {
+    override fun updateUser(user: WpUser): WpUser {
         return apiClient.updateUser(user.id, user)
     }
 
-    fun deleteUser(username: String) {
+    override fun deleteUser(username: String) {
         getUser(username)?.let {
             apiClient.deleteUser(it.id)
         }
     }
 
     @Scheduled(cron = "0 0 */12 * * *")
-    @SchedulerLock(name = "updateWordpressToken")
     override fun afterPropertiesSet() = updateApiClient()
 
     private fun updateApiClient() {
