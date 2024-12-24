@@ -11,7 +11,15 @@ app:
     bucket: portal-files
     bucket-service: portal-data
   wordpress:
-    base-url: https://russian.rs/wp-json
+    base-url: http://localhost
+  schedulers:
+    email-outbox: "-"
+    user-sync: "-"
+
+ds:
+  cf:
+    turnstile:
+      url: http://localhost:${server.port}/turnstile
 
 --- # Data
 spring:
@@ -39,6 +47,13 @@ spring:
         registration:
           authentik:
             redirect-uri: http://localhost:3000/api/oauth2/code
+
+--- # Mail
+spring:
+  mail:
+    host: localhost
+    username: change
+    password: change
 
 --- # Logging
 logging:

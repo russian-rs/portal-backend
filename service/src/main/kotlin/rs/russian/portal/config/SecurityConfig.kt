@@ -4,10 +4,12 @@ import jakarta.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY
 import jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Profile
 import org.springframework.http.HttpHeaders.LOCATION
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.web.SecurityFilterChain
 import rs.russian.portal.user.service.AccountService
@@ -20,6 +22,7 @@ class SecurityConfig(
 ) {
 
     @Bean
+    @Profile("!no-auth")
     fun securityFilterChain(
         httpSecurity: HttpSecurity
     ): SecurityFilterChain = httpSecurity
@@ -53,6 +56,24 @@ class SecurityConfig(
         .sessionManagement {
             it.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
         }
+        .build()
+
+    @Bean
+    @Profile("no-auth")
+    fun securityFilterChainNoAuth(
+        httpSecurity: HttpSecurity,
+        defaultUserFilter: DefaultUserFilter
+    ): SecurityFilterChain = httpSecurity
+        .csrf {
+            it.disable()
+        }
+        .authorizeHttpRequests {
+            it.anyRequest().permitAll()
+        }
+        .sessionManagement {
+            it.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+        }
+        .addFilterBefore(defaultUserFilter, OAuth2LoginAuthenticationFilter::class.java)
         .build()
 
     companion object {

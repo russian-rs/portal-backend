@@ -8,12 +8,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.DependsOn
+import org.springframework.context.annotation.Profile
 import org.wordpress.api.TokenWordpressApi
 
 @Configuration
 class ApiConfig {
 
     @Bean
+    @Profile("!no-auth")
     fun coreAuthentikApi(authentikProperties: AuthentikProperties): CoreAuthentikApi {
         return CoreAuthentikApi(
             client = authentikApiClient(
@@ -50,6 +52,7 @@ class ApiConfig {
     }
 
     @Bean
+    @Profile("!local")
     @DependsOn(value = ["objectMapper"])
     fun tokenWordpressApi(wordpressProperties: WordpressProperties): TokenWordpressApi {
         return TokenWordpressApi(client = wordpressApiClient(wordpressProperties.baseUrl))

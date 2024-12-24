@@ -12,8 +12,8 @@ import rs.russian.portal.user.domain.Account_
 import rs.russian.portal.user.mapper.WordpressUserMapper
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.AccountService
-import rs.russian.portal.user.service.AuthentikUserService
-import rs.russian.portal.user.service.WordpressUserService
+import rs.russian.portal.user.service.authentik.AuthentikService
+import rs.russian.portal.user.service.wordpress.WordpressUserService
 import java.time.LocalDateTime
 
 @Component
@@ -22,10 +22,10 @@ class UserSyncScheduler(
     private val accountRepository: AccountRepository,
     private val wordpressUserMapper: WordpressUserMapper,
     private val wordpressUserService: WordpressUserService,
-    private val authentikUserService: AuthentikUserService
+    private val authentikUserService: AuthentikService
 ) {
 
-    @Scheduled(cron = "0 0 */1 * * *")
+    @Scheduled(cron = "\${app.schedulers.user-sync}")
     @SchedulerLock(name = "syncUsers")
     fun sync() {
         val syncStart = LocalDateTime.now()
