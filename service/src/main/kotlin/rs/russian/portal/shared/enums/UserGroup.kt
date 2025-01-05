@@ -12,6 +12,7 @@ enum class UserGroup(val oauthGroup: String) {
     LAWYERS("um_lawyers"),
     MEDIA("um_media"),
     TEACHER("stm_lms_instructor"),
+    SEO_MANAGER("wpseo_editor"),
     MEMBER("um_member_of_diaspora");
 
     companion object {
