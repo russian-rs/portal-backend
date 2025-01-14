@@ -5,5 +5,5 @@ data class EmailProperties(
     var ccList: List<String> = mutableListOf(),
     var subject: String,
     var body: String,
-    var from: String
+    var from: String = "Русская Диаспора <info@russian.rs>"
 )

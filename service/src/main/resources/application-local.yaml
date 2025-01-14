@@ -51,9 +51,9 @@ spring:
 --- # Mail
 spring:
   mail:
-    host: localhost
-    username: change
-    password: change
+    host: ${SMTP_SERVER:localhost}
+    username: ${SMTP_USERNAME:change}
+    password: ${SMTP_PASSWORD:change}
 
 --- # Logging
 logging:

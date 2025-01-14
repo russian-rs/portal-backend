@@ -6,14 +6,14 @@ import kotlinx.coroutines.launch
 import org.springframework.context.ApplicationContext
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.util.ClassUtils
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
+import rs.russian.portal.mail.service.EmailService
 import rs.russian.portal.shared.enums.UserGroup.ADMIN
 import rs.russian.portal.shared.security.Authorized
 
 @RestController
 class TestController(
+    private val emailService: EmailService,
     private val applicationContext: ApplicationContext
 ) {
 
@@ -37,5 +37,15 @@ class TestController(
         } catch (e: Exception) {
             return e.message
         }
+    }
+
+    @Authorized(allowed = [ADMIN])
+    @PostMapping("/email/test")
+    fun sendTestEmail(
+        @RequestParam(name = "to", required = true) to: String,
+        @RequestBody(required = true) text: String
+    ): String? {
+        emailService.sendCommonEmail(to, subject = "Тестовое письмо", text = text)
+        return "OK"
     }
 }
