@@ -52,4 +52,8 @@ class AuthentikServiceImpl(
     override fun switchActiveState(account: Account, isActive: Boolean) {
         coreAuthentikApi.coreUsersPartialUpdate(account.id!!, PatchedUserRequest(isActive = isActive))
     }
+
+    override fun createRecoveryLink(account: Account): String {
+        return coreAuthentikApi.coreUsersRecoveryCreate(account.id!!).link
+    }
 }

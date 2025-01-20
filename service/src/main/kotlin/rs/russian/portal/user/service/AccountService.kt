@@ -68,6 +68,17 @@ class AccountService(
     }
 
     @Transactional
+    fun create(email: String, fullName: String): Account {
+        val username = email.split("@")[0].lowercase()
+        val ssoUser = authentikUserService.createUser(username, fullName, email)
+        var account = userMapper.map(ssoUser)
+        account.info = UserInfo.default(account)
+        account = accountRepository.saveAndFlush(account)
+        wordpressUserService.createUser(wordpressUserMapper.map(account))
+        return account
+    }
+
+    @Transactional
     fun createOrUpdateAccount(oidcUser: OidcUser) {
         val email = oidcUser.userInfo.email
         val id = authentikUserService.getUser(email)!!.pk

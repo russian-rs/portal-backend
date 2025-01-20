@@ -1,17 +1,20 @@
 package rs.russian.portal.application.domain
 
 import jakarta.persistence.Entity
+import jakarta.persistence.EntityListeners
 import jakarta.persistence.EnumType.STRING
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import rs.russian.portal.application.domain.ApplicationStatus.CREATED
 import rs.russian.portal.application.domain.ApplicationType.NEW
+import rs.russian.portal.application.domain.listener.ApplicationEntityListener
 import rs.russian.portal.shared.jpa.JpaEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
 @Entity
+@EntityListeners(ApplicationEntityListener::class)
 class Application(
     @Id
     override var id: UUID? = UUID.randomUUID(),
