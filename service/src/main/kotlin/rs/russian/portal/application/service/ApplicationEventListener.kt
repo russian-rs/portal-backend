@@ -1,0 +1,43 @@
+package rs.russian.portal.application.service
+
+import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.event.TransactionalEventListener
+import org.thymeleaf.TemplateEngine
+import org.thymeleaf.context.Context
+import rs.russian.portal.application.domain.ApplicationStatus
+import rs.russian.portal.application.domain.ApplicationType
+import rs.russian.portal.application.event.ApplicationCreatedEvent
+import rs.russian.portal.application.event.ApplicationUpdateEvent
+import rs.russian.portal.mail.service.EmailService
+import rs.russian.portal.user.service.AccountService
+
+@Component
+class ApplicationEventListener(
+    private val emailService: EmailService,
+    private val accountService: AccountService,
+    private val templateEngine: TemplateEngine,
+    private val applicationService: ApplicationService
+) {
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @TransactionalEventListener(fallbackExecution = true)
+    fun handleApplicationCreate(event: ApplicationCreatedEvent) {
+        val application = applicationService.get(event.id)
+        val message = templateEngine.process("application_received",
+            Context().also { it.setVariables(mapOf("id" to application.id)) })
+        emailService.sendCommonEmail(application.email, "Ваша анкета получена", message)
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @TransactionalEventListener(fallbackExecution = true)
+    fun handleApplicationStatusChange(event: ApplicationUpdateEvent) {
+        val application = applicationService.get(event.id)
+        if (application.status == ApplicationStatus.DONE && application.type == ApplicationType.NEW) {
+            if (accountService.findAccountByEmail(application.email) == null) {
+                accountService.create(application.email, application.name)
+            }
+        }
+    }
+}

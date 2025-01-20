@@ -17,6 +17,7 @@ import org.springframework.cache.annotation.EnableCaching
 import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Primary
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.thymeleaf.spring6.SpringTemplateEngine
@@ -36,6 +37,7 @@ import javax.sql.DataSource
 class AppConfig {
 
     @Bean
+    @Primary
     fun objectMapper(): ObjectMapper = ObjectMapper()
         .registerKotlinModule()
         .registerModules(JavaTimeModule())

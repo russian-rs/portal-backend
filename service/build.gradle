@@ -7,6 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.noarg")
     id("org.jetbrains.kotlin.plugin.spring")
     id("org.jetbrains.kotlin.plugin.allopen")
+    id("org.jetbrains.kotlin.plugin.serialization")
 }
 
 group = "rs.russian"
@@ -47,6 +48,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$KOTLINX_VERSION")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$JACKSON_KOTLIN_VERSION")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 
     // S3
     var S3_KOTLIN_SDK = "1.3.84"

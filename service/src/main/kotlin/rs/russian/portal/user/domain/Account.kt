@@ -8,9 +8,11 @@ import rs.russian.portal.report.domain.Report
 import rs.russian.portal.shared.enums.UserGroup
 import rs.russian.portal.shared.jpa.JpaEntity
 import rs.russian.portal.shared.jpa.converter.UserGroupSetConverter
+import rs.russian.portal.user.domain.listener.AccountEntityListener
 import java.time.LocalDateTime
 
 @Entity
+@EntityListeners(AccountEntityListener::class)
 @NamedEntityGraph(
     name = Account.GRAPH_FULL,
     attributeNodes = [

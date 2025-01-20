@@ -12,4 +12,6 @@ interface AuthentikService {
     fun createUser(username: String, name: String, email: String): User
 
     fun switchActiveState(account: Account, isActive: Boolean)
+
+    fun createRecoveryLink(account: Account): String
 }

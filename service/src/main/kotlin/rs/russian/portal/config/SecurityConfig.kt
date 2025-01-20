@@ -81,7 +81,8 @@ class SecurityConfig(
             "/actuator/health",
             "/application/create",
             "/application/status/{id}",
-            "/application/searchByEmail"
+            "/application/searchByEmail",
+            "/turnstile"
         )
     }
 
