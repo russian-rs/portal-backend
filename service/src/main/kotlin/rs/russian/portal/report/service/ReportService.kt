@@ -55,9 +55,7 @@ class ReportService(
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toSet())
             }
         }
-        reportDto.status?.let {
-            report.status = ReportStatus.valueOf(it)
-        }
+        report.status = ReportStatus.CREATED
         report.tasks.clear()
         return reportRepository.save(report.also { it.tasks.addAll(tasks) })
     }
