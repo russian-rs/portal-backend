@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.10.0
+  version: 1.11.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -330,6 +330,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/NoteDto'
+  /report/{id}/status:
+    post:
+      operationId: changeStatus
+      tags:
+        - report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChangeReportStatusRequest'
+      responses:
+        '200':
+          description: Success
   /reports:
     post:
       operationId: getReports
@@ -917,4 +938,15 @@ components:
         createdBy:
           type: string
         text:
+          type: string
+    ChangeReportStatusRequest:
+      type: object
+      nullable: false
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          nullable: false
+        note:
           type: string
