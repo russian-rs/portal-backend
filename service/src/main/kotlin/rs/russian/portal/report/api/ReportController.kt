@@ -6,9 +6,12 @@ import org.springframework.web.bind.annotation.RestController
 import rs.russian.generated.api.ReportApi
 import rs.russian.generated.model.*
 import rs.russian.portal.note.mapper.NoteMapper
+import rs.russian.portal.report.domain.enums.ReportStatus
 import rs.russian.portal.report.mapper.ReportMapper
 import rs.russian.portal.report.service.ReportService
 import rs.russian.portal.shared.jpa.convert
+import rs.russian.portal.shared.security.Authorized
+import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
 import java.util.*
 
 @RestController
@@ -48,9 +51,21 @@ class ReportController(
     }
 
     @Transactional
+    @Authorized(allowed = [ADMIN_VOLUNTEER])
     override fun addNote(id: UUID, noteDto: NoteDto): ResponseEntity<NoteDto> {
         val note = reportService.addNote(id, noteDto)
         return ResponseEntity.ok(noteMapper.map(note))
+    }
+
+    @Transactional
+    @Authorized(allowed = [ADMIN_VOLUNTEER])
+    override fun changeStatus(id: UUID, changeReportStatusRequest: ChangeReportStatusRequest): ResponseEntity<Unit> {
+        reportService.changeStatus(
+            id,
+            ReportStatus.valueOf(changeReportStatusRequest.status),
+            changeReportStatusRequest.note
+        )
+        return ResponseEntity.ok().build()
     }
 
 }

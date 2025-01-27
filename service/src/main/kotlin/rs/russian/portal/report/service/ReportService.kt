@@ -36,7 +36,7 @@ class ReportService(
 
     @Transactional
     fun createReport(reportDto: ReportDto): Report {
-        val report = Report(account = accountService.getCurrentAccount(), status = ReportStatus.ACCEPTED)
+        val report = Report(account = accountService.getCurrentAccount(), status = ReportStatus.CREATED)
         val tasks = reportDto.tasks.map { taskDto ->
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
@@ -84,5 +84,23 @@ class ReportService(
         )
         report.notes.add(note)
         return note
+    }
+
+    @Transactional
+    fun changeStatus(reportId: UUID, status: ReportStatus, noteText: String? = null) {
+        val report = getReport(reportId)
+        if (!noteText.isNullOrEmpty()) {
+            val currentAccount = accountService.getAccountByLogin(currentUserLogin())
+            val note = noteService.save(
+                Note(
+                    createdBy = currentAccount,
+                    entityId = reportId,
+                    entityType = EntityType.REPORT,
+                    text = noteText
+                )
+            )
+            report.notes.add(note)
+        }
+        report.status = status
     }
 }
