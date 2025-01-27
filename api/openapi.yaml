@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.9.0
+  version: 1.10.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -267,6 +267,23 @@ paths:
                 $ref: '#/components/schemas/ReportDto'
         '500':
           $ref: '#/components/responses/ServerError'
+    put:
+      operationId: updateReport
+      tags:
+        - report
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportDto'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportDto'
   /report/{id}:
     get:
       operationId: getReport
@@ -288,6 +305,31 @@ paths:
                 $ref: '#/components/schemas/ReportDto'
         '404':
           $ref: '#/components/responses/ServerError'
+  /report/{id}/note:
+    post:
+      operationId: addNote
+      tags:
+        - report
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteDto'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteDto'
   /reports:
     post:
       operationId: getReports
@@ -679,6 +721,11 @@ components:
           default: [ ]
           items:
             $ref: '#/components/schemas/TaskDto'
+        notes:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/NoteDto'
     TaskDto:
       type: object
       description: Task information
@@ -854,3 +901,20 @@ components:
           nullable: false
           items:
             $ref: '#/components/schemas/ApplicationDto'
+    NoteDto:
+      type: object
+      nullable: false
+      required:
+        - id
+        - text
+      properties:
+        id:
+          type: string
+          format: uuid
+        createTime:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        text:
+          type: string
