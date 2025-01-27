@@ -1,8 +1,8 @@
 package rs.russian.portal.file.domain
 
 import jakarta.persistence.*
+import rs.russian.portal.file.domain.enums.FileExt
 import rs.russian.portal.file.domain.listener.FileInfoListener
-import rs.russian.portal.shared.enums.FileExt
 import rs.russian.portal.shared.jpa.JpaEntity
 import rs.russian.portal.user.domain.Account
 import java.time.LocalDateTime

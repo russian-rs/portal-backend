@@ -8,8 +8,8 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.util.ClassUtils
 import org.springframework.web.bind.annotation.*
 import rs.russian.portal.mail.service.EmailService
-import rs.russian.portal.shared.enums.UserGroup.ADMIN
 import rs.russian.portal.shared.security.Authorized
+import rs.russian.portal.user.domain.enums.UserGroup.ADMIN
 
 @RestController
 class TestController(

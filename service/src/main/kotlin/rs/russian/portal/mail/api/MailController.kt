@@ -5,9 +5,9 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import rs.russian.generated.api.MailApi
 import rs.russian.portal.mail.service.EmailService
-import rs.russian.portal.shared.enums.UserGroup.ADMIN
-import rs.russian.portal.shared.enums.UserGroup.ADMIN_VOLUNTEER
 import rs.russian.portal.shared.security.Authorized
+import rs.russian.portal.user.domain.enums.UserGroup.ADMIN
+import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
 import rs.russian.portal.user.service.AccountService
 
 @RestController

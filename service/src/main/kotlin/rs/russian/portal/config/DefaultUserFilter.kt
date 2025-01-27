@@ -13,9 +13,9 @@ import org.springframework.security.oauth2.core.oidc.OidcIdToken
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo
 import org.springframework.security.oauth2.core.oidc.user.DefaultOidcUser
 import org.springframework.stereotype.Component
-import rs.russian.portal.shared.enums.UserGroup
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.UserInfo
+import rs.russian.portal.user.domain.enums.UserGroup
 import rs.russian.portal.user.service.AccountService
 import java.time.LocalDate
 import java.time.LocalDateTime

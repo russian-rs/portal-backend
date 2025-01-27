@@ -7,9 +7,9 @@ import rs.russian.generated.model.PageRequest
 import rs.russian.generated.model.UserCreateRequest
 import rs.russian.generated.model.UserInfoDto
 import rs.russian.generated.model.UserPageResponse
-import rs.russian.portal.shared.enums.UserGroup.*
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.Authorized
+import rs.russian.portal.user.domain.enums.UserGroup.*
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.service.AccountService
 import rs.russian.portal.user.service.SessionService

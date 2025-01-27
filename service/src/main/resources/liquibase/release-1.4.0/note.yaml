@@ -1,0 +1,48 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.4.0-note-create-table
+      author: Maksim Aminov
+      changes:
+        - createTable:
+            tableName: note
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_note
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: version
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: create_time
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                    referencedTableName: account
+                    referencedColumnNames: username
+                    foreignKeyName: fk_note_account
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: entity_id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: entity_type
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: text
+                  type: TEXT

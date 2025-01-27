@@ -16,10 +16,4 @@ interface ReportRepository : JpaRepository<Report, UUID> {
 
     @EntityGraph(value = GRAPH_TASKS_ACCOUNT)
     fun findAll(specification: Specification<Report>, pageable: Pageable): Page<Report>
-
-    @EntityGraph(value = GRAPH_TASKS_ACCOUNT)
-    fun findAllByAccountUsername(username: String, pageable: Pageable): Page<Report>
-
-    @EntityGraph(value = GRAPH_TASKS_ACCOUNT)
-    fun findByAccountUsernameAndHash(username: String, hash: Int): Optional<Report>
 }

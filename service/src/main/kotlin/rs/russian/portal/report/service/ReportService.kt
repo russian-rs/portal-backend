@@ -4,15 +4,19 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import rs.russian.generated.model.NoteDto
 import rs.russian.generated.model.ReportDto
 import rs.russian.generated.model.ReportFilter
 import rs.russian.portal.file.service.FileService
+import rs.russian.portal.note.domain.Note
+import rs.russian.portal.note.domain.enums.EntityType
+import rs.russian.portal.note.service.NoteService
 import rs.russian.portal.report.domain.Report
+import rs.russian.portal.report.domain.enums.ReportStatus
 import rs.russian.portal.report.domain.specification.from
 import rs.russian.portal.report.mapper.ReportMapper
 import rs.russian.portal.report.repository.ReportRepository
-import rs.russian.portal.shared.enums.ReportStatus
-import rs.russian.portal.user.domain.Account
+import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.service.AccountService
 import java.util.*
 
@@ -21,6 +25,7 @@ class ReportService(
     private val accountService: AccountService,
     private val fileService: FileService,
     private val reportMapper: ReportMapper,
+    private val noteService: NoteService,
     private val reportRepository: ReportRepository
 ) {
 
@@ -38,7 +43,23 @@ class ReportService(
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toSet())
             }
         }
-        return reportRepository.save(report.also { it.tasks = tasks.toSet() })
+        return reportRepository.save(report.also { it.tasks = tasks.toMutableSet() })
+    }
+
+    @Transactional
+    fun updateReport(reportDto: ReportDto): Report {
+        val report = getReport(reportDto.id)
+        val tasks = reportDto.tasks.map { taskDto ->
+            reportMapper.map(taskDto, report).also { task ->
+                task.customer = accountService.findAccountByLogin(taskDto.customer)
+                task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toSet())
+            }
+        }
+        reportDto.status?.let {
+            report.status = ReportStatus.valueOf(it)
+        }
+        report.tasks.clear()
+        return reportRepository.save(report.also { it.tasks.addAll(tasks) })
     }
 
     @Transactional(readOnly = true)
@@ -46,13 +67,24 @@ class ReportService(
         return reportRepository.findAll(from(reportFilter), pageable)
     }
 
-    @Transactional(readOnly = true)
-    fun findByAccountAndHash(account: Account, hash: Int): Report? {
-        return reportRepository.findByAccountUsernameAndHash(account.username, hash).orElseGet { null }
-    }
-
     @Transactional
     fun save(report: Report): Report {
         return reportRepository.save(report)
+    }
+
+    @Transactional
+    fun addNote(reportId: UUID, noteDto: NoteDto): Note {
+        val report = getReport(reportId)
+        val currentAccount = accountService.getAccountByLogin(currentUserLogin())
+        val note = noteService.save(
+            Note(
+                createdBy = currentAccount,
+                entityId = reportId,
+                entityType = EntityType.REPORT,
+                text = noteDto.text
+            )
+        )
+        report.notes.add(note)
+        return note
     }
 }

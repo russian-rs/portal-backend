@@ -4,10 +4,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.RestController
 import rs.russian.generated.api.ReportApi
-import rs.russian.generated.model.PageRequest
-import rs.russian.generated.model.ReportDto
-import rs.russian.generated.model.ReportFilter
-import rs.russian.generated.model.ReportPageResponse
+import rs.russian.generated.model.*
+import rs.russian.portal.note.mapper.NoteMapper
 import rs.russian.portal.report.mapper.ReportMapper
 import rs.russian.portal.report.service.ReportService
 import rs.russian.portal.shared.jpa.convert
@@ -16,7 +14,8 @@ import java.util.*
 @RestController
 class ReportController(
     private val reportService: ReportService,
-    private val reportMapper: ReportMapper
+    private val reportMapper: ReportMapper,
+    private val noteMapper: NoteMapper
 ) : ReportApi {
 
     @Transactional(readOnly = true)
@@ -31,6 +30,12 @@ class ReportController(
         return ResponseEntity.ok(reportMapper.map(report))
     }
 
+    @Transactional
+    override fun updateReport(reportDto: ReportDto): ResponseEntity<ReportDto> {
+        val report = reportService.updateReport(reportDto)
+        return ResponseEntity.ok(reportMapper.map(report))
+    }
+
     @Transactional(readOnly = true)
     override fun getReports(pageRequest: PageRequest, reportFilter: ReportFilter): ResponseEntity<ReportPageResponse> {
         val page = reportService.getReports(reportFilter, convert(pageRequest))
@@ -40,6 +45,12 @@ class ReportController(
                 content = page.map { reportMapper.map(it) }.toMutableList()
             )
         )
+    }
+
+    @Transactional
+    override fun addNote(id: UUID, noteDto: NoteDto): ResponseEntity<NoteDto> {
+        val note = reportService.addNote(id, noteDto)
+        return ResponseEntity.ok(noteMapper.map(note))
     }
 
 }

@@ -3,8 +3,8 @@ package rs.russian.portal.shared.security
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Before
 import org.springframework.stereotype.Component
-import rs.russian.portal.shared.enums.UserGroup
 import rs.russian.portal.shared.exception.NotAuthorizedException
+import rs.russian.portal.user.domain.enums.UserGroup
 
 @Target(AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)

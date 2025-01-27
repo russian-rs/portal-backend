@@ -1,4 +1,4 @@
-package rs.russian.portal.shared.enums
+package rs.russian.portal.report.domain.enums
 
 enum class ReportStatus {
     CREATED,
