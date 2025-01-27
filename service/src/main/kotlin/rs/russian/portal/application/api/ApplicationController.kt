@@ -11,11 +11,11 @@ import rs.russian.generated.model.ApplicationStatusDto
 import rs.russian.generated.model.PageRequest
 import rs.russian.portal.application.mapper.ApplicationMapper
 import rs.russian.portal.application.service.ApplicationService
-import rs.russian.portal.shared.enums.UserGroup.ADMIN
-import rs.russian.portal.shared.enums.UserGroup.ADMIN_VOLUNTEER
 import rs.russian.portal.shared.exception.CaptchaInvalidException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.Authorized
+import rs.russian.portal.user.domain.enums.UserGroup.ADMIN
+import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
 import java.util.*
 
 @RestController

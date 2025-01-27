@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.persistence.AttributeConverter
 import jakarta.persistence.Converter
-import rs.russian.portal.shared.enums.UserGroup
+import rs.russian.portal.user.domain.enums.UserGroup
 
 @Converter
 class UserGroupSetConverter(

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import rs.russian.generated.model.ReportDto
 import rs.russian.generated.model.TaskDto
 import rs.russian.portal.file.mapper.FileInfoMapper
+import rs.russian.portal.note.mapper.NoteMapper
 import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.Task
 import java.time.LocalDateTime
@@ -17,12 +18,15 @@ import java.util.*
     componentModel = SPRING,
     unmappedTargetPolicy = ERROR,
     imports = [UUID::class, LocalDateTime::class, HashSet::class],
-    uses = [FileInfoMapper::class]
+    uses = [FileInfoMapper::class, NoteMapper::class]
 )
 abstract class ReportMapper {
 
     @Autowired
     private lateinit var fileInfoMapper: FileInfoMapper
+
+    @Autowired
+    private lateinit var noteMapper: NoteMapper
 
     @Mapping(target = "user", source = "account.username")
     abstract fun map(report: Report): ReportDto

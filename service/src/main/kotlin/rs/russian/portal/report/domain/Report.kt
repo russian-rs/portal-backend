@@ -3,7 +3,9 @@ package rs.russian.portal.report.domain
 import jakarta.persistence.*
 import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.EnumType.STRING
-import rs.russian.portal.shared.enums.ReportStatus
+import org.hibernate.annotations.SQLRestriction
+import rs.russian.portal.note.domain.Note
+import rs.russian.portal.report.domain.enums.ReportStatus
 import rs.russian.portal.shared.jpa.JpaEntity
 import rs.russian.portal.user.domain.Account
 import java.time.LocalDateTime
@@ -35,15 +37,17 @@ data class Report(
     var status: ReportStatus = ReportStatus.CREATED,
 
     @OneToMany(mappedBy = "report", cascade = [ALL], orphanRemoval = true)
-    var tasks: Set<Task> = HashSet(),
+    var tasks: MutableSet<Task> = mutableSetOf(),
 
     @ManyToOne
     @JoinColumn(name = "user_login", referencedColumnName = "username")
     var account: Account,
 
-    var hash: Int? = null
+    @SQLRestriction("entity_type = 'REPORT'")
+    @OneToMany(mappedBy = "entityId", cascade = [ALL], orphanRemoval = true)
+    var notes: MutableSet<Note> = mutableSetOf(),
 
-) : JpaEntity<UUID>() {
+    ) : JpaEntity<UUID>() {
 
     override fun equalityProperties() = setOf(Report::id)
 

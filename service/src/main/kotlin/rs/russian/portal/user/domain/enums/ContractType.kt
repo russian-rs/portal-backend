@@ -1,4 +1,4 @@
-package rs.russian.portal.shared.enums
+package rs.russian.portal.user.domain.enums
 
 enum class ContractType {
     REGULAR,    // required to submit reports, with residence permit

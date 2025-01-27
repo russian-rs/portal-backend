@@ -5,9 +5,9 @@ import jakarta.persistence.CascadeType.ALL
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
 import rs.russian.portal.report.domain.Report
-import rs.russian.portal.shared.enums.UserGroup
 import rs.russian.portal.shared.jpa.JpaEntity
 import rs.russian.portal.shared.jpa.converter.UserGroupSetConverter
+import rs.russian.portal.user.domain.enums.UserGroup
 import rs.russian.portal.user.domain.listener.AccountEntityListener
 import java.time.LocalDateTime
 

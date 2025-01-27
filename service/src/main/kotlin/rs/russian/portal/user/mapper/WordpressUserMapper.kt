@@ -7,8 +7,8 @@ import org.mapstruct.MappingTarget
 import org.mapstruct.Named
 import org.mapstruct.ReportingPolicy.ERROR
 import org.wordpress.model.WpUser
-import rs.russian.portal.shared.enums.UserGroup
 import rs.russian.portal.user.domain.Account
+import rs.russian.portal.user.domain.enums.UserGroup
 import java.util.*
 
 @Mapper(componentModel = SPRING, unmappedTargetPolicy = ERROR, imports = [UUID::class])

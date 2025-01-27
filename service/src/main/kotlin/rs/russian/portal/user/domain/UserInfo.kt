@@ -5,9 +5,9 @@ import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.EnumType.STRING
 import jakarta.persistence.FetchType.LAZY
 import rs.russian.portal.file.domain.FileInfo
-import rs.russian.portal.shared.enums.Gender
-import rs.russian.portal.shared.enums.Program
 import rs.russian.portal.shared.jpa.JpaEntity
+import rs.russian.portal.user.domain.enums.Gender
+import rs.russian.portal.user.domain.enums.Program
 import java.time.LocalDate
 import java.time.LocalDateTime
 

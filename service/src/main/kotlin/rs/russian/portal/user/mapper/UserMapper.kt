@@ -12,11 +12,11 @@ import org.springframework.security.oauth2.core.oidc.OidcUserInfo
 import rs.russian.generated.model.ContractDto
 import rs.russian.generated.model.UserInfoDto
 import rs.russian.portal.file.mapper.FileInfoMapper
-import rs.russian.portal.shared.enums.UserGroup
 import rs.russian.portal.shared.security.userGroups
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.Contract
 import rs.russian.portal.user.domain.UserInfo
+import rs.russian.portal.user.domain.enums.UserGroup
 import java.time.LocalDateTime
 import java.util.*
 

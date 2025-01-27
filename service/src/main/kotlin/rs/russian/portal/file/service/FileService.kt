@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.FileInfoDto
 import rs.russian.portal.file.domain.FileInfo
+import rs.russian.portal.file.domain.enums.FileExt
 import rs.russian.portal.file.mapper.FileInfoMapper
 import rs.russian.portal.file.repository.FileInfoRepository
-import rs.russian.portal.shared.enums.FileExt
 import rs.russian.portal.user.domain.Account
 import java.util.*
 

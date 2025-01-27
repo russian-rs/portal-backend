@@ -1,4 +1,4 @@
-package rs.russian.portal.shared.enums
+package rs.russian.portal.file.domain.enums
 
 import rs.russian.portal.shared.exception.UnsupportedFileFormat
 

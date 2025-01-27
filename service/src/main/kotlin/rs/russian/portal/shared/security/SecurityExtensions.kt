@@ -3,7 +3,7 @@ package rs.russian.portal.shared.security
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
-import rs.russian.portal.shared.enums.UserGroup
+import rs.russian.portal.user.domain.enums.UserGroup
 
 fun currentUser() = SecurityContextHolder.getContext().authentication.principal as OidcUser
 
