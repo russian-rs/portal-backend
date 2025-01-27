@@ -6,6 +6,7 @@ import jakarta.persistence.EnumType.STRING
 import org.hibernate.annotations.SQLRestriction
 import rs.russian.portal.note.domain.Note
 import rs.russian.portal.report.domain.enums.ReportStatus
+import rs.russian.portal.report.domain.listener.ReportEntityListener
 import rs.russian.portal.shared.jpa.JpaEntity
 import rs.russian.portal.user.domain.Account
 import java.time.LocalDateTime
@@ -13,6 +14,7 @@ import java.time.OffsetDateTime
 import java.util.*
 
 @Entity
+@EntityListeners(ReportEntityListener::class)
 @NamedEntityGraph(
     name = Report.GRAPH_TASKS_ACCOUNT,
     attributeNodes = [
