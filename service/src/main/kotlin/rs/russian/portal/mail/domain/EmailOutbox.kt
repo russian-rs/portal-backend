@@ -28,5 +28,5 @@ data class EmailOutbox(
 
 ) : JpaEntity<UUID>() {
 
-    override fun equalityProperties() = setOf(EmailOutbox::id)
+    override fun equalityProperties() = setOf(EmailOutbox::id, EmailOutbox::status, EmailOutbox::properties)
 }

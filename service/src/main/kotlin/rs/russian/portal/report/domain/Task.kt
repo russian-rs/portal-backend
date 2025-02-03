@@ -43,7 +43,8 @@ data class Task(
 
 ) : JpaEntity<UUID>() {
 
-    override fun equalityProperties() = setOf(Task::id)
+    override fun equalityProperties() =
+        setOf(Task::id, Task::date, Task::name, Task::description, Task::timeSpent, Task::result)
 
     companion object {
         const val GRAPH_FULL = "TaskCustomerFiles"

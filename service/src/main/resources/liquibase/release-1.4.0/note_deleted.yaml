@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.4.0-add-deleted-column-to-note
+      author: Maksim Aminov
+      changes:
+        - addColumn:
+            tableName: note
+            columns:
+              - column:
+                  name: deleted
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false

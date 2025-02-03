@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.4.0-create-audit
+      author: Maksim Aminov
+      changes:
+        - createTable:
+            tableName: audit
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: timestamp
+                  type: timestamp
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_login
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_type
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entity_id
+                  type: varchar(255)
+              - column:
+                  name: operation
+                  type: varchar(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: data
+                  type: text
+                  constraints:
+                    nullable: true

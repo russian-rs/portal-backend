@@ -30,7 +30,7 @@ data class FileInfo(
 
 ) : JpaEntity<String>() {
 
-    override fun equalityProperties() = setOf(FileInfo::id)
+    override fun equalityProperties() = setOf(FileInfo::id, FileInfo::name, FileInfo::suffix, FileInfo::author)
 
     fun getIdWithSuffix(): String {
         return "${id}.${suffix.name.lowercase()}"

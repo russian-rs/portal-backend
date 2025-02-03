@@ -23,9 +23,9 @@ internal abstract class JpaEntityExtensions {
             obj: T,
             properties: Collection<KProperty1<out T, Any?>>
         ): Int = properties.map {
-                @Suppress("UNCHECKED_CAST")
-                it as KProperty1<T, Any?>
-            }.map { it.get(obj) }.hashCode()
+            @Suppress("UNCHECKED_CAST")
+            it as KProperty1<T, Any?>
+        }.map { it.get(obj) }.hashCode()
 
         /**
          * Checks if the given properties of two objects are equal.
