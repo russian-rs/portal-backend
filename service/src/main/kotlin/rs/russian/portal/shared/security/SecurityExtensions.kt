@@ -5,11 +5,17 @@ import org.springframework.security.oauth2.core.oidc.OidcUserInfo
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import rs.russian.portal.user.domain.enums.UserGroup
 
-fun currentUser() = SecurityContextHolder.getContext().authentication.principal as OidcUser
+fun currentUser(): OidcUser? {
+    return try {
+        SecurityContextHolder.getContext().authentication.principal as OidcUser
+    } catch (e: Exception) {
+        null
+    }
+}
 
-fun currentUserLogin(): String = currentUser().nickName
+fun currentUserLogin(): String? = currentUser()?.nickName
 
-fun currentUserRoles(): Set<UserGroup> = currentUser().userInfo.userGroups()
+fun currentUserRoles(): Set<UserGroup>? = currentUser()?.userInfo?.userGroups()
 
 fun OidcUserInfo.userGroups(): Set<UserGroup> {
     val groups = mutableSetOf<UserGroup>()

@@ -16,6 +16,7 @@ import rs.russian.portal.report.domain.enums.ReportStatus
 import rs.russian.portal.report.domain.specification.from
 import rs.russian.portal.report.mapper.ReportMapper
 import rs.russian.portal.report.repository.ReportRepository
+import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.service.AccountService
 import java.util.*
@@ -79,7 +80,7 @@ class ReportService(
     @Transactional
     fun addNote(reportId: UUID, noteDto: NoteDto): Note {
         val report = getReport(reportId)
-        val currentAccount = accountService.getAccountByLogin(currentUserLogin())
+        val currentAccount = accountService.getAccountByLogin(currentUserLogin() ?: throw NotAuthorizedException())
         val note = noteService.save(
             Note(
                 createdBy = currentAccount,
@@ -96,7 +97,7 @@ class ReportService(
     fun changeStatus(reportId: UUID, status: ReportStatus, noteText: String? = null) {
         val report = getReport(reportId)
         if (!noteText.isNullOrEmpty()) {
-            val currentAccount = accountService.getAccountByLogin(currentUserLogin())
+            val currentAccount = accountService.getAccountByLogin(currentUserLogin() ?: throw NotAuthorizedException())
             val note = noteService.save(
                 Note(
                     createdBy = currentAccount,

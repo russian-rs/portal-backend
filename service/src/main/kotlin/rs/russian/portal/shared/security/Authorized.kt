@@ -25,7 +25,7 @@ class AuthorizedAnnotationAspect {
         if (authorized.allowed.isEmpty() && authorized.disallowed.isEmpty()) {
             throw IllegalArgumentException("At least one of the parameters [allowed, disallowed] should be specified")
         }
-        val currentUserRoles = currentUserRoles()
+        val currentUserRoles = currentUserRoles() ?: throw NotAuthorizedException()
         if (authorized.allowed.isNotEmpty()) {
             if (currentUserRoles.none { it in authorized.allowed }) {
                 throw NotAuthorizedException()

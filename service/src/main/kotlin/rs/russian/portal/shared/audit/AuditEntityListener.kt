@@ -41,7 +41,7 @@ class AuditEntityListener(
             entityType = entityName.uppercase(),
             entityId = entityId,
             operation = operation,
-            userLogin = currentUserLogin(),
+            userLogin = currentUserLogin() ?: "",
             data = entity.toString()
         )
 
