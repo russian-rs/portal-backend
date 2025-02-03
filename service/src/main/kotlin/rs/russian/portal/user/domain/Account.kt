@@ -49,7 +49,7 @@ data class Account(
 
     ) : JpaEntity<Int>() {
 
-    override fun equalityProperties() = setOf(Account::email)
+    override fun equalityProperties() = setOf(Account::email, Account::username)
 
     companion object {
         const val GRAPH_FULL = "AccountUserInfoContracts"

@@ -47,6 +47,12 @@ class ReportService(
     }
 
     @Transactional
+    fun deleteReport(reportId: UUID) {
+        val report = getReport(reportId)
+        reportRepository.save(report.also { it.deleted = true })
+    }
+
+    @Transactional
     fun updateReport(reportDto: ReportDto): Report {
         val report = getReport(reportDto.id)
         val tasks = reportDto.tasks.map { taskDto ->

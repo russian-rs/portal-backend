@@ -1,6 +1,7 @@
 package rs.russian.portal.shared.jpa
 
 import jakarta.persistence.*
+import rs.russian.portal.shared.audit.AuditEntityListener
 import rs.russian.portal.shared.jpa.JpaEntityExtensions.Companion.propertyEquals
 import rs.russian.portal.shared.jpa.JpaEntityExtensions.Companion.propertyHashCode
 import java.io.Serializable
@@ -17,6 +18,7 @@ import kotlin.reflect.full.declaredMemberProperties
 @MappedSuperclass
 @Access(AccessType.FIELD)
 @Suppress("UNUSED")
+@EntityListeners(AuditEntityListener::class)
 abstract class JpaEntity<ID_TYPE> : Serializable where ID_TYPE : Comparable<ID_TYPE> {
 
     @get:[Access(AccessType.PROPERTY) Id]
@@ -40,12 +42,16 @@ abstract class JpaEntity<ID_TYPE> : Serializable where ID_TYPE : Comparable<ID_T
         if (equalityProperties.isEmpty()) super.hashCode() else propertyHashCode(this, equalityProperties)
 
     final override fun toString(): String =
-        "${this::class.simpleName}(${equalityProperties().joinToString(",") { "${it::name}=${it::get}" }})"
+        "[${
+            equalityProperties().joinToString(", ") { prop ->
+                "${prop.name} = ${(prop as KProperty1<JpaEntity<*>, Any?>).get(this).toString()}"
+            }
+        }]"
 
     @get:Transient
     private val equalityProperties: Collection<KProperty1<out JpaEntity<ID_TYPE>, Any?>>
         get() = emptyPropertiesMap<ID_TYPE>().computeIfAbsent(this::class) { _ -> equalityProperties() }
-    
+
     private fun publicProperties(): Collection<KProperty1<out JpaEntity<ID_TYPE>, Any?>> =
         this::class.declaredMemberProperties.filter { it.visibility === KVisibility.PUBLIC }
 

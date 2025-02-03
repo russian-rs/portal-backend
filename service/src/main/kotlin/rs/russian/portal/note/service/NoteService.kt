@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import rs.russian.portal.note.domain.Note
 import rs.russian.portal.note.repository.NoteRepository
+import java.util.*
 
 @Service
 class NoteService(
@@ -11,5 +12,8 @@ class NoteService(
 ) {
 
     @Transactional
-    fun save(note: Note) = repository.save(note)
+    fun save(note: Note): Note = repository.save(note)
+
+    @Transactional
+    fun delete(noteId: UUID) = repository.deleteById(noteId)
 }

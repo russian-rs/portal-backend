@@ -1,3 +1,9 @@
 databaseChangeLog:
   - include:
       file: liquibase/release-1.4.0/note.yaml
+  - include:
+      file: liquibase/release-1.4.0/note_deleted.yaml
+  - include:
+      file: liquibase/release-1.4.0/report_deleted.yaml
+  - include:
+      file: liquibase/release-1.4.0/audit.yaml

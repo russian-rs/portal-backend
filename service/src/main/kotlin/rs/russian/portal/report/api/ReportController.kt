@@ -33,6 +33,12 @@ class ReportController(
         return ResponseEntity.ok(reportMapper.map(report))
     }
 
+    @Authorized(allowed = [ADMIN_VOLUNTEER])
+    override fun deleteReport(id: UUID): ResponseEntity<Unit> {
+        reportService.deleteReport(id)
+        return ResponseEntity.ok().build()
+    }
+
     @Transactional
     override fun updateReport(reportDto: ReportDto): ResponseEntity<ReportDto> {
         val report = reportService.updateReport(reportDto)
