@@ -23,7 +23,7 @@ enum class FileExt {
             if (extension.isNullOrBlank()) {
                 throw UnsupportedFileFormat()
             }
-            return entries.find { it.name.lowercase() == extension } ?: throw UnsupportedFileFormat()
+            return entries.find { it.name.lowercase() == extension.lowercase() } ?: throw UnsupportedFileFormat()
         }
     }
 }
