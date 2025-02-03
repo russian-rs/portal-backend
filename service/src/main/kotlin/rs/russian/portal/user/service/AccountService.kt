@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.PageRequest
 import rs.russian.generated.model.UserCreateRequest
 import rs.russian.portal.file.service.FileService
+import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.domain.Account
@@ -49,7 +50,7 @@ class AccountService(
     }
 
     @Transactional(readOnly = true)
-    fun getCurrentAccount(): Account = getAccountByLogin(currentUserLogin())
+    fun getCurrentAccount(): Account = getAccountByLogin(currentUserLogin() ?: throw NotAuthorizedException())
 
     @Transactional
     fun save(account: Account): Account {

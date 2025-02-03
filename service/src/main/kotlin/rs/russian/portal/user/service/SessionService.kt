@@ -6,6 +6,7 @@ import org.springframework.session.Session
 import org.springframework.stereotype.Service
 import org.springframework.web.context.request.RequestContextHolder
 import org.springframework.web.context.request.ServletRequestAttributes
+import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.security.currentUser
 
 @Service
@@ -22,7 +23,8 @@ class SessionService(
      */
     fun invalidate(all: Boolean) {
         if (all) {
-            val sessionIds = sessionRepository.findByPrincipalName(currentUser().nickName).keys
+            val sessionIds =
+                sessionRepository.findByPrincipalName(currentUser()?.nickName ?: throw NotAuthorizedException()).keys
             sessionIds.forEach { sessionId ->
                 sessionRepository.deleteById(sessionId)
             }
