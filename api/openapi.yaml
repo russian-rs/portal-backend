@@ -992,10 +992,10 @@ components:
       type: object
       nullable: false
       required:
-        - active
+        - onlyInactive
       properties:
-        active:
+        onlyInactive:
           type: boolean
           nullable: false
-          default: true
-          description: Показывать только активных пользователей
+          default: false
+          description: Показывать только неактивных пользователей
