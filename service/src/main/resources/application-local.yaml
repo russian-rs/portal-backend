@@ -4,12 +4,12 @@ server:
     include-message: always
 
 app:
-  frontend-uri: http://localhost:3000
+  frontend-uri: ${FRONTEND_URL:http://localhost:3000}
   s3:
-    region: eu-central
-    endpoint: http://localhost:9000
-    bucket: portal-files
-    bucket-service: portal-data
+    region: ${S3_REGION:eu-central}
+    endpoint: ${S3_ENDPOINT:http://localhost:9000}
+    bucket: ${S3_BUCKET:portal-files}
+    bucket-service: ${S3_BUCKET_SERVICE:portal-data}
   wordpress:
     base-url: http://localhost
   schedulers:
@@ -24,9 +24,9 @@ ds:
 --- # Data
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/portal?ApplicationName=${spring.application.name}&targetServerType=master
-    username: admin
-    password: 123456
+    url: jdbc:postgresql://${DB_HOST:localhost:5432}/${DB_NAME:portal}?ApplicationName=${spring.application.name}&targetServerType=master
+    username: ${DB_USER:admin}
+    password: ${DB_PASS:123456}
   jpa:
     show-sql: true
     properties:
@@ -34,10 +34,10 @@ spring:
         format_sql: true
   data:
     redis:
-      host: localhost
-      port: 6379
-      password: 123456
-      database: 0
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASS:123456}
+      database: ${REDIS_DATABASE:0}
 
 --- # Security
 spring:
@@ -46,7 +46,7 @@ spring:
       client:
         registration:
           authentik:
-            redirect-uri: http://localhost:3000/api/oauth2/code
+            redirect-uri: ${FRONTEND_URL:http://localhost:3000}/api/oauth2/code
 
 --- # Mail
 spring:
