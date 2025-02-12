@@ -11,7 +11,7 @@ def npmVersion = resolveApiVersion(openApiPath)
 def npmRepository = "https://npm.pkg.github.com"
 
 if (project.hasProperty('snapshot')) {
-    npmVersion = "${resolveApiVersion()}-snapshot-${snapshot}"
+    npmVersion = "${resolveApiVersion(openApiPath)}-snapshot-${snapshot}"
 }
 
 openApiGenerate {
