@@ -14,8 +14,8 @@ import rs.russian.portal.application.service.ApplicationService
 import rs.russian.portal.shared.exception.CaptchaInvalidException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.Authorized
-import rs.russian.portal.user.domain.enums.UserGroup.ADMIN
 import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
+import rs.russian.portal.user.domain.enums.UserGroup.INTERVIEWER
 import java.util.*
 
 @RestController
@@ -51,13 +51,13 @@ class ApplicationController(
         return ResponseEntity.ok(applicationMapper.mapStatus(application))
     }
 
-    @Authorized(allowed = [ADMIN, ADMIN_VOLUNTEER])
+    @Authorized(allowed = [ADMIN_VOLUNTEER, INTERVIEWER])
     override fun getApplication(id: UUID): ResponseEntity<ApplicationDto> {
         val application = applicationService.get(id)
         return ResponseEntity.ok(applicationMapper.map(application))
     }
 
-    @Authorized(allowed = [ADMIN, ADMIN_VOLUNTEER])
+    @Authorized(allowed = [ADMIN_VOLUNTEER, INTERVIEWER])
     override fun getApplications(
         pageRequest: PageRequest,
         searchQuery: String?
@@ -71,7 +71,7 @@ class ApplicationController(
         )
     }
 
-    @Authorized(allowed = [ADMIN, ADMIN_VOLUNTEER])
+    @Authorized(allowed = [ADMIN_VOLUNTEER, INTERVIEWER])
     override fun updateApplication(applicationDto: ApplicationDto): ResponseEntity<ApplicationDto> {
         val application = applicationService.update(applicationDto)
         return ResponseEntity.ok(applicationMapper.map(application))
