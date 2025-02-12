@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.PageRequest
 import rs.russian.generated.model.UserCreateRequest
+import rs.russian.generated.model.UserSearchFilter
 import rs.russian.portal.file.service.FileService
 import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.jpa.convert
@@ -110,8 +111,8 @@ class AccountService(
     }
 
     @Transactional(readOnly = true)
-    fun search(query: String, pageRequest: PageRequest): Page<Account> {
-        val specification = searchSpecification(query)
+    fun search(query: String, pageRequest: PageRequest, filter: UserSearchFilter?): Page<Account> {
+        val specification = searchSpecification(query, filter)
         return accountRepository.findAll(specification, convert(pageRequest))
     }
 
