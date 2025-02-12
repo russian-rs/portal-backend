@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.12.0
+  version: 1.13.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -124,6 +124,12 @@ paths:
           required: true
           schema:
             $ref: '#/components/schemas/PageRequest'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSearchFilter'
       responses:
         '200':
           description: Success
@@ -982,3 +988,14 @@ components:
           nullable: false
         note:
           type: string
+    UserSearchFilter:
+      type: object
+      nullable: false
+      required:
+        - active
+      properties:
+        active:
+          type: boolean
+          nullable: false
+          default: true
+          description: Показывать только активных пользователей
