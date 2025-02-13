@@ -13,14 +13,15 @@ class EmailService(
     private val emailOutboxService: EmailOutboxService
 ) {
 
-    fun sendCommonEmail(to: String, subject: String, text: String) {
+    fun sendCommonEmail(to: String, subject: String, text: String, from: String? = null) {
         val context = Context().also { it.setVariables(mapOf("text" to text)) }
         val body = templateEngine.process("common_template", context)
         val props = EmailProperties(toList = listOf(to), subject = subject, body = body)
+        from?.let { props.from = it }
         emailOutboxService.save(EmailOutbox(properties = props))
     }
 
-    fun sendCommonEmail(user: Account, subject: String, text: String) {
-        sendCommonEmail("${user.fullName} <${user.email}>", subject, text)
+    fun sendCommonEmail(user: Account, subject: String, text: String, from: String? = null) {
+        sendCommonEmail("${user.fullName} <${user.email}>", subject, text, from)
     }
 }

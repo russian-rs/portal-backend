@@ -17,15 +17,23 @@ class MailController(
 ) : MailApi {
 
     @Authorized(allowed = [ADMIN_VOLUNTEER, INTERVIEWER])
-    override fun sendMail(subject: String, body: String, email: String?, username: String?): ResponseEntity<Unit> {
+    override fun sendMail(
+        subject: String,
+        body: String,
+        from: String?,
+        email: String?,
+        username: String?
+    ): ResponseEntity<Unit> {
         if (email.isNullOrBlank() && username.isNullOrBlank()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
         if (!username.isNullOrBlank()) {
-            emailService.sendCommonEmail(accountService.getAccountByLogin(username), subject, body)
+            emailService.sendCommonEmail(accountService.getAccountByLogin(username), subject, body, from)
         } else {
-            emailService.sendCommonEmail(email!!, subject, body)
+            emailService.sendCommonEmail(email!!, subject, body, from)
         }
         return ResponseEntity(HttpStatus.OK)
     }
+
+
 }
