@@ -27,7 +27,12 @@ class ApplicationEventListener(
         val application = applicationService.get(event.id)
         val message = templateEngine.process("application_received",
             Context().also { it.setVariables(mapOf("id" to application.id)) })
-        emailService.sendCommonEmail(application.email, "Ваша анкета получена", message)
+        emailService.sendCommonEmail(
+            application.email,
+            "Ваша анкета получена",
+            message,
+            "Русская Диаспора <apply@russian.rs>"
+        )
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
