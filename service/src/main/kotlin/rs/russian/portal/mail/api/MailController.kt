@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RestController
 import rs.russian.generated.api.MailApi
 import rs.russian.portal.mail.service.EmailService
 import rs.russian.portal.shared.security.Authorized
-import rs.russian.portal.user.domain.enums.UserGroup.ADMIN
 import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
+import rs.russian.portal.user.domain.enums.UserGroup.INTERVIEWER
 import rs.russian.portal.user.service.AccountService
 
 @RestController
@@ -16,7 +16,7 @@ class MailController(
     private val accountService: AccountService
 ) : MailApi {
 
-    @Authorized(allowed = [ADMIN, ADMIN_VOLUNTEER])
+    @Authorized(allowed = [ADMIN_VOLUNTEER, INTERVIEWER])
     override fun sendMail(subject: String, body: String, email: String?, username: String?): ResponseEntity<Unit> {
         if (email.isNullOrBlank() && username.isNullOrBlank()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
