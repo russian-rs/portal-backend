@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.13.1
+  version: 1.13.2
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -780,6 +780,8 @@ components:
           type: string
         status:
           type: string
+        week:
+          type: number
         tasks:
           type: array
           default: [ ]
