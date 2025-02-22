@@ -47,6 +47,9 @@ class Application(
     var bio: String? = null,
 
     var refuseReason: String? = null,
-    var comment: String? = null
+    var comment: String? = null,
+
+    var contractFrom: LocalDate? = null,
+    var contractUntil: LocalDate? = null
 
 ) : JpaEntity<UUID>()
