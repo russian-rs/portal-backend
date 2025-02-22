@@ -45,5 +45,5 @@ abstract class ReportMapper {
 
     @Named("reportWeek")
     fun week(report: Report) =
-        report.tasks.maxOf { it.date }.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear())
+        report.tasks.maxOf { it.date }.get(WeekFields.of(Locale.of("sr", "RS")).weekOfWeekBasedYear())
 }
