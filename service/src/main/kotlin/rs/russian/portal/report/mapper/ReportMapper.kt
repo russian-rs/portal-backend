@@ -3,6 +3,7 @@ package rs.russian.portal.report.mapper
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
 import org.mapstruct.MappingConstants.ComponentModel.SPRING
+import org.mapstruct.Named
 import org.mapstruct.ReportingPolicy.ERROR
 import org.springframework.beans.factory.annotation.Autowired
 import rs.russian.generated.model.ReportDto
@@ -12,6 +13,7 @@ import rs.russian.portal.note.mapper.NoteMapper
 import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.Task
 import java.time.LocalDateTime
+import java.time.temporal.WeekFields
 import java.util.*
 
 @Mapper(
@@ -28,6 +30,7 @@ abstract class ReportMapper {
     @Autowired
     private lateinit var noteMapper: NoteMapper
 
+    @Mapping(target = "week", source = "report", qualifiedByName = ["reportWeek"])
     @Mapping(target = "user", source = "account.username")
     abstract fun map(report: Report): ReportDto
 
@@ -39,4 +42,8 @@ abstract class ReportMapper {
 
     @Mapping(target = "customer", source = "customer.username")
     abstract fun map(task: Task): TaskDto
+
+    @Named("reportWeek")
+    fun week(report: Report) =
+        report.tasks.maxOf { it.date }.get(WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear())
 }
