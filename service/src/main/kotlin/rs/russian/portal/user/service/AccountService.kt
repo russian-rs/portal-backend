@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import rs.russian.generated.model.ContractDto
 import rs.russian.generated.model.PageRequest
 import rs.russian.generated.model.UserCreateRequest
 import rs.russian.generated.model.UserSearchFilter
@@ -16,6 +17,7 @@ import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.domain.specification.searchSpecification
+import rs.russian.portal.user.mapper.ContractMapper
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.mapper.WordpressUserMapper
 import rs.russian.portal.user.repository.AccountRepository
@@ -26,6 +28,7 @@ import rs.russian.portal.user.service.wordpress.WordpressUserService
 class AccountService(
     private val userMapper: UserMapper,
     private val fileService: FileService,
+    private val contractMapper: ContractMapper,
     private val accountRepository: AccountRepository,
     private val wordpressUserMapper: WordpressUserMapper,
     private val wordpressUserService: WordpressUserService,
@@ -145,6 +148,13 @@ class AccountService(
         } catch (e: Exception) {
             log.error("Failed to create/delete user in WordPress - ${account.username}", e)
         }
+        return save(account)
+    }
+
+    @Transactional
+    fun updateContracts(account: Account, contractList: List<ContractDto>): Account {
+        account.contracts.clear()
+        account.contracts.addAll(contractList.map { contractMapper.map(it, account) })
         return save(account)
     }
 

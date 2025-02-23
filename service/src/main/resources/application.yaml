@@ -45,6 +45,7 @@ app:
   schedulers:
     email-outbox: "*/15 * * * * *"
     user-sync: "0 0 */1 * * *"
+    expired-applications: "0 0 6 */1 * *"
 
 --- # Data
 spring:

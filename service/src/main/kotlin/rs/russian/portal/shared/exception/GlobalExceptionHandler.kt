@@ -51,6 +51,14 @@ class GlobalExceptionHandler {
         return ResponseEntity(ErrorResponse(BAD_REQUEST.reasonPhrase), BAD_REQUEST)
     }
 
+    @ExceptionHandler(InvalidRequestException::class)
+    fun handleInvalidRequestException(
+        ex: InvalidRequestException,
+        request: WebRequest
+    ): ResponseEntity<ErrorResponse> {
+        return ResponseEntity(ErrorResponse(ex.message), BAD_REQUEST)
+    }
+
     @ExceptionHandler(NotAuthorizedException::class)
     fun handleUnsupportedFileFormat(ex: NotAuthorizedException, request: WebRequest): ResponseEntity<ErrorResponse> {
         return ResponseEntity(ErrorResponse(FORBIDDEN.reasonPhrase), FORBIDDEN)
