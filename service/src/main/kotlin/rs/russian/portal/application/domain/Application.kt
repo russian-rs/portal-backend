@@ -5,6 +5,7 @@ import jakarta.persistence.EntityListeners
 import jakarta.persistence.EnumType.STRING
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
+import rs.russian.generated.model.ContractTypeEnum
 import rs.russian.portal.application.domain.ApplicationStatus.CREATED
 import rs.russian.portal.application.domain.ApplicationType.NEW
 import rs.russian.portal.application.domain.listener.ApplicationEntityListener
@@ -50,6 +51,8 @@ class Application(
     var comment: String? = null,
 
     var contractFrom: LocalDate? = null,
-    var contractUntil: LocalDate? = null
+    var contractUntil: LocalDate? = null,
+    @Enumerated(STRING)
+    var contractType: ContractTypeEnum? = null
 
 ) : JpaEntity<UUID>()

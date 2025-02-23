@@ -28,12 +28,14 @@ abstract class ApplicationMapper {
     @Mapping(target = "refuseReason", ignore = true)
     @Mapping(target = "contractFrom", source = "contract.startDate")
     @Mapping(target = "contractUntil", source = "contract.endDate")
+    @Mapping(target = "contractType", source = "contract.type")
     abstract fun map(applicationDto: ApplicationDto, @MappingTarget application: Application)
 
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "contractFrom", source = "contract.startDate")
     @Mapping(target = "contractUntil", source = "contract.endDate")
+    @Mapping(target = "contractType", source = "contract.type")
     abstract fun update(applicationDto: ApplicationDto, @MappingTarget application: Application)
 
     @Mapping(target = "contract", source = "application", qualifiedByName = ["contract"])
