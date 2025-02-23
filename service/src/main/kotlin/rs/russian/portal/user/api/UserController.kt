@@ -75,4 +75,10 @@ class UserController(
         val account = accountService.getAccount(id)
         return ResponseEntity.ok(userMapper.map(accountService.switchActiveState(account, false).info))
     }
+
+    @Authorized(allowed = [ADMIN_VOLUNTEER])
+    override fun updateContracts(id: Int, contractDto: List<ContractDto>): ResponseEntity<UserInfoDto> {
+        val account = accountService.getAccount(id)
+        return ResponseEntity.ok(userMapper.map(accountService.updateContracts(account, contractDto).info))
+    }
 }
