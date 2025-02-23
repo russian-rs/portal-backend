@@ -2,8 +2,8 @@ package rs.russian.portal.user.domain
 
 import jakarta.persistence.*
 import jakarta.persistence.EnumType.STRING
+import rs.russian.generated.model.ContractTypeEnum
 import rs.russian.portal.shared.jpa.JpaEntity
-import rs.russian.portal.user.domain.enums.ContractType
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -22,7 +22,7 @@ class Contract(
     var endDate: LocalDate,
 
     @Enumerated(STRING)
-    var type: ContractType = ContractType.REGULAR
+    var type: ContractTypeEnum = ContractTypeEnum.REGULAR
 
 ) : JpaEntity<UUID>() {
 

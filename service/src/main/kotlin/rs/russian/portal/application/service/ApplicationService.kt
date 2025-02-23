@@ -12,6 +12,7 @@ import rs.russian.portal.application.domain.ApplicationType
 import rs.russian.portal.application.domain.specification.searchSpecification
 import rs.russian.portal.application.mapper.ApplicationMapper
 import rs.russian.portal.application.repository.ApplicationRepository
+import rs.russian.portal.shared.exception.InvalidRequestException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.user.service.AccountService
 import java.util.*
@@ -66,6 +67,9 @@ class ApplicationService(
     fun update(applicationDto: ApplicationDto): Application {
         val application = get(applicationDto.id)
         applicationMapper.update(applicationDto, application)
+        if (application.status == DONE && application.contractFrom == null) {
+            throw InvalidRequestException("Contract dates not specified")
+        }
         return applicationRepository.save(application)
     }
 
