@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.14.0
+  version: 1.14.1
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -477,6 +477,12 @@ paths:
           required: false
           schema:
             type: string
+      requestBody:
+        required: false
+        content:
+          "*/*":
+            schema:
+              $ref: '#/components/schemas/ApplicationsFilter'
       responses:
         '200':
           description: Success
@@ -926,6 +932,15 @@ components:
           type: string
         contract:
           $ref: '#/components/schemas/ContractDto'
+    ApplicationsFilter:
+      type: object
+      required:
+        - showCompleted
+      properties:
+        showCompleted:
+          type: boolean
+          default: false
+          description: Показывать обработанные заявки
     ApplicationStatusDto:
       type: object
       required:

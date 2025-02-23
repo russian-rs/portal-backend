@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.ApplicationDto
+import rs.russian.generated.model.ApplicationsFilter
 import rs.russian.generated.model.PageRequest
 import rs.russian.portal.application.domain.Application
 import rs.russian.portal.application.domain.ApplicationStatus.DENY
@@ -58,8 +59,8 @@ class ApplicationService(
     }
 
     @Transactional(readOnly = true)
-    fun getAll(searchQuery: String?, pageRequest: PageRequest): Page<Application> {
-        val specification = searchSpecification(searchQuery)
+    fun getAll(searchQuery: String?, pageRequest: PageRequest, filter: ApplicationsFilter?): Page<Application> {
+        val specification = searchSpecification(searchQuery, filter)
         return applicationRepository.findAll(specification, convert(pageRequest))
     }
 
