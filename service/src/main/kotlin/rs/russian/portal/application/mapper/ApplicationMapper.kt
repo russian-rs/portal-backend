@@ -9,7 +9,6 @@ import org.mapstruct.ReportingPolicy.ERROR
 import rs.russian.generated.model.ApplicationDto
 import rs.russian.generated.model.ApplicationStatusDto
 import rs.russian.generated.model.ContractDto
-import rs.russian.generated.model.ContractTypeEnum
 import rs.russian.portal.application.domain.Application
 import rs.russian.portal.application.domain.ApplicationStatus
 import java.time.LocalDateTime
@@ -56,16 +55,14 @@ abstract class ApplicationMapper {
 
     @Named("contract")
     fun mapContract(application: Application): ContractDto? {
-        if (application.contractFrom == null || application.contractUntil == null) {
+        if (application.contractFrom == null || application.contractUntil == null || application.contractType == null) {
             return null
         }
-        val contractType =
-            if (application.residenceRequired == true) ContractTypeEnum.REGULAR else ContractTypeEnum.ASSOCIATED
         return ContractDto(
             id = UUID.randomUUID(),
             startDate = application.contractFrom!!,
             endDate = application.contractUntil!!,
-            type = contractType
+            type = application.contractType!!
         )
     }
 }
