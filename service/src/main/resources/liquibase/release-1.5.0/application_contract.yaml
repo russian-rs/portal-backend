@@ -12,3 +12,6 @@ databaseChangeLog:
               - column:
                   name: contract_until
                   type: DATE
+              - column:
+                  name: contract_type
+                  type: VARCHAR(255)
