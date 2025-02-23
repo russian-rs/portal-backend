@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.14.1
+  version: 1.15.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -79,6 +79,34 @@ paths:
           schema:
             type: integer
             nullable: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
+  /user/account/{id}/contracts:
+    post:
+      operationId: updateContracts
+      description: Обновить список договоров волонтера
+      tags:
+        - user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            nullable: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ContractDto'
       responses:
         '200':
           description: Success
