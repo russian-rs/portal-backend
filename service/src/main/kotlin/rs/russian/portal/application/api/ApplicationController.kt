@@ -5,10 +5,7 @@ import jakarta.servlet.http.HttpServletRequest
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import rs.russian.generated.api.ApplicationApi
-import rs.russian.generated.model.ApplicationDto
-import rs.russian.generated.model.ApplicationPageResponse
-import rs.russian.generated.model.ApplicationStatusDto
-import rs.russian.generated.model.PageRequest
+import rs.russian.generated.model.*
 import rs.russian.portal.application.mapper.ApplicationMapper
 import rs.russian.portal.application.service.ApplicationService
 import rs.russian.portal.shared.exception.CaptchaInvalidException
@@ -60,9 +57,10 @@ class ApplicationController(
     @Authorized(allowed = [ADMIN_VOLUNTEER, INTERVIEWER])
     override fun getApplications(
         pageRequest: PageRequest,
-        searchQuery: String?
+        searchQuery: String?,
+        applicationsFilter: ApplicationsFilter?
     ): ResponseEntity<ApplicationPageResponse> {
-        val page = applicationService.getAll(searchQuery, pageRequest)
+        val page = applicationService.getAll(searchQuery, pageRequest, applicationsFilter)
         return ResponseEntity.ok(
             ApplicationPageResponse(
                 page = convert(page),
