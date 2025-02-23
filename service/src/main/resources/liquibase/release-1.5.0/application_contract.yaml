@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.5.0-add-contract-columns-to-application
+      author: Maksim Aminov
+      changes:
+        - addColumn:
+            tableName: application
+            columns:
+              - column:
+                  name: contract_from
+                  type: DATE
+              - column:
+                  name: contract_until
+                  type: DATE
+              - column:
+                  name: contract_type
+                  type: VARCHAR(255)

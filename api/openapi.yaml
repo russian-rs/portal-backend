@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.13.2
+  version: 1.14.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -864,9 +864,7 @@ components:
           format: date
           nullable: false
         type:
-          type: string
-          example: ASSOCIATED
-          nullable: false
+          $ref: '#/components/schemas/ContractTypeEnum'
     ApplicationDto:
       type: object
       required:
@@ -926,6 +924,8 @@ components:
           type: string
         comment:
           type: string
+        contract:
+          $ref: '#/components/schemas/ContractDto'
     ApplicationStatusDto:
       type: object
       required:
@@ -1006,3 +1006,8 @@ components:
           nullable: false
           default: false
           description: Показывать только неактивных пользователей
+    ContractTypeEnum:
+      type: string
+      enum:
+        - ASSOCIATED
+        - REGULAR

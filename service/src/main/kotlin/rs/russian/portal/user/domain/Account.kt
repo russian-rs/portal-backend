@@ -41,7 +41,7 @@ data class Account(
     var reports: List<Report> = ArrayList(),
 
     @OneToMany(mappedBy = "account", cascade = [ALL], orphanRemoval = true)
-    var contracts: List<Contract> = ArrayList(),
+    var contracts: MutableList<Contract> = ArrayList(),
 
     var active: Boolean = true,
 
