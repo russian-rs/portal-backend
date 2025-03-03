@@ -29,9 +29,9 @@ class MailController(
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
         if (!username.isNullOrBlank()) {
-            emailService.sendCommonEmail(accountService.getAccountByLogin(username), subject, body, from)
+            emailService.sendCommonEmail(accountService.getAccountByLogin(username), subject, body, from, attachments)
         } else {
-            emailService.sendCommonEmail(email!!, subject, body, from)
+            emailService.sendCommonEmail(email!!, subject, body, from, attachments)
         }
         return ResponseEntity(HttpStatus.OK)
     }
