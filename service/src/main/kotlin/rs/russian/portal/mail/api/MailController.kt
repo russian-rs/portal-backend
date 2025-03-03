@@ -22,7 +22,8 @@ class MailController(
         body: String,
         from: String?,
         email: String?,
-        username: String?
+        username: String?,
+        attachments: List<String>?
     ): ResponseEntity<Unit> {
         if (email.isNullOrBlank() && username.isNullOrBlank()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
