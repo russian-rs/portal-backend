@@ -1,8 +1,5 @@
 package rs.russian.portal.config
 
-import aws.sdk.kotlin.runtime.auth.credentials.StaticCredentialsProvider
-import aws.sdk.kotlin.services.s3.S3Client
-import aws.smithy.kotlin.runtime.net.url.Url
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
@@ -23,6 +20,13 @@ import org.springframework.scheduling.annotation.EnableScheduling
 import org.thymeleaf.spring6.SpringTemplateEngine
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import rs.russian.portal.shared.utils.CacheService
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.S3Configuration
+import software.amazon.awssdk.services.s3.presigner.S3Presigner
+import java.net.URI
 import java.util.concurrent.TimeUnit
 import javax.sql.DataSource
 
@@ -60,15 +64,29 @@ class AppConfig {
 
     @Bean
     fun s3Client(props: S3Properties): S3Client {
-        return S3Client {
-            region = props.region
-            endpointUrl = Url.parse(props.endpoint)
-            forcePathStyle = true
-            credentialsProvider = StaticCredentialsProvider {
-                accessKeyId = props.accessKey
-                secretAccessKey = props.secretKey
-            }
-        }
+        val creds = AwsBasicCredentials.create(props.accessKey, props.secretKey)
+        return S3Client.builder()
+            .region(Region.of(props.region))
+            .endpointOverride(URI(props.endpoint))
+            .forcePathStyle(true)
+            .credentialsProvider(StaticCredentialsProvider.create(creds))
+            .build()
+    }
+
+    @Bean
+    fun s3Presigner(props: S3Properties, s3Client: S3Client): S3Presigner {
+        val creds = AwsBasicCredentials.create(props.accessKey, props.secretKey)
+        return S3Presigner.builder()
+            .region(Region.of(props.region))
+            .endpointOverride(URI(props.endpoint))
+            .credentialsProvider(StaticCredentialsProvider.create(creds))
+            .s3Client(s3Client)
+            .serviceConfiguration(
+                S3Configuration.builder()
+                    .pathStyleAccessEnabled(true)
+                    .build()
+            )
+            .build()
     }
 
     @Bean

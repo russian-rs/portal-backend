@@ -21,7 +21,7 @@ abstract class FileInfoMapper {
 
     fun map(fileInfo: FileInfo?): FileInfoDto? {
         if (fileInfo == null) return null
-        val link = runBlocking { s3Service.get(fileInfo.getIdWithSuffix()) }
+        val link = runBlocking { s3Service.getUrl(fileInfo.getIdWithSuffix()) }
         return map(fileInfo, link.toString())
     }
 }

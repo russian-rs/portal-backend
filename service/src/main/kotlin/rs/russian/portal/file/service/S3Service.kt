@@ -1,14 +1,5 @@
 package rs.russian.portal.file.service
 
-import aws.sdk.kotlin.services.s3.S3Client
-import aws.sdk.kotlin.services.s3.model.DeleteObjectRequest
-import aws.sdk.kotlin.services.s3.model.GetObjectRequest
-import aws.sdk.kotlin.services.s3.model.PutObjectRequest
-import aws.sdk.kotlin.services.s3.presigners.presignGetObject
-import aws.smithy.kotlin.runtime.content.asByteStream
-import aws.smithy.kotlin.runtime.content.toInputStream
-import aws.smithy.kotlin.runtime.net.url.Url
-import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.apache.commons.io.FileUtils
@@ -18,81 +9,67 @@ import org.springframework.stereotype.Service
 import rs.russian.portal.config.S3Properties
 import rs.russian.portal.file.domain.FileInfo
 import rs.russian.portal.shared.utils.CacheService
+import software.amazon.awssdk.core.sync.RequestBody
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
+import software.amazon.awssdk.services.s3.model.GetObjectRequest
+import software.amazon.awssdk.services.s3.model.PutObjectRequest
+import software.amazon.awssdk.services.s3.presigner.S3Presigner
+import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest
 import java.io.File
-import kotlin.reflect.KClass
-import kotlin.time.toKotlinDuration
+import java.io.InputStream
+import java.net.URL
 
 @Service
 class S3Service(
     private val s3Client: S3Client,
-    private val csvMapper: CsvMapper,
+    private val s3Presigner: S3Presigner,
     private val s3Properties: S3Properties
 ) {
 
-    @Cacheable(cacheNames = [CacheService.S3_FILE_CACHE], key = "#idWithSuffix")
-    suspend fun get(idWithSuffix: String): Url {
-        val request = s3Client.presignGetObject(GetObjectRequest {
-            key = idWithSuffix
-            bucket = s3Properties.bucket
-        }, s3Properties.presignDuration.toKotlinDuration())
-        return request.url
+    fun get(fileInfo: FileInfo): InputStream {
+        val getObjectRequest = GetObjectRequest.builder()
+            .bucket(s3Properties.bucket)
+            .key(fileInfo.getIdWithSuffix())
+            .build()
+        return s3Client.getObject(getObjectRequest)
     }
 
-    suspend fun upload(file: Resource, fileInfo: FileInfo): Url {
+    @Cacheable(cacheNames = [CacheService.S3_FILE_CACHE], key = "#idWithSuffix")
+    fun getUrl(idWithSuffix: String): URL {
+        val getObjectRequest = GetObjectRequest.builder()
+            .bucket(s3Properties.bucket)
+            .key(idWithSuffix)
+            .build()
+
+        val presignRequest = GetObjectPresignRequest.builder()
+            .signatureDuration(s3Properties.presignDuration)
+            .getObjectRequest(getObjectRequest)
+            .build()
+
+        return s3Presigner.presignGetObject(presignRequest).url()
+    }
+
+    suspend fun upload(file: Resource, fileInfo: FileInfo): URL {
         val temp = withContext(Dispatchers.IO) {
             File.createTempFile(fileInfo.id!!, null)
         }
         FileUtils.copyInputStreamToFile(file.inputStream, temp)
-        s3Client.putObject(
-            PutObjectRequest {
-                key = fileInfo.getIdWithSuffix()
-                bucket = s3Properties.bucket
-                body = temp.asByteStream()
-            }
-        )
-        return get(fileInfo.getIdWithSuffix())
+        val putObjectRequest = PutObjectRequest.builder()
+            .bucket(s3Properties.bucket)
+            .key(fileInfo.getIdWithSuffix())
+            .build()
+        s3Client.putObject(putObjectRequest, RequestBody.fromFile(temp))
+        temp.delete()
+        return getUrl(fileInfo.getIdWithSuffix())
     }
 
     suspend fun remove(fileInfo: FileInfo) {
         s3Client.deleteObject(
-            DeleteObjectRequest {
-                key = fileInfo.getIdWithSuffix()
-                bucket = s3Properties.bucket
-            }
+            DeleteObjectRequest.builder()
+                .bucket(s3Properties.bucket)
+                .key(fileInfo.getIdWithSuffix())
+                .build()
         )
-    }
-
-    suspend fun <T : Any> csv(key: String, clazz: KClass<T>, delimiter: Char = ','): List<T> {
-        val request = GetObjectRequest {
-            this.bucket = s3Properties.bucketService
-            this.key = key
-        }
-
-        val schema = csvMapper.schemaFor(clazz.java)
-            .withHeader()
-            .withColumnReordering(true)
-            .withColumnSeparator(delimiter)
-
-        return s3Client.getObject(request) { resp ->
-            return@getObject resp.body?.toInputStream().use {
-                csvMapper.readerFor(clazz.java)
-                    .with(schema)
-                    .readValues<T>(it)
-                    .readAll()
-            }
-        }
-    }
-
-    suspend fun file(key: String): String {
-        val request = GetObjectRequest {
-            this.bucket = s3Properties.bucketService
-            this.key = key
-        }
-
-        return s3Client.getObject(request) { resp ->
-            return@getObject resp.body!!.toInputStream().use {
-                String(it.readAllBytes(), Charsets.UTF_8)
-            }
-        }
     }
 }
