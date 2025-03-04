@@ -611,6 +611,85 @@ paths:
         '200':
           description: Success
 
+  /maps/volunteers:
+    get:
+      summary: "Получить список волонтёров для карты"
+      description: "Возвращает список волонтёров из базы `maps_users`."
+      operationId: "getVolunteers"
+      tags:
+        - "Maps"
+      responses:
+        "200":
+          description: "Список волонтёров"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    full_name:
+                      type: string
+                    email:
+                      type: string
+                    telegram:
+                      type: string
+                    city:
+                      type: string
+                    address:
+                      type: string
+                    latitude:
+                      type: number
+                    longitude:
+                      type: number
+                    groups:
+                      type: array
+                      items:
+                        type: string
+        "400":
+          description: "Некорректный запрос"
+        "500":
+          description: "Ошибка сервера"
+
+  /maps/playgrounds:
+    get:
+      summary: Получение списка отчетов
+      operationId: getPlaygrounds
+      tags:
+        - Playgrounds
+      responses:
+        "200":
+          description: "Список волонтёров"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    data_id:
+                      type: integer
+                    date:
+                      type: string
+                    photo:
+                      type: string
+                    pokritie:
+                      type: string
+                    drenaj:
+                      type: string
+                    ograjdenie:
+                      type: string
+                    security:
+                      type: string
+                    light:
+                      type: string
+                    latitude:
+                      type: number
+                    longitude:
+                      type: number
+        '500':
+          description: Ошибка сервера
+
 components:
   responses:
     ServerError:
@@ -1038,6 +1117,8 @@ components:
           nullable: false
         note:
           type: string
+
+
     UserSearchFilter:
       type: object
       nullable: false
