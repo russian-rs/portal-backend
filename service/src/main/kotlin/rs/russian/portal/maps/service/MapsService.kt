@@ -19,12 +19,16 @@ class MapsService(
 
     fun getVolunteersMap(): List<VolunteerMapDto> {
         val users = accountService.findAll()
-        return users.map { volunteerMapper.map(it) }
+        return users
+            .filter { it.info?.latitude != null && it.info?.longitude != null }
+            .map { volunteerMapper.map(it) }
     }
 
     @Transactional(readOnly = true)
     fun getPlaygroundsMap(): List<PlaygroundDto> {
         val playgrounds = playgroundRepository.findAll()
-        return playgrounds.map { playgroundMapper.map(it) }
+        return playgrounds
+            .filter { it.lat != null && it.lng != null }
+            .map { playgroundMapper.map(it) }
     }
 }
