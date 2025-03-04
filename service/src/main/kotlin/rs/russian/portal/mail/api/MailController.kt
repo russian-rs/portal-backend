@@ -22,15 +22,16 @@ class MailController(
         body: String,
         from: String?,
         email: String?,
-        username: String?
+        username: String?,
+        attachments: List<String>?
     ): ResponseEntity<Unit> {
         if (email.isNullOrBlank() && username.isNullOrBlank()) {
             return ResponseEntity(HttpStatus.BAD_REQUEST)
         }
         if (!username.isNullOrBlank()) {
-            emailService.sendCommonEmail(accountService.getAccountByLogin(username), subject, body, from)
+            emailService.sendCommonEmail(accountService.getAccountByLogin(username), subject, body, from, attachments)
         } else {
-            emailService.sendCommonEmail(email!!, subject, body, from)
+            emailService.sendCommonEmail(email!!, subject, body, from, attachments)
         }
         return ResponseEntity(HttpStatus.OK)
     }
