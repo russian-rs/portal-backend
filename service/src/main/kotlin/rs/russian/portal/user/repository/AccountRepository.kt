@@ -30,4 +30,7 @@ interface AccountRepository : JpaRepository<Account, Int> {
 
     @EntityGraph(value = GRAPH_FULL)
     fun findAll(specification: Specification<Account>): List<Account>
+
+    @EntityGraph(value = GRAPH_FULL)
+    override fun findAll(): List<Account>
 }

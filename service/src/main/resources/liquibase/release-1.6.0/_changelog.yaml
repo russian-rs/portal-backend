@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/release-1.6.0/playground.yaml
+  - include:
+      file: liquibase/release-1.6.0/alter_user_info.yaml

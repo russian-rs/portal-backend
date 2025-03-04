@@ -31,3 +31,8 @@ data class WordpressProperties(
     val username: String,
     val password: String
 )
+
+@ConfigurationProperties(prefix = "app.nominatim")
+data class NominatimProperties(
+    val baseUrl: String,
+)

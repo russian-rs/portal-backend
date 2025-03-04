@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.6.0-add-latlng-columns-to-user-info
+      author: Sergey Bespalov
+      changes:
+        - addColumn:
+            tableName: user_info
+            columns:
+              - column:
+                  name: latitude
+                  type: DOUBLE
+              - column:
+                  name: longitude
+                  type: DOUBLE

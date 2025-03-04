@@ -1,0 +1,50 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.6.0-create-playgrounds
+      author: Sergey Bespalov
+      changes:
+        - createTable:
+            tableName: playground
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  constraints:
+                    nullable: false
+                  name: version
+                  type: DATETIME
+              - column:
+                  name: url
+                  type: TEXT
+              - column:
+                  name: date
+                  type: TEXT
+              - column:
+                  name: photo
+                  type: TEXT
+              - column:
+                  name: covering
+                  type: TEXT
+              - column:
+                  name: drainage
+                  type: TEXT
+              - column:
+                  name: fencing
+                  type: TEXT
+              - column:
+                  name: security
+                  type: TEXT
+              - column:
+                  name: light
+                  type: TEXT
+              - column:
+                  name: lat
+                  type: DOUBLE
+              - column:
+                  name: lng
+                  type: DOUBLE

@@ -8,12 +8,10 @@ plugins {
     id("org.jetbrains.kotlin.plugin.spring")
     id("org.jetbrains.kotlin.plugin.allopen")
     id("org.jetbrains.kotlin.plugin.serialization")
-    id("org.jetbrains.kotlin.kapt")
-
 }
 
 group = "rs.russian"
-version = "1.5.0"
+version = "1.6.0"
 
 repositories {
     mavenCentral()
@@ -29,6 +27,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("org.springframework.boot:spring-boot-starter-json")
+    implementation("org.springframework.boot:spring-boot-starter-quartz")
     implementation("org.springframework.session:spring-session-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -36,6 +36,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+
 
     // Data
     implementation("org.postgresql:postgresql")
@@ -85,25 +86,6 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
-
-    //Maps
-    implementation("org.springframework.boot:spring-boot-starter-quartz")
-    implementation("org.springframework.boot:spring-boot-starter-json")
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.2.1")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")
-    runtimeOnly("org.postgresql:postgresql")
-    kapt("org.springframework.boot:spring-boot-configuration-processor")
-
-    //Hibernate & JPA
-    implementation("org.hibernate:hibernate-core:6.2.7.Final")
-
-    //Kapt
-    kapt("org.springframework.boot:spring-boot-configuration-processor")
-    kapt("org.mapstruct:mapstruct-processor:1.6.3")
-
-    //Lombok
-    compileOnly("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
 }
 
 kotlin {

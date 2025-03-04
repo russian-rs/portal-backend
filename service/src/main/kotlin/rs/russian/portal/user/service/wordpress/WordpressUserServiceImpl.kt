@@ -71,4 +71,8 @@ class WordpressUserServiceImpl(
 
         this.apiClient = UsersWordpressApi(client = okHttpClient)
     }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(this::class.java)
+    }
 }

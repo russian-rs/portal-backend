@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.16.1
+  version: 1.17.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -622,80 +622,39 @@ paths:
 
   /maps/volunteers:
     get:
-      summary: "Получить список волонтёров для карты"
-      description: "Возвращает список волонтёров из базы `maps_users`."
-      operationId: "getVolunteers"
+      summary: Получить список волонтёров для карты
+      description: Возвращает список волонтёров из базы `maps_users`.
+      operationId: getVolunteersMap
       tags:
-        - "Maps"
+        - maps
       responses:
         "200":
-          description: "Список волонтёров"
+          description: Список волонтёров
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    full_name:
-                      type: string
-                    email:
-                      type: string
-                    telegram:
-                      type: string
-                    city:
-                      type: string
-                    address:
-                      type: string
-                    latitude:
-                      type: number
-                    longitude:
-                      type: number
-                    groups:
-                      type: array
-                      items:
-                        type: string
+                  $ref: "#/components/schemas/VolunteerMapDto"
         "400":
           description: "Некорректный запрос"
         "500":
           description: "Ошибка сервера"
-
   /maps/playgrounds:
     get:
       summary: Получение списка отчетов
-      operationId: getPlaygrounds
+      operationId: getPlaygroundsMap
       tags:
-        - Playgrounds
+        - maps
       responses:
         "200":
-          description: "Список волонтёров"
+          description: Список волонтёров
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    data_id:
-                      type: integer
-                    date:
-                      type: string
-                    photo:
-                      type: string
-                    pokritie:
-                      type: string
-                    drenaj:
-                      type: string
-                    ograjdenie:
-                      type: string
-                    security:
-                      type: string
-                    light:
-                      type: string
-                    latitude:
-                      type: number
-                    longitude:
-                      type: number
+                  $ref: "#/components/schemas/PlaygroundDto"
         '500':
           description: Ошибка сервера
 
@@ -1126,8 +1085,6 @@ components:
           nullable: false
         note:
           type: string
-
-
     UserSearchFilter:
       type: object
       nullable: false
@@ -1144,3 +1101,64 @@ components:
       enum:
         - ASSOCIATED
         - REGULAR
+    VolunteerMapDto:
+      type: object
+      required:
+        - id
+        - full_name
+        - email
+      properties:
+        id:
+          type: integer
+          nullable: false
+        full_name:
+          type: string
+          nullable: false
+        email:
+          type: string
+          nullable: false
+        telegram:
+          type: string
+        city:
+          type: string
+        address:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        groups:
+          type: array
+          items:
+            type: string
+    PlaygroundDto:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: integer
+          format: int64
+          nullable: false
+        url:
+          type: string
+        date:
+          type: string
+        photo:
+          type: string
+        covering:
+          type: string
+        drainage:
+          type: string
+        fencing:
+          type: string
+        security:
+          type: string
+        light:
+          type: string
+        lat:
+          type: number
+          format: double
+        lng:
+          type: number
+          format: double

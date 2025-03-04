@@ -41,7 +41,10 @@ data class UserInfo(
 
     @OneToOne(fetch = LAZY, cascade = [ALL], orphanRemoval = true)
     @JoinColumn(name = "avatar_file_id")
-    var avatar: FileInfo? = null
+    var avatar: FileInfo? = null,
+
+    var latitude: Double? = null,
+    var longitude: Double? = null
 
 ) : JpaEntity<String>() {
 
