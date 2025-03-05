@@ -16,7 +16,11 @@ interface ApplicationRepository : JpaRepository<Application, UUID> {
 
     fun findByEmailAndStatusNotIn(email: String, statuses: List<ApplicationStatus>): Optional<Application>
 
-    fun findByEmailAndPassport(email: String, passport: String): Optional<Application>
+    fun findByEmailAndPassportAndStatusNotIn(
+        email: String,
+        passport: String,
+        statuses: List<ApplicationStatus>
+    ): Optional<Application>
 
     fun findAll(specification: Specification<Application>, pageable: Pageable): Page<Application>
 }
