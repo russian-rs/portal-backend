@@ -158,6 +158,16 @@ class AccountService(
         return save(account)
     }
 
+    @Transactional
+    fun updateInfo(accountId: Int, newInfo: UserInfo) {
+        val account = getAccount(accountId)
+        newInfo.id = account.username
+        newInfo.account = account
+        newInfo.version = account.info?.version
+        account.info = newInfo
+        accountRepository.save(account)
+    }
+
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
     }
