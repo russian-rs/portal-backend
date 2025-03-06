@@ -11,6 +11,7 @@ import rs.russian.generated.model.ApplicationStatusDto
 import rs.russian.generated.model.ContractDto
 import rs.russian.portal.application.domain.Application
 import rs.russian.portal.application.domain.ApplicationStatus
+import rs.russian.portal.user.domain.UserInfo
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -44,6 +45,14 @@ abstract class ApplicationMapper {
     @Mapping(target = "terminated", source = "status")
     @Mapping(target = "lastUpdate", source = "version")
     abstract fun mapStatus(application: Application): ApplicationStatusDto
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "city", ignore = true)
+    @Mapping(target = "program", ignore = true)
+    @Mapping(target = "gender", ignore = true)
+    @Mapping(target = "account", ignore = true)
+    @Mapping(target = "avatar", ignore = true)
+    abstract fun mapToInfo(application: Application): UserInfo
 
     fun mapProgress(status: ApplicationStatus): Int = status.progress
 

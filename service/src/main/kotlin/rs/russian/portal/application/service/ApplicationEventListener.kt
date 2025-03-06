@@ -11,6 +11,7 @@ import rs.russian.portal.application.domain.ApplicationStatus
 import rs.russian.portal.application.domain.ApplicationType
 import rs.russian.portal.application.event.ApplicationCreatedEvent
 import rs.russian.portal.application.event.ApplicationUpdateEvent
+import rs.russian.portal.application.mapper.ApplicationMapper
 import rs.russian.portal.mail.service.EmailService
 import rs.russian.portal.user.mapper.ContractMapper
 import rs.russian.portal.user.service.AccountService
@@ -22,6 +23,7 @@ class ApplicationEventListener(
     private val accountService: AccountService,
     private val contractMapper: ContractMapper,
     private val templateEngine: TemplateEngine,
+    private val applicationMapper: ApplicationMapper,
     private val applicationService: ApplicationService
 ) {
 
@@ -58,6 +60,7 @@ class ApplicationEventListener(
                             )
                         )
                     )
+                    accountService.updateInfo(account.id!!, applicationMapper.mapToInfo(application))
                 }
             }
             if (application.type == ApplicationType.PROLONGATION) {
