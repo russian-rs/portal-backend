@@ -34,7 +34,11 @@ class ApplicationService(
             return existByEmail.get()
         }
         if (!request.passport.isNullOrBlank()) {
-            val existByEmailAndPassport = applicationRepository.findByEmailAndPassport(email, request.passport!!)
+            val existByEmailAndPassport = applicationRepository.findByEmailAndPassportAndStatusNotIn(
+                email,
+                request.passport!!,
+                listOf(DONE, DENY)
+            )
             if (existByEmailAndPassport.isPresent) {
                 return existByEmailAndPassport.get()
             }
