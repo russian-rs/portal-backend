@@ -6,10 +6,7 @@ import org.springframework.data.domain.Page
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import rs.russian.generated.model.ContractDto
-import rs.russian.generated.model.PageRequest
-import rs.russian.generated.model.UserCreateRequest
-import rs.russian.generated.model.UserSearchFilter
+import rs.russian.generated.model.*
 import rs.russian.portal.file.service.FileService
 import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.jpa.convert
@@ -23,6 +20,7 @@ import rs.russian.portal.user.mapper.WordpressUserMapper
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.authentik.AuthentikService
 import rs.russian.portal.user.service.wordpress.WordpressUserService
+import java.time.LocalDate
 
 @Service
 class AccountService(
@@ -166,6 +164,20 @@ class AccountService(
         newInfo.version = account.info?.version
         account.info = newInfo
         accountRepository.save(account)
+    }
+
+    fun partialUpdateInfo(account: Account, userInfoUpdateRequest: UserInfoUpdateRequest): Account {
+        val userInfo = account.info ?: UserInfo.default(account)
+
+        userInfoUpdateRequest.city?.let { userInfo.city = it }
+        userInfoUpdateRequest.address?.let { userInfo.address = it }
+        userInfoUpdateRequest.birthDate?.let { userInfo.birthDate = it }
+        userInfoUpdateRequest.telegram?.let { userInfo.telegram = it }
+        userInfoUpdateRequest.phone?.let { userInfo.phone = it }
+
+        account.info = userInfo
+
+        return save(account)
     }
 
     companion object {
