@@ -20,7 +20,6 @@ import rs.russian.portal.user.mapper.WordpressUserMapper
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.authentik.AuthentikService
 import rs.russian.portal.user.service.wordpress.WordpressUserService
-import java.time.LocalDate
 
 @Service
 class AccountService(
