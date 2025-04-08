@@ -1,15 +1,14 @@
 package rs.russian.portal.user.api
 
-import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import rs.russian.generated.api.UserApi
 import rs.russian.generated.model.*
+import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.Authorized
 import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_SSO
 import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
-import rs.russian.portal.user.domain.enums.UserGroup.MEMBER
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.service.AccountService
 import rs.russian.portal.user.service.SessionService
@@ -84,13 +83,12 @@ class UserController(
         return ResponseEntity.ok(userMapper.map(accountService.updateContracts(account, contractDto).info))
     }
 
-    @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER, MEMBER])
     override fun updateInfo(login: String, userInfoUpdateRequest: UserInfoUpdateRequest): ResponseEntity<UserInfoDto> {
         val account = accountService.getCurrentAccount()
 
         if (!(account.groups.contains(ADMIN_SSO) || account.groups.contains(ADMIN_VOLUNTEER))) {
             if (account.username != login) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build()
+                throw NotAuthorizedException()
             }
         }
 
