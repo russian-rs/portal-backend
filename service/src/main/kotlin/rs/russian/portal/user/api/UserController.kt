@@ -4,6 +4,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import rs.russian.generated.api.UserApi
 import rs.russian.generated.model.*
+import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.Authorized
 import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_SSO
@@ -80,5 +81,17 @@ class UserController(
     override fun updateContracts(id: Int, contractDto: List<ContractDto>): ResponseEntity<UserInfoDto> {
         val account = accountService.getAccount(id)
         return ResponseEntity.ok(userMapper.map(accountService.updateContracts(account, contractDto).info))
+    }
+
+    override fun updateInfo(login: String, userInfoUpdateRequest: UserInfoUpdateRequest): ResponseEntity<UserInfoDto> {
+        val account = accountService.getCurrentAccount()
+
+        if (!(account.groups.contains(ADMIN_SSO) || account.groups.contains(ADMIN_VOLUNTEER))) {
+            if (account.username != login) {
+                throw NotAuthorizedException()
+            }
+        }
+
+        return ResponseEntity.ok(userMapper.map(accountService.partialUpdateInfo(account, userInfoUpdateRequest).info))
     }
 }
