@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.16.1
+  version: 1.17.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -136,6 +136,36 @@ paths:
                 $ref: '#/components/schemas/UserInfoDto'
         '500':
           $ref: '#/components/responses/ServerError'
+
+    patch:
+      operationId: updateInfo
+      tags:
+        - user
+      parameters:
+        - name: login
+          in: path
+          description: User login
+          required: true
+          schema:
+            type: string
+            minLength: 3
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserInfoUpdateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+
   /user/search:
     post:
       operationId: searchUsers
@@ -747,6 +777,22 @@ components:
           default: [ ]
           items:
             $ref: '#/components/schemas/ContractDto'
+    UserInfoUpdateRequest:
+      type: object
+      description: update user info
+      properties:
+        city:
+          type: string
+        address:
+          type: string
+        birthDate:
+          type: string
+          format: date
+        telegram:
+          type: string
+        phone:
+          type: string
+      additionalProperties: false
     UserPageResponse:
       type: object
       nullable: false
@@ -1063,3 +1109,4 @@ components:
       enum:
         - ASSOCIATED
         - REGULAR
+
