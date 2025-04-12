@@ -761,7 +761,7 @@ components:
         phone:
           type: string
         program:
-          type: string
+          $ref: '#/components/schemas/ProgramDto'
         avatar:
           $ref: '#/components/schemas/FileInfoDto'
         groups:
@@ -1109,4 +1109,31 @@ components:
       enum:
         - ASSOCIATED
         - REGULAR
+    ProgramCode:
+      type: string
+      enum:
+        - IT
+        - MEDIA
+        - DESIGN
+        - URBANISM
+        - INFORMATION
+        - EDUCATION
+        - LAW
+    ProgramDto:
+      type: object
+      required:
+        - code
+        - nameRu
+        - nameEn
+        - NameRs
+      properties:
+        code:
+          $ref: '#/components/schemas/ProgramCode'
+        nameRu:
+          type: string
+        nameEn:
+          type: string
+        nameRs:
+          type: string
+
 
