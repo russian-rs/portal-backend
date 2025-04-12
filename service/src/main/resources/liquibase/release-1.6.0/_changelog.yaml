@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/release-1.6.0/program.yaml
+  - include:
+      file: liquibase/release-1.6.0/user-info-update.yaml

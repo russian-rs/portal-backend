@@ -1,0 +1,88 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.6.0-create-program-table
+      author: Valerii Linden
+      changes:
+        - createTable:
+            tableName: program
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_program
+              - column:
+                  name: code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name_ru
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name_en
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name_rs
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: program
+            columnNames: code
+            constraintName: uq_program_code
+        - insert:
+            tableName: program
+            columns:
+              - column: { name: code, value: IT }
+              - column: { name: name_ru, value: ИТ }
+              - column: { name: name_en, value: IT }
+              - column: { name: name_rs, value: IT }
+        - insert:
+            tableName: program
+            columns:
+              - column: { name: code, value: MEDIA }
+              - column: { name: name_ru, value: Медиа }
+              - column: { name: name_en, value: Media }
+              - column: { name: name_rs, value: Medija }
+        - insert:
+            tableName: program
+            columns:
+              - column: { name: code, value: DESIGN }
+              - column: { name: name_ru, value: Дизайн }
+              - column: { name: name_en, value: Design }
+              - column: { name: name_rs, value: Dizajn }
+        - insert:
+            tableName: program
+            columns:
+              - column: { name: code, value: URBANISM }
+              - column: { name: name_ru, value: Урбанизм }
+              - column: { name: name_en, value: Urbanism }
+              - column: { name: name_rs, value: Urbanizam }
+        - insert:
+            tableName: program
+            columns:
+              - column: { name: code, value: INFORMATION }
+              - column: { name: name_ru, value: Информация }
+              - column: { name: name_en, value: Information }
+              - column: { name: name_rs, value: Informacije }
+        - insert:
+            tableName: program
+            columns:
+              - column: { name: code, value: EDUCATION }
+              - column: { name: name_ru, value: Обучение }
+              - column: { name: name_en, value: Education }
+              - column: { name: name_rs, value: Obrazovanje }
+        - insert:
+            tableName: program
+            columns:
+              - column: { name: code, value: LAW }
+              - column: { name: name_ru, value: Право }
+              - column: { name: name_en, value: Law }
+              - column: { name: name_rs, value: Pravo }
