@@ -48,6 +48,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserInfoDto'
+  /user/account/{id}/program/{code}:
+    patch:
+      operationId: setProgram
+      tags:
+        - user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            nullable: false
+        - in: path
+          name: code
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProgramCode'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
   /user/account/{id}/deactivate:
     post:
       operationId: deactivateAccount
@@ -1123,17 +1147,6 @@ components:
       type: object
       required:
         - code
-        - nameRu
-        - nameEn
-        - NameRs
       properties:
         code:
           $ref: '#/components/schemas/ProgramCode'
-        nameRu:
-          type: string
-        nameEn:
-          type: string
-        nameRs:
-          type: string
-
-

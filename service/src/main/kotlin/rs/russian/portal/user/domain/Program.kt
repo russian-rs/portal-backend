@@ -1,4 +1,4 @@
-package rs.russian.portal.program.domain
+package rs.russian.portal.user.domain
 
 import jakarta.persistence.*
 import rs.russian.generated.model.ProgramCode
@@ -12,14 +12,5 @@ data class Program(
 
     @Column(nullable = false, unique = true)
     @Enumerated(EnumType.STRING)
-    val code: ProgramCode,
-
-    @Column(nullable = false)
-    val nameRu: String,
-
-    @Column(nullable = false)
-    val nameEn: String,
-
-    @Column(nullable = false)
-    val nameRs: String
+    val code: ProgramCode
 )
