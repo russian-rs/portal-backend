@@ -15,7 +15,6 @@ import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.domain.specification.searchSpecification
 import rs.russian.portal.user.mapper.ContractMapper
-import rs.russian.portal.user.mapper.ProgramMapper
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.mapper.WordpressUserMapper
 import rs.russian.portal.user.repository.AccountRepository
