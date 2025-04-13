@@ -15,15 +15,18 @@ import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.domain.specification.searchSpecification
 import rs.russian.portal.user.mapper.ContractMapper
+import rs.russian.portal.user.mapper.ProgramMapper
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.mapper.WordpressUserMapper
 import rs.russian.portal.user.repository.AccountRepository
+import rs.russian.portal.user.repository.ProgramRepository
 import rs.russian.portal.user.service.authentik.AuthentikService
 import rs.russian.portal.user.service.wordpress.WordpressUserService
 
 @Service
 class AccountService(
     private val userMapper: UserMapper,
+    private val programRepository: ProgramRepository,
     private val fileService: FileService,
     private val contractMapper: ContractMapper,
     private val accountRepository: AccountRepository,
@@ -165,6 +168,7 @@ class AccountService(
         accountRepository.save(account)
     }
 
+    @Transactional
     fun partialUpdateInfo(account: Account, userInfoUpdateRequest: UserInfoUpdateRequest): Account {
         val userInfo = account.info ?: UserInfo.default(account)
 
@@ -174,6 +178,19 @@ class AccountService(
         userInfoUpdateRequest.telegram?.let { userInfo.telegram = it }
         userInfoUpdateRequest.phone?.let { userInfo.phone = it }
 
+        account.info = userInfo
+
+        return save(account)
+    }
+
+    @Transactional
+    fun setProgram(account: Account, code: ProgramCode): Account {
+        val userInfo = account.info ?: UserInfo.default(account)
+
+        val program = programRepository.findByCode(code)
+            ?: throw IllegalArgumentException("Program with code: ${code.value} not found!")
+
+        userInfo.program = program
         account.info = userInfo
 
         return save(account)
