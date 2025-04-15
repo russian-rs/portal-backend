@@ -28,7 +28,7 @@ data class UserInfo(
     var phone: String? = null,
 
     @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "program_id")
+    @JoinColumn(name = "program_code")
     var program: Program? = null,
 
     @Enumerated(STRING)
