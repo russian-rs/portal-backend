@@ -10,13 +10,13 @@ databaseChangeLog:
             tableName: user_info
             columns:
               - column:
-                  name: program_id
-                  type: BIGINT
+                  name: program_code
+                  type: VARCHAR(50)
                   constraints:
                     nullable: true
         - addForeignKeyConstraint:
             baseTableName: user_info
-            baseColumnNames: program_id
+            baseColumnNames: program_code
             referencedTableName: program
-            referencedColumnNames: id
+            referencedColumnNames: code
             constraintName: fk_user_info_program
