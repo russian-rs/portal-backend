@@ -84,7 +84,7 @@ class UserController(
     }
 
     override fun updateInfo(login: String, userInfoUpdateRequest: UserInfoUpdateRequest): ResponseEntity<UserInfoDto> {
-        val account = accountService.getCurrentAccount()
+        val account = accountService.getAccountByLogin(login)
 
         if (!(account.groups.contains(ADMIN_SSO) || account.groups.contains(ADMIN_VOLUNTEER))) {
             if (account.username != login) {
