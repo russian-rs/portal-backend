@@ -84,14 +84,15 @@ class UserController(
     }
 
     override fun updateInfo(login: String, userInfoUpdateRequest: UserInfoUpdateRequest): ResponseEntity<UserInfoDto> {
-        val account = accountService.getAccountByLogin(login)
+        val targetAccount = accountService.getAccountByLogin(login)
+        val currentAccount = accountService.getCurrentAccount()
 
-        if (!(account.groups.contains(ADMIN_SSO) || account.groups.contains(ADMIN_VOLUNTEER))) {
-            if (account.username != login) {
+        if (!(currentAccount.groups.contains(ADMIN_SSO) || currentAccount.groups.contains(ADMIN_VOLUNTEER))) {
+            if (currentAccount.username != login) {
                 throw NotAuthorizedException()
             }
         }
 
-        return ResponseEntity.ok(userMapper.map(accountService.partialUpdateInfo(account, userInfoUpdateRequest).info))
+        return ResponseEntity.ok(userMapper.map(accountService.partialUpdateInfo(targetAccount, userInfoUpdateRequest).info))
     }
 }
