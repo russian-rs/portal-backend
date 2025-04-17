@@ -64,7 +64,7 @@ paths:
           name: code
           required: true
           schema:
-            $ref: '#/components/schemas/ProgramCode'
+            type: string
       responses:
         '200':
           description: Success
@@ -188,7 +188,6 @@ paths:
                 $ref: '#/components/schemas/UserInfoDto'
         '500':
           $ref: '#/components/responses/ServerError'
-
 
   /user/search:
     post:
@@ -674,6 +673,24 @@ paths:
         '200':
           description: Success
 
+  /programs:
+    get:
+      operationId: getPrograms
+      tags:
+        - programs
+      summary: Получить список всех доступных программ
+      responses:
+        '200':
+          description: Список программ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProgramDto'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   responses:
     ServerError:
@@ -1133,20 +1150,19 @@ components:
       enum:
         - ASSOCIATED
         - REGULAR
-    ProgramCode:
-      type: string
-      enum:
-        - IT
-        - MEDIA
-        - DESIGN
-        - URBANISM
-        - INFORMATION
-        - EDUCATION
-        - LAW
     ProgramDto:
       type: object
       required:
         - code
+        - nameRu
+        - nameEn
+        - nameSr
       properties:
         code:
-          $ref: '#/components/schemas/ProgramCode'
+          type: string
+        nameRu:
+          type: string
+        nameEn:
+          type: string
+        nameSr:
+          type: string

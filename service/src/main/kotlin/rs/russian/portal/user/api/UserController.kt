@@ -60,7 +60,7 @@ class UserController(
     }
 
     @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])
-    override fun setProgram(id: Int, code: ProgramCode): ResponseEntity<UserInfoDto> {
+    override fun setProgram(id: Int, code: String): ResponseEntity<UserInfoDto> {
         val account = accountService.getAccount(id)
         return ResponseEntity.ok(userMapper.map(accountService.setProgram(account, code).info))
     }

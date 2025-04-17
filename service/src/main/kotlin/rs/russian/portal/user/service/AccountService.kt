@@ -18,7 +18,7 @@ import rs.russian.portal.user.mapper.ContractMapper
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.mapper.WordpressUserMapper
 import rs.russian.portal.user.repository.AccountRepository
-import rs.russian.portal.user.repository.ProgramRepository
+import rs.russian.portal.program.repository.ProgramRepository
 import rs.russian.portal.user.service.authentik.AuthentikService
 import rs.russian.portal.user.service.wordpress.WordpressUserService
 
@@ -183,11 +183,11 @@ class AccountService(
     }
 
     @Transactional
-    fun setProgram(account: Account, code: ProgramCode): Account {
+    fun setProgram(account: Account, code: String): Account {
         val userInfo = account.info ?: UserInfo.default(account)
 
         val program = programRepository.findByCode(code)
-            ?: throw IllegalArgumentException("Program with code: ${code.value} not found!")
+            ?: throw IllegalArgumentException("Program with code: $code not found!")
 
         userInfo.program = program
         account.info = userInfo
