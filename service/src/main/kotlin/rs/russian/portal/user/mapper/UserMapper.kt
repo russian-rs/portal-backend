@@ -12,6 +12,7 @@ import org.springframework.security.oauth2.core.oidc.OidcUserInfo
 import rs.russian.generated.model.ContractDto
 import rs.russian.generated.model.UserInfoDto
 import rs.russian.portal.file.mapper.FileInfoMapper
+import rs.russian.portal.program.mapper.ProgramMapper
 import rs.russian.portal.shared.security.userGroups
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.Contract

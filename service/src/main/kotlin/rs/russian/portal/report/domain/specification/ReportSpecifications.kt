@@ -2,8 +2,8 @@ package rs.russian.portal.report.domain.specification
 
 import jakarta.persistence.criteria.JoinType
 import org.springframework.data.jpa.domain.Specification
-import rs.russian.generated.model.ProgramCode
 import rs.russian.generated.model.ReportFilter
+import rs.russian.portal.program.domain.Program
 import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.Report_
 import rs.russian.portal.report.domain.Task
@@ -51,7 +51,7 @@ fun from(filter: ReportFilter): Specification<Report> {
             val accountJoin = root.join<Report, Account>(Report_.ACCOUNT)
             val infoJoin = accountJoin.join<Account, UserInfo>(Account_.INFO)
             val programJoin = infoJoin.join<UserInfo, Program>(UserInfo_.PROGRAM, JoinType.LEFT)
-            builder.equal(programJoin.get<ProgramCode>("code"), ProgramCode.forValue(programFilter))
+            builder.equal(programJoin.get<String>("code"), programFilter)
         }
     }
 
