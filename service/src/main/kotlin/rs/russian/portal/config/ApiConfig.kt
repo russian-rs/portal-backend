@@ -9,9 +9,13 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Profile
+import org.springframework.scheduling.annotation.Scheduled
 import org.wordpress.api.TokenWordpressApi
+import org.wordpress.api.UsersWordpressApi
+import org.wordpress.model.WpTokenRequest
 import rs.russian.portal.user.service.wordpress.WordpressUserService
 import rs.russian.portal.user.service.wordpress.WordpressUserServiceImpl
+import java.util.concurrent.ConcurrentHashMap
 
 @Configuration
 class ApiConfig {
@@ -56,21 +60,68 @@ class ApiConfig {
     @Bean
     @Profile("!local")
     @DependsOn(value = ["objectMapper"])
-    fun tokenWordpressApi(wordpressProperties: WordpressProperties): TokenWordpressApi {
-        return TokenWordpressApi(client = wordpressApiClient(wordpressProperties.instances.first().baseUrl))
+    fun tokenWordpressApis(wordpressProperties: WordpressProperties): Map<String, TokenWordpressApi> {
+        return wordpressProperties.instances.associate { instance ->
+            instance.name to TokenWordpressApi(client = wordpressApiClient(instance.baseUrl))
+        }
     }
 
     @Bean
     @Profile("!local")
     fun wordpressUserServices(
         wpProps: WordpressProperties,
-        tokenWordpressApi: TokenWordpressApi
+        tokenWordpressApis: Map<String, TokenWordpressApi>
     ): Map<String, WordpressUserService> {
         return wpProps.instances.associate { instance ->
-            instance.name to WordpressUserServiceImpl(
-                instance = instance,
-                tokenWordpressApi = tokenWordpressApi
-            )
+            val tokenApi = tokenWordpressApis[instance.name] 
+                ?: throw IllegalStateException("No TokenWordpressApi found for instance ${instance.name}")
+
+            val apiClient = createWordpressApiClient(instance, tokenApi)
+
+            instance.name to WordpressUserServiceImpl(apiClient)
+        }
+    }
+
+    private fun createWordpressApiClient(
+        instance: WordpressInstance,
+        tokenWordpressApi: TokenWordpressApi
+    ): UsersWordpressApi {
+        val logger = LoggerFactory.getLogger("UsersWordpressApi")
+        val token = tokenWordpressApi.getToken(WpTokenRequest(instance.username, instance.password)).token
+        val interceptor = Interceptor { chain ->
+            val originalRequest = chain.request()
+            val originalUrl = originalRequest.url
+
+            val url = originalUrl.newBuilder()
+                .host(instance.baseUrl.toHttpUrl().host)
+                .build()
+
+            val request = originalRequest.newBuilder()
+                .url(url)
+                .addHeader("Authorization", "Bearer $token")
+                .build()
+
+            logger.info("${originalRequest.method} $url")
+
+            chain.proceed(request)
+        }
+        val okHttpClient = OkHttpClient.Builder()
+            .addInterceptor(interceptor)
+            .build()
+        okHttpClient.interceptors
+
+        return UsersWordpressApi(client = okHttpClient)
+    }
+
+    @Scheduled(cron = "0 0 */12 * * *")
+    fun updateWordpressApiClients(
+        wpProps: WordpressProperties,
+        wpUserServices: Map<String, WordpressUserService>,
+    ) {
+        wpProps.instances.forEach { instance ->
+            val tokenApi = TokenWordpressApi(client = wordpressApiClient(instance.baseUrl))
+            val apiClient = createWordpressApiClient(instance, tokenApi)
+            wpUserServices[instance.name]?.apiClient = apiClient
         }
     }
 
