@@ -39,9 +39,11 @@ app:
     base-url: ${OAUTH2_SERVER}
     api-key: ${AUTHENTIK_API_KEY}
   wordpress:
-    base-url: ${WP_BASE_URL}
-    username: ${WP_USERNAME}
-    password: ${WP_PASSWORD}
+    instances:
+      - name: "russian.rs"
+        base-url: ${WP_MAIN_URL}
+        username: ${WP_MAIN_USERNAME}
+        password: ${WP_MAIN_PASSWORD}
   schedulers:
     email-outbox: "*/15 * * * * *"
     user-sync: "0 0 */1 * * *"
