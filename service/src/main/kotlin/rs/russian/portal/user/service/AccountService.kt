@@ -165,6 +165,7 @@ class AccountService(
         accountRepository.save(account)
     }
 
+    @Transactional
     fun partialUpdateInfo(account: Account, userInfoUpdateRequest: UserInfoUpdateRequest): Account {
         val userInfo = account.info ?: UserInfo.default(account)
 
