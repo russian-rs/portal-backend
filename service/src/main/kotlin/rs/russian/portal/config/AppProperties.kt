@@ -27,6 +27,11 @@ data class AuthentikProperties(
 
 @ConfigurationProperties(prefix = "app.wordpress")
 data class WordpressProperties(
+    val instances: List<WordpressInstance>
+)
+
+data class WordpressInstance(
+    val name: String,
     val baseUrl: String,
     val username: String,
     val password: String

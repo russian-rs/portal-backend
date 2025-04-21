@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Profile
 import org.wordpress.api.TokenWordpressApi
+import rs.russian.portal.user.service.wordpress.WordpressUserService
+import rs.russian.portal.user.service.wordpress.WordpressUserServiceImpl
 
 @Configuration
 class ApiConfig {
@@ -55,7 +57,21 @@ class ApiConfig {
     @Profile("!local")
     @DependsOn(value = ["objectMapper"])
     fun tokenWordpressApi(wordpressProperties: WordpressProperties): TokenWordpressApi {
-        return TokenWordpressApi(client = wordpressApiClient(wordpressProperties.baseUrl))
+        return TokenWordpressApi(client = wordpressApiClient(wordpressProperties.instances.first().baseUrl))
+    }
+
+    @Bean
+    @Profile("!local")
+    fun wordpressUserServices(
+        wpProps: WordpressProperties,
+        tokenWordpressApi: TokenWordpressApi
+    ): Map<String, WordpressUserService> {
+        return wpProps.instances.associate { instance ->
+            instance.name to WordpressUserServiceImpl(
+                instance = instance,
+                tokenWordpressApi = tokenWordpressApi
+            )
+        }
     }
 
     fun wordpressApiClient(baseUrl: String): OkHttpClient {

@@ -5,19 +5,15 @@ import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.InitializingBean
-import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Service
 import org.wordpress.api.TokenWordpressApi
 import org.wordpress.api.UsersWordpressApi
 import org.wordpress.model.WpTokenRequest
 import org.wordpress.model.WpUser
-import rs.russian.portal.config.WordpressProperties
+import rs.russian.portal.config.WordpressInstance
 
-@Service
-@Profile("!local")
 class WordpressUserServiceImpl(
-    private val wpProps: WordpressProperties,
+    private val instance: WordpressInstance,
     private val tokenWordpressApi: TokenWordpressApi
 ) : WordpressUserService, InitializingBean {
 
@@ -47,13 +43,13 @@ class WordpressUserServiceImpl(
 
     private fun updateApiClient() {
         val logger = LoggerFactory.getLogger("UsersWordpressApi")
-        val token = tokenWordpressApi.getToken(WpTokenRequest(wpProps.username, wpProps.password)).token
+        val token = tokenWordpressApi.getToken(WpTokenRequest(instance.username, instance.password)).token
         val interceptor = Interceptor { chain ->
             val originalRequest = chain.request()
             val originalUrl = originalRequest.url
 
             val url = originalUrl.newBuilder()
-                .host(wpProps.baseUrl.toHttpUrl().host)
+                .host(instance.baseUrl.toHttpUrl().host)
                 .build()
 
             val request = originalRequest.newBuilder()
