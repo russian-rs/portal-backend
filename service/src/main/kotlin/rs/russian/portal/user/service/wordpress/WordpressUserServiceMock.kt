@@ -3,12 +3,14 @@ package rs.russian.portal.user.service.wordpress
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
+import org.wordpress.api.UsersWordpressApi
 import org.wordpress.model.WpUser
 import kotlin.random.Random
 
 @Service
 @Profile("local")
 class WordpressUserServiceMock : WordpressUserService {
+    override lateinit var apiClient: UsersWordpressApi // will not be inited
 
     override fun getUser(username: String): WpUser? {
         log.info("Mock get user")
