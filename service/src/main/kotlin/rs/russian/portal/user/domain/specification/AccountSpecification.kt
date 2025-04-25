@@ -1,12 +1,17 @@
 package rs.russian.portal.user.domain.specification
 
+import jakarta.persistence.criteria.Join
+import jakarta.persistence.criteria.JoinType
 import org.springframework.data.jpa.domain.Specification
 import rs.russian.generated.model.UserSearchFilter
+import rs.russian.portal.program.domain.Program
+import rs.russian.portal.program.domain.Program_
 import rs.russian.portal.shared.jpa.empty
 import rs.russian.portal.shared.jpa.equal
 import rs.russian.portal.shared.jpa.like
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.Account_
+import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.domain.UserInfo_
 
 fun searchSpecification(query: String, filter: UserSearchFilter?): Specification<Account> {
@@ -27,8 +32,26 @@ fun searchSpecification(query: String, filter: UserSearchFilter?): Specification
         if (filter.onlyInactive)
             filterSpec = filterSpec.and(equal(Account_.ACTIVE, false))
 
+        it.programCodes
+            ?.takeIf { codes -> codes.isNotEmpty() }
+            ?.let { codes ->
+               val programSpec = Specification<Account> {root, _, _ ->
+                   val infoJoin: Join<Account, UserInfo> =
+                       root.join(Account_.info, JoinType.LEFT)
+
+                   val progJoin: Join<UserInfo, Program> =
+                       infoJoin.join(UserInfo_.program, JoinType.LEFT)
+
+                   progJoin.get(Program_.code)
+                       .`in`(codes)
+               }
+                filterSpec = filterSpec.and(programSpec)
+            }
+
         resultSpec = resultSpec.and(filterSpec)
     }
 
     return resultSpec
 }
+
+

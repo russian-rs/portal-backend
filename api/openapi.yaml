@@ -1145,6 +1145,13 @@ components:
           nullable: false
           default: false
           description: Показывать только неактивных пользователей
+        programCodes:
+          type: array
+          description: Показывать только пользователей указанных программ
+          items:
+            type: string
+          uniqueItems: true
+          minItems: 1
     ContractTypeEnum:
       type: string
       enum:
