@@ -1,0 +1,25 @@
+--- # Data
+spring:
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+
+  liquibase:
+    enabled: true
+    drop-first: true
+    change-log: classpath:liquibase/changelog-master.yaml
+
+  datasource:
+    url: jdbc:postgresql://${DB_HOST:localhost:5433}/${DB_NAME:test}?ApplicationName=${spring.application.name}&targetServerType=master
+    username: ${DB_USER:admin}
+    password: ${DB_PASS:123456}
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+
+
+
+
