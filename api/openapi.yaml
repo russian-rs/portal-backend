@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.17.0
+  version: 1.18.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -41,6 +41,30 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UserCreateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
+  /user/account/{id}/program/{code}:
+    patch:
+      operationId: setProgram
+      tags:
+        - user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            nullable: false
+        - in: path
+          name: code
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: Success
@@ -164,7 +188,6 @@ paths:
                 $ref: '#/components/schemas/UserInfoDto'
         '500':
           $ref: '#/components/responses/ServerError'
-
 
   /user/search:
     post:
@@ -650,6 +673,24 @@ paths:
         '200':
           description: Success
 
+  /programs:
+    get:
+      operationId: getPrograms
+      tags:
+        - programs
+      summary: Получить список всех доступных программ
+      responses:
+        '200':
+          description: Список программ
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProgramDto'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   responses:
     ServerError:
@@ -761,7 +802,7 @@ components:
         phone:
           type: string
         program:
-          type: string
+          $ref: '#/components/schemas/ProgramDto'
         avatar:
           $ref: '#/components/schemas/FileInfoDto'
         groups:
@@ -1104,9 +1145,31 @@ components:
           nullable: false
           default: false
           description: Показывать только неактивных пользователей
+        programCodes:
+          type: array
+          description: Показывать только пользователей указанных программ
+          items:
+            type: string
+          uniqueItems: true
+          minItems: 1
     ContractTypeEnum:
       type: string
       enum:
         - ASSOCIATED
         - REGULAR
-
+    ProgramDto:
+      type: object
+      required:
+        - code
+        - nameRu
+        - nameEn
+        - nameSr
+      properties:
+        code:
+          type: string
+        nameRu:
+          type: string
+        nameEn:
+          type: string
+        nameSr:
+          type: string
