@@ -5,9 +5,9 @@ import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.EnumType.STRING
 import jakarta.persistence.FetchType.LAZY
 import rs.russian.portal.file.domain.FileInfo
+import rs.russian.portal.program.domain.Program
 import rs.russian.portal.shared.jpa.JpaEntity
 import rs.russian.portal.user.domain.enums.Gender
-import rs.russian.portal.user.domain.enums.Program
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -28,7 +28,8 @@ data class UserInfo(
     var telegram: String? = null,
     var phone: String? = null,
 
-    @Enumerated(STRING)
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "program_code")
     var program: Program? = null,
 
     @Enumerated(STRING)
