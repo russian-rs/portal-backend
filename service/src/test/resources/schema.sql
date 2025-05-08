@@ -1,0 +1,1 @@
+TRUNCATE TABLE audit, report, user_info RESTART IDENTITY CASCADE;

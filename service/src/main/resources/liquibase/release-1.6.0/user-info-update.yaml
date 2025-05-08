@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.6.0-user-info-program-fk
+      author: Valerii Linden
+      changes:
+        - dropColumn:
+            tableName: user_info
+            columnName: program
+        - addColumn:
+            tableName: user_info
+            columns:
+              - column:
+                  name: program_code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: user_info
+            baseColumnNames: program_code
+            referencedTableName: program
+            referencedColumnNames: code
+            constraintName: fk_user_info_program

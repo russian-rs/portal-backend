@@ -3,14 +3,14 @@ package rs.russian.portal.report.domain.specification
 import jakarta.persistence.criteria.JoinType
 import org.springframework.data.jpa.domain.Specification
 import rs.russian.generated.model.ReportFilter
+import rs.russian.portal.program.domain.Program
 import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.Report_
 import rs.russian.portal.report.domain.Task
 import rs.russian.portal.report.domain.Task_
 import rs.russian.portal.shared.jpa.empty
 import rs.russian.portal.shared.jpa.equal
-import rs.russian.portal.user.domain.Account_
-import rs.russian.portal.user.domain.UserInfo_
+import rs.russian.portal.user.domain.*
 
 fun from(filter: ReportFilter): Specification<Report> {
     var specification = empty<Report>()
@@ -44,9 +44,15 @@ fun from(filter: ReportFilter): Specification<Report> {
         specification = specification.and(equal(Report_.STATUS, status))
     }
 
-    val program = filter.program
-    if (!program.isNullOrBlank()) {
-        specification = specification.and(equal(Report_.ACCOUNT, Account_.INFO, UserInfo_.PROGRAM, program))
+    val programFilter = filter.program
+    if (!programFilter.isNullOrBlank()) {
+        specification = specification.and { root, query, builder ->
+            query!!.distinct(true)
+            val accountJoin = root.join<Report, Account>(Report_.ACCOUNT)
+            val infoJoin = accountJoin.join<Account, UserInfo>(Account_.INFO)
+            val programJoin = infoJoin.join<UserInfo, Program>(UserInfo_.PROGRAM, JoinType.LEFT)
+            builder.equal(programJoin.get<String>("code"), programFilter)
+        }
     }
 
     return specification
