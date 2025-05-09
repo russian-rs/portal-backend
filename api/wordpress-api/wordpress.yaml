@@ -137,6 +137,21 @@ paths:
                 properties:
                   deleted:
                     type: boolean
+  /custom/v1/roles:
+    get:
+      operationId: rolesList
+      tags:
+        - custom
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WpRole'
+
 components:
   securitySchemes:
     bearerAuth:
@@ -192,3 +207,15 @@ components:
             type: string
         password:
           type: string
+    WpRole:
+      type: object
+      required:
+        - slug
+        - name
+      properties:
+        slug:
+          type: string
+          example: administrator
+        name:
+          type: string
+          example: Administrator

@@ -40,10 +40,6 @@ app:
     api-key: ${AUTHENTIK_API_KEY}
   wordpress:
     instances:
-      - name: "russian.rs"
-        base-url: ${WP_MAIN_URL}
-        username: ${WP_MAIN_USERNAME}
-        password: ${WP_MAIN_PASSWORD}
   schedulers:
     email-outbox: "*/15 * * * * *"
     user-sync: "0 0 */1 * * *"

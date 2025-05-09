@@ -2,7 +2,6 @@ package rs.russian.portal.user.scheduler
 
 import io.authentik.model.UserTypeEnum
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
-import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import rs.russian.portal.shared.jpa.isNull
@@ -28,14 +27,15 @@ class UserSyncScheduler(
     fun sync() {
         val syncStart = LocalDateTime.now()
         val authentikUsers = authentikUserService.getAllUsers()
-        authentikUsers
+        val wpUsersToSync = authentikUsers
             .filter { it.type != UserTypeEnum.service_account }
             .filter { it.type != UserTypeEnum.internal_service_account }
             .filter { !it.email.isNullOrBlank() }
-            .forEach { ssoUser ->
-                val account = accountService.createOrUpdateAccount(ssoUser)
-                multiWordpressUserService.syncToAll(account)
+            .map { ssoUser ->
+                accountService.createOrUpdateAccount(ssoUser)
             }
+        multiWordpressUserService.syncToAll(wpUsersToSync)
+
         val inactiveSpec = less<Account, LocalDateTime>(Account_.LAST_SYNCED, syncStart)
             .or(isNull(Account_.LAST_SYNCED))
         val inactiveUsers = accountRepository.findAll(inactiveSpec)

@@ -66,7 +66,7 @@ class AccountService(
         account.info = UserInfo.default(account)
         account.contracts = mutableListOf(userMapper.map(request.contract, account))
         account = accountRepository.saveAndFlush(account)
-        multiWordpressUserService.syncToAll(account)
+        multiWordpressUserService.syncToAll(listOf(account))
         return account
     }
 
@@ -77,7 +77,7 @@ class AccountService(
         var account = userMapper.map(ssoUser)
         account.info = UserInfo.default(account)
         account = accountRepository.saveAndFlush(account)
-        multiWordpressUserService.syncToAll(account)
+        multiWordpressUserService.syncToAll(listOf(account))
         return account
     }
 
@@ -136,7 +136,7 @@ class AccountService(
         }
         account.active = isActive
         authentikUserService.switchActiveState(account, isActive)
-        multiWordpressUserService.syncToAll(account)
+        multiWordpressUserService.syncToAll(listOf(account))
         return save(account)
     }
 

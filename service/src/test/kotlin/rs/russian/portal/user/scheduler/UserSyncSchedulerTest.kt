@@ -61,8 +61,7 @@ class UserSyncSchedulerTest {
         verify { accountService.createOrUpdateAccount(user1) }
         verify { accountService.createOrUpdateAccount(user2) }
         verify(exactly = 0) { accountService.createOrUpdateAccount(serviceAccount) }
-        verify { multiWordpressUserService.syncToAll(account1) }
-        verify { multiWordpressUserService.syncToAll(account2) }
+        verify { multiWordpressUserService.syncToAll(listOf(account1, account2)) }
         verify { accountRepository.findAll(any<Specification<Account>>()) }
     }
 
@@ -83,7 +82,7 @@ class UserSyncSchedulerTest {
         // Assert
         verify { authentikUserService.getAllUsers() }
         verify { accountService.createOrUpdateAccount(user1) }
-        verify { multiWordpressUserService.syncToAll(account1) }
+        verify { multiWordpressUserService.syncToAll(listOf(account1)) }
 
         verify { accountService.save(match { it.id == 3 && !it.active }) }
         verify { multiWordpressUserService.deleteFromAll(inactiveAccount) }

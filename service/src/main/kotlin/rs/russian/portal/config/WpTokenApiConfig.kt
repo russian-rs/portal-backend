@@ -3,6 +3,7 @@ package rs.russian.portal.config
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -11,16 +12,19 @@ import org.springframework.context.annotation.Profile
 import org.wordpress.api.TokenWordpressApi
 
 @Configuration
-class TokenApiConfig {
+class WpTokenApiConfig {
 
     @Bean
     @Profile("!local")
-    @DependsOn(value = ["objectMapper"])
     fun tokenWordpressApis(wordpressProperties: WordpressProperties): Map<String, TokenWordpressApi> {
         return wordpressProperties.instances.associate { instance ->
-            instance.name to TokenWordpressApi(client = wordpressApiClient(instance.baseUrl))
+            instance.name to TokenWordpressApi(basePath = instance.baseUrl, client = wordpressApiClient(instance.baseUrl))
         }
     }
+
+    @Bean
+    @Profile("local")
+    fun tokenWordpressApisLocal(): Map<String, TokenWordpressApi> = mapOf("local" to TokenWordpressApi())
 
     fun wordpressApiClient(baseUrl: String): OkHttpClient {
         val logger = LoggerFactory.getLogger("TokenWordpressApi")
@@ -41,8 +45,13 @@ class TokenApiConfig {
             chain.proceed(request)
         }
 
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
         return OkHttpClient.Builder()
-            .addInterceptor(interceptor)
+//            .addInterceptor(interceptor)
+            .addInterceptor(loggingInterceptor)
             .build()
     }
 }

@@ -36,28 +36,28 @@ class MultiWordpressUserServiceTest {
     @Test
     fun `syncToAll should sync user to all WordPress instances`() {
         // Arrange
-        val wpUser1 = mockk<WpUser>()
-        val wpUser2 = mockk<WpUser>()
-        val updatedWpUser = mockk<WpUser>()
+        val updatingWpUser = WpUser(1, "", "", mutableListOf())
+        val creatingWpUser = WpUser(0, "", "", mutableListOf())
+        val updatedWpUser = WpUser(1, "", "", mutableListOf())
         
-        every { mainService.getUser("testuser") } returns wpUser1
+        every { mainService.getUser("testuser") } returns updatingWpUser
         every { secondaryService.getUser("testuser") } returns null
-        every { wordpressUserMapper.map(account) } returns wpUser2
-        every { wordpressUserMapper.update(account, wpUser1) } returns Unit
-        every { mainService.updateUser(wpUser1) } returns updatedWpUser
-        every { secondaryService.createUser(wpUser2) } returns wpUser2
+        every { wordpressUserMapper.map(account) } returns creatingWpUser
+        every { wordpressUserMapper.update(account, any()) } returns Unit
+        every { mainService.updateUser(updatingWpUser) } returns updatedWpUser
+        every { secondaryService.createUser(creatingWpUser) } returns creatingWpUser
         
         // Act
-        multiWordpressUserService.syncToAll(account)
+        multiWordpressUserService.syncToAll(listOf(account))
         
         // Assert
         verify { mainService.getUser("testuser") }
-        verify { wordpressUserMapper.update(account, wpUser1) }
-        verify { mainService.updateUser(wpUser1) }
+        verify { wordpressUserMapper.update(account, updatingWpUser) }
+        verify { mainService.updateUser(updatingWpUser) }
         
         verify { secondaryService.getUser("testuser") }
         verify { wordpressUserMapper.map(account) }
-        verify { secondaryService.createUser(wpUser2) }
+        verify { secondaryService.createUser(creatingWpUser) }
     }
     
     @Test
@@ -65,11 +65,11 @@ class MultiWordpressUserServiceTest {
         // Arrange
         every { mainService.getUser("testuser") } throws RuntimeException("API error")
         every { secondaryService.getUser("testuser") } returns null
-        every { wordpressUserMapper.map(account) } returns mockk()
+        every { wordpressUserMapper.map(account) } returns WpUser(0, "", "", mutableListOf())
         every { secondaryService.createUser(any()) } returns mockk()
         
         // Act - this should not throw even though one service fails
-        multiWordpressUserService.syncToAll(account)
+        multiWordpressUserService.syncToAll(listOf(account))
         
         // Assert
         verify { mainService.getUser("testuser") }
