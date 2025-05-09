@@ -5,6 +5,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.wordpress.api.CustomWordpressApi
 import org.wordpress.api.UsersWordpressApi
 import org.wordpress.model.DeleteUser200Response
 import org.wordpress.model.WpUser
@@ -14,12 +15,14 @@ import kotlin.test.assertNull
 class WordpressUserServiceImplTest {
 
     private lateinit var usersWordpressApi: UsersWordpressApi
+    private lateinit var customWordpressApi: CustomWordpressApi
     private lateinit var wordpressUserService: WordpressUserServiceImpl
 
     @BeforeEach
     fun setUp() {
         usersWordpressApi = mockk()
-        wordpressUserService = WordpressUserServiceImpl(usersWordpressApi)
+        customWordpressApi = mockk()
+        wordpressUserService = WordpressUserServiceImpl("test", usersWordpressApi, customWordpressApi)
     }
 
     @Test
