@@ -18,7 +18,7 @@ class WpTokenApiConfig {
     @Profile("!local")
     fun tokenWordpressApis(wordpressProperties: WordpressProperties): Map<String, TokenWordpressApi> {
         return wordpressProperties.instances.associate { instance ->
-            instance.name to TokenWordpressApi(basePath = instance.baseUrl, client = wordpressApiClient(instance.baseUrl))
+            instance.name to TokenWordpressApi(basePath = instance.baseUrl, client = wordpressApiClient())
         }
     }
 
@@ -26,31 +26,13 @@ class WpTokenApiConfig {
     @Profile("local")
     fun tokenWordpressApisLocal(): Map<String, TokenWordpressApi> = mapOf("local" to TokenWordpressApi())
 
-    fun wordpressApiClient(baseUrl: String): OkHttpClient {
-        val logger = LoggerFactory.getLogger("TokenWordpressApi")
-        val interceptor = Interceptor { chain ->
-            val originalRequest = chain.request()
-            val originalUrl = originalRequest.url
-
-            val url = originalUrl.newBuilder()
-                .host(baseUrl.toHttpUrl().host)
-                .build()
-
-            val request = originalRequest.newBuilder()
-                .url(url)
-                .build()
-
-            logger.info("${originalRequest.method} $url")
-
-            chain.proceed(request)
-        }
+    fun wordpressApiClient(): OkHttpClient {
 
         val loggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
         }
 
         return OkHttpClient.Builder()
-//            .addInterceptor(interceptor)
             .addInterceptor(loggingInterceptor)
             .build()
     }
