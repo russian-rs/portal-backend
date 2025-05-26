@@ -59,7 +59,6 @@ class UserController(
         return ResponseEntity.ok(userMapper.map(accountService.setAvatar(currentUser, avatarId).info))
     }
 
-    @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])
     override fun setProgram(id: Int, code: String): ResponseEntity<UserInfoDto> {
         val account = accountService.getAccount(id)
         return ResponseEntity.ok(userMapper.map(accountService.setProgram(account, code).info))
@@ -99,6 +98,13 @@ class UserController(
             }
         }
 
-        return ResponseEntity.ok(userMapper.map(accountService.partialUpdateInfo(targetAccount, userInfoUpdateRequest).info))
+        return ResponseEntity.ok(
+            userMapper.map(
+                accountService.partialUpdateInfo(
+                    targetAccount,
+                    userInfoUpdateRequest
+                ).info
+            )
+        )
     }
 }
