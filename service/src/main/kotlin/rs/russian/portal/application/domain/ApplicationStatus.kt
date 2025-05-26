@@ -7,6 +7,7 @@ enum class ApplicationStatus(
     CREATED(0, false),
     IN_PROGRESS(10, false),
     CLARIFICATION(30, false),
+    PAUSED(40, false),
     READY_TO_SEND(50, false),
     DOCS_SENT(70, false),
     DOCS_RECEIVED(90, false),
