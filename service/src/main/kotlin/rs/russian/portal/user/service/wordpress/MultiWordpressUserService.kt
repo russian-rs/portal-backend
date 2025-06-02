@@ -13,9 +13,13 @@ class MultiWordpressUserService(
 ) {
     fun syncToAll(account: List<Account>) {
         wordpressUserServices.forEach { (_, service) ->
-            val existingRoles = service.getAvailableRoles().map { it.slug }
-            val count = account.map { createOrUpdateWpUser(service, it, existingRoles) }.count { it }
-            log.info("Successfully synced $count of ${account.size} users to WordPress instance ${service.instanceName}")
+            try {
+                val existingRoles = service.getAvailableRoles().map { it.slug }
+                val count = account.map { createOrUpdateWpUser(service, it, existingRoles) }.count { it }
+                log.info("Successfully synced $count of ${account.size} users to WordPress instance ${service.instanceName}")
+            } catch (ex: Exception) {
+                log.error("Failed to sync users to WordPress instance ${service.instanceName}, skipping instance", ex)
+            }
         }
     }
 
