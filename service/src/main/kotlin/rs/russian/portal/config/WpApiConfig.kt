@@ -26,20 +26,20 @@ class WpApiConfig(
     private val tokenWordpressApis: Map<String, TokenWordpressApi>,
     private val env: Environment
 ) {
-    private val tokens = if (env.activeProfiles.any { "local".equals(it, ignoreCase = true) }) {
+    private val tokens: MutableMap<String, String?> = if (env.activeProfiles.any { "local".equals(it, ignoreCase = true) }) {
         mutableMapOf("local" to "")
     } else ConcurrentHashMap()
 
-    private fun receiveTokenByInstance(instance: WordpressInstance): String {
+    private fun receiveTokenByInstance(instance: WordpressInstance): String? {
         val tokenApi = tokenWordpressApis[instance.name]
             ?: throw IllegalStateException("No TokenWordpressApi found for instance ${instance.name}") // impossible
         val token = try {
             tokenApi.getToken(WpTokenRequest(instance.username, instance.password)).token
         } catch (e: Exception) {
             log.error("Failed to get token for instance ${instance.name}", e)
-            throw e
+            null
         }
-        return token!!
+        return token
     }
 
     private var wpUserServices: Map<String, WordpressUserService> =
@@ -63,12 +63,15 @@ class WpApiConfig(
     fun wordpressUserServices(): Map<String, WordpressUserService> = wpUserServices
 
     private fun createWordpressApiClient(instance: WordpressInstance): OkHttpClient {
-        val token = tokens.computeIfAbsent(instance.name) { receiveTokenByInstance(instance) }
-
         val authInterceptor = Interceptor { chain ->
+            val actualToken = tokens.computeIfAbsent(instance.name) { receiveTokenByInstance(instance) }
+            if (actualToken == null) {
+                log.error("Failed to retrieve token for instance ${instance.name}, request will not be authorized and will fail. Wait for the next scheduled token update.")
+                return@Interceptor chain.proceed(chain.request())
+            }
 
             val request = chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer $token")
+                .addHeader("Authorization", "Bearer $actualToken")
                 .build()
 
             chain.proceed(request)

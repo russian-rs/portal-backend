@@ -1,13 +1,9 @@
 package rs.russian.portal.config
 
-import okhttp3.HttpUrl.Companion.toHttpUrl
-import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Profile
 import org.wordpress.api.TokenWordpressApi
 
@@ -16,11 +12,10 @@ class WpTokenApiConfig {
 
     @Bean
     @Profile("!local")
-    fun tokenWordpressApis(wordpressProperties: WordpressProperties): Map<String, TokenWordpressApi> {
-        return wordpressProperties.instances.associate { instance ->
+    fun tokenWordpressApis(wordpressProperties: WordpressProperties): Map<String, TokenWordpressApi> =
+        wordpressProperties.instances.associate { instance ->
             instance.name to TokenWordpressApi(basePath = instance.baseUrl, client = wordpressApiClient())
         }
-    }
 
     @Bean
     @Profile("local")
