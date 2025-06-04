@@ -7,8 +7,7 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import rs.russian.portal.application.domain.Application
-import rs.russian.portal.application.domain.ApplicationStatus.DENY
-import rs.russian.portal.application.domain.ApplicationStatus.DONE
+import rs.russian.portal.application.domain.ApplicationStatus.*
 import rs.russian.portal.application.domain.Application_
 import rs.russian.portal.application.repository.ApplicationRepository
 import rs.russian.portal.application.service.ApplicationService
@@ -28,7 +27,7 @@ class ExpiredApplicationsScheduler(
         log.info("[SCHEDULER] Denying expired applications")
         val spec: Specification<Application> =
             less<Application, LocalDateTime>(Application_.VERSION, LocalDateTime.now().minusMonths(1))
-                .and(notContains(Application_.STATUS, listOf(DONE, DENY)))
+                .and(notContains(Application_.STATUS, listOf(DONE, DENY, PAUSED)))
         val applications = applicationRepository.findAll(spec, Pageable.unpaged())
         applications.forEach {
             applicationService.save(it.also { it.status = DENY })
