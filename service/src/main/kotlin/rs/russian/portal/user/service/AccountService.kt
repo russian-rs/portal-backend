@@ -20,7 +20,7 @@ import rs.russian.portal.user.mapper.WordpressUserMapper
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.program.repository.ProgramRepository
 import rs.russian.portal.user.service.authentik.AuthentikService
-import rs.russian.portal.user.service.wordpress.WordpressUserService
+import rs.russian.portal.user.service.wordpress.MultiWordpressUserService
 
 @Service
 class AccountService(
@@ -29,8 +29,7 @@ class AccountService(
     private val fileService: FileService,
     private val contractMapper: ContractMapper,
     private val accountRepository: AccountRepository,
-    private val wordpressUserMapper: WordpressUserMapper,
-    private val wordpressUserService: WordpressUserService,
+    private val multiWordpressUserService: MultiWordpressUserService,
     private val authentikUserService: AuthentikService
 ) {
 
@@ -67,7 +66,7 @@ class AccountService(
         account.info = UserInfo.default(account)
         account.contracts = mutableListOf(userMapper.map(request.contract, account))
         account = accountRepository.saveAndFlush(account)
-        wordpressUserService.createUser(wordpressUserMapper.map(account))
+        multiWordpressUserService.syncToAll(listOf(account))
         return account
     }
 
@@ -78,7 +77,7 @@ class AccountService(
         var account = userMapper.map(ssoUser)
         account.info = UserInfo.default(account)
         account = accountRepository.saveAndFlush(account)
-        wordpressUserService.createUser(wordpressUserMapper.map(account))
+        multiWordpressUserService.syncToAll(listOf(account))
         return account
     }
 
@@ -137,16 +136,7 @@ class AccountService(
         }
         account.active = isActive
         authentikUserService.switchActiveState(account, isActive)
-        try {
-            val wpUser = wordpressUserMapper.map(account)
-            if (isActive) {
-                wordpressUserService.createUser(wpUser)
-            } else {
-                wordpressUserService.deleteUser(account.username)
-            }
-        } catch (e: Exception) {
-            log.error("Failed to create/delete user in WordPress - ${account.username}", e)
-        }
+        multiWordpressUserService.syncToAll(listOf(account))
         return save(account)
     }
 
