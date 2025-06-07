@@ -31,6 +31,7 @@ class UserSyncScheduler(
             .filter { it.type != UserTypeEnum.service_account }
             .filter { it.type != UserTypeEnum.internal_service_account }
             .filter { !it.email.isNullOrBlank() }
+            .filter { it.isActive == true }
             .map { ssoUser ->
                 accountService.createOrUpdateAccount(ssoUser)
             }
