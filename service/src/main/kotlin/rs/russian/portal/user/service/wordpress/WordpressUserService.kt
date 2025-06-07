@@ -1,8 +1,14 @@
 package rs.russian.portal.user.service.wordpress
 
+import org.wordpress.api.CustomWordpressApi
+import org.wordpress.api.UsersWordpressApi
+import org.wordpress.model.WpRole
 import org.wordpress.model.WpUser
 
 interface WordpressUserService {
+    val instanceName: String
+    var apiClient: UsersWordpressApi
+    var customWpApi: CustomWordpressApi
 
     fun getUser(username: String): WpUser?
 
@@ -12,4 +18,5 @@ interface WordpressUserService {
 
     fun deleteUser(username: String)
 
+    fun getAvailableRoles(): List<WpRole>
 }

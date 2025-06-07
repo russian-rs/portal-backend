@@ -4,15 +4,20 @@ import io.authentik.api.CoreAuthentikApi
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.DependsOn
 import org.springframework.context.annotation.Profile
+import org.springframework.scheduling.annotation.Scheduled
 import org.wordpress.api.TokenWordpressApi
+import org.wordpress.api.UsersWordpressApi
+import org.wordpress.model.WpTokenRequest
+import rs.russian.portal.user.service.wordpress.WordpressUserService
+import rs.russian.portal.user.service.wordpress.WordpressUserServiceImpl
 
 @Configuration
-class ApiConfig {
+class AuthentikApiConfig() {
 
     @Bean
     @Profile("!no-auth")
@@ -46,39 +51,14 @@ class ApiConfig {
             chain.proceed(request)
         }
 
-        return OkHttpClient.Builder()
-            .addInterceptor(interceptor)
-            .build()
-    }
-
-    @Bean
-    @Profile("!local")
-    @DependsOn(value = ["objectMapper"])
-    fun tokenWordpressApi(wordpressProperties: WordpressProperties): TokenWordpressApi {
-        return TokenWordpressApi(client = wordpressApiClient(wordpressProperties.baseUrl))
-    }
-
-    fun wordpressApiClient(baseUrl: String): OkHttpClient {
-        val logger = LoggerFactory.getLogger("TokenWordpressApi")
-        val interceptor = Interceptor { chain ->
-            val originalRequest = chain.request()
-            val originalUrl = originalRequest.url
-
-            val url = originalUrl.newBuilder()
-                .host(baseUrl.toHttpUrl().host)
-                .build()
-
-            val request = originalRequest.newBuilder()
-                .url(url)
-                .build()
-
-            logger.info("${originalRequest.method} $url")
-
-            chain.proceed(request)
+        val loggingInterceptor = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
         }
 
         return OkHttpClient.Builder()
             .addInterceptor(interceptor)
+            .addInterceptor(loggingInterceptor)
             .build()
     }
+
 }
