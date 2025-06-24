@@ -10,6 +10,7 @@ import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.Account_
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.AccountService
+import rs.russian.portal.user.service.AccountSynchroniser
 import rs.russian.portal.user.service.authentik.AuthentikService
 import rs.russian.portal.user.service.wordpress.MultiWordpressUserService
 import java.time.LocalDateTime
@@ -18,7 +19,7 @@ import java.time.LocalDateTime
 class UserSyncScheduler(
     private val accountService: AccountService,
     private val accountRepository: AccountRepository,
-    private val multiWordpressUserService: MultiWordpressUserService,
+    private val accountSynchronisers: List<AccountSynchroniser>,
     private val authentikUserService: AuthentikService
 ) {
 
@@ -27,7 +28,7 @@ class UserSyncScheduler(
     fun sync() {
         val syncStart = LocalDateTime.now()
         val authentikUsers = authentikUserService.getAllUsers()
-        val wpUsersToSync = authentikUsers
+        val usersToSync = authentikUsers
             .filter { it.type != UserTypeEnum.service_account }
             .filter { it.type != UserTypeEnum.internal_service_account }
             .filter { !it.email.isNullOrBlank() }
@@ -35,14 +36,14 @@ class UserSyncScheduler(
             .map { ssoUser ->
                 accountService.createOrUpdateAccount(ssoUser)
             }
-        multiWordpressUserService.syncToAll(wpUsersToSync)
+        accountSynchronisers.forEach { it.sync(usersToSync) }
 
         val inactiveSpec = less<Account, LocalDateTime>(Account_.LAST_SYNCED, syncStart)
             .or(isNull(Account_.LAST_SYNCED))
         val inactiveUsers = accountRepository.findAll(inactiveSpec)
         inactiveUsers.forEach { user ->
             accountService.save(user.also { it.active = false })
-            multiWordpressUserService.deleteFromAll(user)
+            accountSynchronisers.forEach { it.delete(user) }
         }
     }
 

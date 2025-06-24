@@ -16,7 +16,6 @@ import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.domain.specification.searchSpecification
 import rs.russian.portal.user.mapper.ContractMapper
 import rs.russian.portal.user.mapper.UserMapper
-import rs.russian.portal.user.mapper.WordpressUserMapper
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.program.repository.ProgramRepository
 import rs.russian.portal.user.service.authentik.AuthentikService
@@ -66,7 +65,7 @@ class AccountService(
         account.info = UserInfo.default(account)
         account.contracts = mutableListOf(userMapper.map(request.contract, account))
         account = accountRepository.saveAndFlush(account)
-        multiWordpressUserService.syncToAll(listOf(account))
+        multiWordpressUserService.sync(listOf(account))
         return account
     }
 
@@ -77,7 +76,7 @@ class AccountService(
         var account = userMapper.map(ssoUser)
         account.info = UserInfo.default(account)
         account = accountRepository.saveAndFlush(account)
-        multiWordpressUserService.syncToAll(listOf(account))
+        multiWordpressUserService.sync(listOf(account))
         return account
     }
 
@@ -136,7 +135,7 @@ class AccountService(
         }
         account.active = isActive
         authentikUserService.switchActiveState(account, isActive)
-        multiWordpressUserService.syncToAll(listOf(account))
+        multiWordpressUserService.sync(listOf(account))
         return save(account)
     }
 
