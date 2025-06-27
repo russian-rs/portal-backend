@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.7.0-user-info-project-fk
+      author: Valerii Linden
+      changes:
+        - addColumn:
+            tableName: user_info
+            columns:
+              - column:
+                  name: project_code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: user_info
+            baseColumnNames: project_code
+            referencedTableName: project
+            referencedColumnNames: code
+            constraintName: fk_user_info_project

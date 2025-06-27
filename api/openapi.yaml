@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.18.0
+  version: 1.19.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -691,6 +691,25 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+
+  /projects:
+    get:
+      operationId: getProjects
+      tags:
+        - projects
+      summary: Получить список всех доступных проектов
+      responses:
+        '200':
+          description: Список проектов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectDto'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   responses:
     ServerError:
@@ -803,6 +822,8 @@ components:
           type: string
         program:
           $ref: '#/components/schemas/ProgramDto'
+        project:
+          $ref: '#/components/schemas/ProjectDto'
         avatar:
           $ref: '#/components/schemas/FileInfoDto'
         groups:
@@ -1158,6 +1179,22 @@ components:
         - ASSOCIATED
         - REGULAR
     ProgramDto:
+      type: object
+      required:
+        - code
+        - nameRu
+        - nameEn
+        - nameSr
+      properties:
+        code:
+          type: string
+        nameRu:
+          type: string
+        nameEn:
+          type: string
+        nameSr:
+          type: string
+    ProjectDto:
       type: object
       required:
         - code
