@@ -49,6 +49,7 @@ abstract class ApplicationMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "city", ignore = true)
     @Mapping(target = "program", ignore = true)
+    @Mapping(target = "project", ignore = true)
     @Mapping(target = "gender", ignore = true)
     @Mapping(target = "account", ignore = true)
     @Mapping(target = "avatar", ignore = true)

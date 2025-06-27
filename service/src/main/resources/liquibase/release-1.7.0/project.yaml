@@ -1,0 +1,285 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.7.0-create-project-table
+      author: Valerii Linden
+      changes:
+        - createTable:
+            tableName: project
+            columns:
+              - column:
+                  name: code
+                  type: VARCHAR(50)
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_project
+              - column:
+                  name: name_ru
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name_en
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name_sr
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: IT }
+              - column: { name: name_ru,  value: "ИТ" }
+              - column: { name: name_en,  value: IT }
+              - column: { name: name_sr,  value: IT }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: LAYOUT }
+              - column: { name: name_ru, value: Верстка }
+              - column: { name: name_en, value: "Layout / Page formatting" }
+              - column: { name: name_sr, value: "Raspored stranica / Layout" }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: FORMS }
+              - column: { name: name_ru, value: Электронные формы }
+              - column: { name: name_en, value: Electronic forms }
+              - column: { name: name_sr, value: Elektronske forme }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: SCRAPERS }
+              - column: { name: name_ru, value: Сборщики информации с сайтов }
+              - column: { name: name_en, value: Web scrapers }
+              - column: { name: name_sr, value: "Scraperi / Sakupljači podataka" }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: BOTS }
+              - column: { name: name_ru, value: Боты }
+              - column: { name: name_en, value: Bots }
+              - column: { name: name_sr, value: Botovi }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: APPS }
+              - column: { name: name_ru, value: Приложения }
+              - column: { name: name_en, value: "Applications / Apps" }
+              - column: { name: name_sr, value: Aplikacije }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: LAWS }
+              - column: { name: name_ru, value: "Законы на сайте, консультации" }
+              - column: { name: name_en, value: "Laws on website, consultations" }
+              - column: { name: name_sr, value: "Zakon na sajtu, konsultacije" }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: HR }
+              - column: { name: name_ru, value: "Учет времени, HR" }
+              - column: { name: name_en, value: "Time tracking, HR" }
+              - column: { name: name_sr, value: "Evidencija vremena, HR" }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: DESIGN_3D }
+              - column: { name: name_ru, value: "Проектирование, 3D-моделирование" }
+              - column: { name: name_en, value: "Design, 3D modeling" }
+              - column: { name: name_sr, value: "Projektovanje, 3D modelovanje" }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: DATA_COLLECTION }
+              - column: { name: name_ru, value: Сбор информации }
+              - column: { name: name_en, value: Information collection }
+              - column: { name: name_sr, value: Prikupljanje informacija }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: RESEARCH }
+              - column: { name: name_ru, value: Исследования }
+              - column: { name: name_en, value: Research }
+              - column: { name: name_sr, value: Istraživanja }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: POSTING }
+              - column: { name: name_ru, value: Размещение информации }
+              - column: { name: name_en, value: Information posting }
+              - column: { name: name_sr, value: Postavljanje informacija }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: ARTICLES }
+              - column: { name: name_ru, value: Статьи }
+              - column: { name: name_en, value: Articles }
+              - column: { name: name_sr, value: Članci }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: SMM }
+              - column: { name: name_ru, value: SMM }
+              - column: { name: name_en, value: "SMM (Social Media Marketing)" }
+              - column: { name: name_sr, value: SMM }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: DESIGN }
+              - column: { name: name_ru, value: Дизайн }
+              - column: { name: name_en, value: Design }
+              - column: { name: name_sr, value: Dizajn }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: WEB_FIGMA }
+              - column: { name: name_ru, value: Web figma }
+              - column: { name: name_en, value: Web Figma }
+              - column: { name: name_sr, value: Web figma }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: SOCIAL_MEDIA_DESIGN }
+              - column: { name: name_ru, value: Оформление соцсетей }
+              - column: { name: name_en, value: Social media design }
+              - column: { name: name_sr, value: Uređivanje društvenih mreža }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: MATERIAL_STYLE }
+              - column: { name: name_ru, value: "Дизайн материалов, стиль" }
+              - column: { name: name_en, value: "Material design, style" }
+              - column: { name: name_sr, value: Stil i dizajn materijala }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: STICKERS }
+              - column: { name: name_ru, value: "Стикеры, эмодзи" }
+              - column: { name: name_en, value: "Stickers, emojis" }
+              - column: { name: name_sr, value: "Stikeri, emodžiji" }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: GUIDE_ILLUSTRATIONS }
+              - column: { name: name_ru, value: Иллюстрации для гайдов }
+              - column: { name: name_en, value: Illustrations for guides }
+              - column: { name: name_sr, value: Ilustracije za vodiče }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: BOOK_MURALS }
+              - column: { name: name_ru, value: "Иллюстрации книги, муралы" }
+              - column: { name: name_en, value: "Book illustrations, murals" }
+              - column: { name: name_sr, value: "Ilustracije knjige, murali" }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: VIDEO_EDITING }
+              - column: { name: name_ru, value: Видеомонтаж }
+              - column: { name: name_en, value: Video editing }
+              - column: { name: name_sr, value: "Video montaža" }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: PHOTO }
+              - column: { name: name_ru, value: Фото }
+              - column: { name: name_en, value: Photography }
+              - column: { name: name_sr, value: Fotografija }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: GUIDEBOOK }
+              - column: { name: name_ru, value: Путеводитель }
+              - column: { name: name_en, value: Guidebook }
+              - column: { name: name_sr, value: Vodič }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: TRAINING }
+              - column: { name: name_ru, value: "Обучение, авторы, методологи" }
+              - column: { name: name_en, value: "Training, authors, methodologists" }
+              - column: { name: name_sr, value: "Obuka, autori, metodolozi" }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: COURSE_UPLOAD }
+              - column: { name: name_ru, value: Размещение курсов }
+              - column: { name: name_en, value: "Course uploading / publishing" }
+              - column: { name: name_sr, value: Postavljanje kurseva }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: PSYCHOLOGISTS }
+              - column: { name: name_ru, value: Психологи }
+              - column: { name: name_en, value: Psychologists }
+              - column: { name: name_sr, value: Psiholozi }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: BOOK }
+              - column: { name: name_ru, value: Книга }
+              - column: { name: name_en, value: Book }
+              - column: { name: name_sr, value: Knjiga }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: LANGUAGE_COURSES }
+              - column: { name: name_ru, value: Языковые курсы }
+              - column: { name: name_en, value: Language courses }
+              - column: { name: name_sr, value: Jezički kursevi }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: SPORT }
+              - column: { name: name_ru, value: Спорт }
+              - column: { name: name_en, value: Sport }
+              - column: { name: name_sr, value: Sport }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: MONITORING }
+              - column: { name: name_ru, value: Мониторинг }
+              - column: { name: name_en, value: Monitoring }
+              - column: { name: name_sr, value: Monitoring }
+
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: CLEAN_CITY }
+              - column: { name: name_ru, value: Чистый город }
+              - column: { name: name_en, value: Clean city }
+              - column: { name: name_sr, value: Čist grad }
