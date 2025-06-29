@@ -11,6 +11,6 @@ class ProjectController(
     private val projectService: ProjectService
 ) : ProjectsApi {
     override fun getProjects(): ResponseEntity<List<ProjectDto>> {
-        return ResponseEntity.ok(projectService.getProjects());
+        return ResponseEntity.ok(projectService.getProjects())
     }
 }
