@@ -1,4 +1,4 @@
-package rs.russian.portal.project.domain
+package rs.russian.portal.program.domain
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity

@@ -72,6 +72,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserInfoDto'
+  /user/account/{id}/project/{code}:
+    patch:
+      operationId: setProject
+      tags:
+        - user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            nullable: false
+        - in: path
+          name: code
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
   /user/account/{id}/deactivate:
     post:
       operationId: deactivateAccount
@@ -853,9 +877,6 @@ components:
         telegram:
           type: string
         phone:
-          type: string
-        project:
-          description: Project code
           type: string
       additionalProperties: false
     UserPageResponse:

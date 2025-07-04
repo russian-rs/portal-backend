@@ -4,7 +4,7 @@ import jakarta.persistence.criteria.JoinType
 import org.springframework.data.jpa.domain.Specification
 import rs.russian.generated.model.ReportFilter
 import rs.russian.portal.program.domain.Program
-import rs.russian.portal.project.domain.Project
+import rs.russian.portal.program.domain.Project
 import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.Report_
 import rs.russian.portal.report.domain.Task
