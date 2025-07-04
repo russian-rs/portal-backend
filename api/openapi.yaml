@@ -916,6 +916,9 @@ components:
         program:
           type: string
           nullable: true
+        project:
+          type: string
+          nullable: true
     ReportDto:
       type: object
       nullable: false
