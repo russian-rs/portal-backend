@@ -1,9 +1,9 @@
-package rs.russian.portal.project.service
+package rs.russian.portal.program.service
 
 import org.springframework.stereotype.Service
 import rs.russian.generated.model.ProjectDto
-import rs.russian.portal.project.mapper.ProjectMapper
-import rs.russian.portal.project.repository.ProjectRepository
+import rs.russian.portal.program.mapper.ProjectMapper
+import rs.russian.portal.program.repository.ProjectRepository
 
 @Service
 class ProjectService(
