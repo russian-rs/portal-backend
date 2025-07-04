@@ -1200,6 +1200,13 @@ components:
             type: string
           uniqueItems: true
           minItems: 1
+        projectCodes:
+          type: array
+          description: Показывать только пользователей указанных проектов
+          items:
+            type: string
+          uniqueItems: true
+          minItems: 1
     ContractTypeEnum:
       type: string
       enum:
