@@ -51,6 +51,11 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$JACKSON_KOTLIN_VERSION")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 
+    // Testing
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine")
+
     // S3
     implementation("software.amazon.awssdk:s3:2.30.31")
 
