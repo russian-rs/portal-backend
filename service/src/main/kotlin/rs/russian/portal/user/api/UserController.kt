@@ -64,6 +64,14 @@ class UserController(
         return ResponseEntity.ok(userMapper.map(accountService.setProgram(account, code).info))
     }
 
+    override fun setProject(
+        id: Int,
+        code: String
+    ): ResponseEntity<UserInfoDto> {
+        val account = accountService.getAccount(id)
+        return ResponseEntity.ok(userMapper.map(accountService.setProject(account, code).info))
+    }
+
     @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])
     override fun createUser(userCreateRequest: UserCreateRequest): ResponseEntity<UserInfoDto> {
         val account = accountService.create(userCreateRequest)
