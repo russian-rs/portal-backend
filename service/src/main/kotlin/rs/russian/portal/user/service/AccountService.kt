@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import rs.russian.generated.api.NotFoundException
 import rs.russian.generated.model.*
 import rs.russian.portal.file.service.FileService
 import rs.russian.portal.shared.exception.NotAuthorizedException
@@ -16,9 +17,9 @@ import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.domain.specification.searchSpecification
 import rs.russian.portal.user.mapper.ContractMapper
 import rs.russian.portal.user.mapper.UserMapper
-import rs.russian.portal.user.mapper.WordpressUserMapper
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.program.repository.ProgramRepository
+import rs.russian.portal.program.repository.ProjectRepository
 import rs.russian.portal.user.service.authentik.AuthentikService
 import rs.russian.portal.user.service.wordpress.MultiWordpressUserService
 
@@ -26,6 +27,7 @@ import rs.russian.portal.user.service.wordpress.MultiWordpressUserService
 class AccountService(
     private val userMapper: UserMapper,
     private val programRepository: ProgramRepository,
+    private val projectRepository: ProjectRepository,
     private val fileService: FileService,
     private val contractMapper: ContractMapper,
     private val accountRepository: AccountRepository,
@@ -180,6 +182,19 @@ class AccountService(
             ?: throw IllegalArgumentException("Program with code: $code not found!")
 
         userInfo.program = program
+        account.info = userInfo
+
+        return save(account)
+    }
+
+    @Transactional
+    fun setProject(account: Account, code: String): Account {
+        val userInfo = account.info ?: UserInfo.default(account)
+
+        val project = projectRepository.findByCode(code)
+            ?: throw IllegalArgumentException("Project with code: $code not found!")
+
+        userInfo.project = project
         account.info = userInfo
 
         return save(account)

@@ -16,10 +16,15 @@ import java.time.LocalDateTime
 @NamedEntityGraph(
     name = Account.GRAPH_FULL,
     attributeNodes = [
-        NamedAttributeNode("info", subgraph = UserInfo.GRAPH_AVATAR),
+        NamedAttributeNode("info", subgraph = UserInfo.GRAPH_FULL),
         NamedAttributeNode("contracts"),
     ],
-    subgraphs = [NamedSubgraph(name = UserInfo.GRAPH_AVATAR, attributeNodes = [NamedAttributeNode("avatar")])]
+    subgraphs = [NamedSubgraph(name = UserInfo.GRAPH_FULL, attributeNodes = [
+        NamedAttributeNode("avatar"),
+        NamedAttributeNode("program"),
+        NamedAttributeNode("project")
+    ])
+    ]
 )
 data class Account(
     @Id

@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.18.0
+  version: 1.19.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -51,6 +51,30 @@ paths:
   /user/account/{id}/program/{code}:
     patch:
       operationId: setProgram
+      tags:
+        - user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+            nullable: false
+        - in: path
+          name: code
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
+  /user/account/{id}/project/{code}:
+    patch:
+      operationId: setProject
       tags:
         - user
       parameters:
@@ -691,6 +715,25 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+
+  /projects:
+    get:
+      operationId: getProjects
+      tags:
+        - projects
+      summary: Получить список всех доступных проектов
+      responses:
+        '200':
+          description: Список проектов
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProjectDto'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
 components:
   responses:
     ServerError:
@@ -803,6 +846,8 @@ components:
           type: string
         program:
           $ref: '#/components/schemas/ProgramDto'
+        project:
+          $ref: '#/components/schemas/ProjectDto'
         avatar:
           $ref: '#/components/schemas/FileInfoDto'
         groups:
@@ -890,6 +935,9 @@ components:
           type: string
           nullable: true
         program:
+          type: string
+          nullable: true
+        project:
           type: string
           nullable: true
     ReportDto:
@@ -1152,12 +1200,35 @@ components:
             type: string
           uniqueItems: true
           minItems: 1
+        projectCodes:
+          type: array
+          description: Показывать только пользователей указанных проектов
+          items:
+            type: string
+          uniqueItems: true
+          minItems: 1
     ContractTypeEnum:
       type: string
       enum:
         - ASSOCIATED
         - REGULAR
     ProgramDto:
+      type: object
+      required:
+        - code
+        - nameRu
+        - nameEn
+        - nameSr
+      properties:
+        code:
+          type: string
+        nameRu:
+          type: string
+        nameEn:
+          type: string
+        nameSr:
+          type: string
+    ProjectDto:
       type: object
       required:
         - code

@@ -6,6 +6,8 @@ import org.springframework.data.jpa.domain.Specification
 import rs.russian.generated.model.UserSearchFilter
 import rs.russian.portal.program.domain.Program
 import rs.russian.portal.program.domain.Program_
+import rs.russian.portal.program.domain.Project
+import rs.russian.portal.program.domain.Project_
 import rs.russian.portal.shared.jpa.empty
 import rs.russian.portal.shared.jpa.equal
 import rs.russian.portal.shared.jpa.like
@@ -46,6 +48,22 @@ fun searchSpecification(query: String, filter: UserSearchFilter?): Specification
                        .`in`(codes)
                }
                 filterSpec = filterSpec.and(programSpec)
+            }
+
+        it.projectCodes
+            ?.takeIf { codes -> codes.isNotEmpty() }
+            ?.let { codes ->
+                val projectSpec = Specification<Account> {root, _, _ ->
+                    val infoJoin: Join<Account, UserInfo> =
+                        root.join(Account_.info, JoinType.LEFT)
+
+                    val projJoin: Join<UserInfo, Project> =
+                        infoJoin.join(UserInfo_.project, JoinType.LEFT)
+
+                    projJoin.get(Project_.code)
+                        .`in`(codes)
+                }
+                filterSpec = filterSpec.and(projectSpec)
             }
 
         resultSpec = resultSpec.and(filterSpec)

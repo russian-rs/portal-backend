@@ -6,6 +6,7 @@ import jakarta.persistence.EnumType.STRING
 import jakarta.persistence.FetchType.LAZY
 import rs.russian.portal.file.domain.FileInfo
 import rs.russian.portal.program.domain.Program
+import rs.russian.portal.program.domain.Project
 import rs.russian.portal.shared.jpa.JpaEntity
 import rs.russian.portal.user.domain.enums.Gender
 import java.time.LocalDate
@@ -13,8 +14,12 @@ import java.time.LocalDateTime
 
 @Entity
 @NamedEntityGraph(
-    name = UserInfo.GRAPH_AVATAR,
-    attributeNodes = [NamedAttributeNode("avatar")]
+    name = UserInfo.GRAPH_FULL,
+    attributeNodes = [
+        NamedAttributeNode("avatar"),
+        NamedAttributeNode("program"),
+        NamedAttributeNode("project")
+    ]
 )
 data class UserInfo(
     @Id
@@ -31,6 +36,10 @@ data class UserInfo(
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "program_code")
     var program: Program? = null,
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "project_code")
+    var project: Project? = null,
 
     @Enumerated(STRING)
     var gender: Gender? = null,
@@ -50,7 +59,7 @@ data class UserInfo(
 
     companion object {
 
-        const val GRAPH_AVATAR = "UserInfoAvatar"
+        const val GRAPH_FULL = "UserInfoFull"
 
         fun default(account: Account) = UserInfo(
             id = account.username,
