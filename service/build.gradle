@@ -55,6 +55,8 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.8")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
+    implementation("io.github.serpro69:kotlin-faker:2.0.0-rc.10")
+    testImplementation("org.instancio:instancio-core:5.4.1")
 
     // S3
     implementation("software.amazon.awssdk:s3:2.30.31")
