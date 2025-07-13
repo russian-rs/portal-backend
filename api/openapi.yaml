@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.19.0
+  version: 1.19.1
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -1199,14 +1199,12 @@ components:
           items:
             type: string
           uniqueItems: true
-          minItems: 1
         projectCodes:
           type: array
           description: Показывать только пользователей указанных проектов
           items:
             type: string
           uniqueItems: true
-          minItems: 1
     ContractTypeEnum:
       type: string
       enum:

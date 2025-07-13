@@ -45,27 +45,49 @@ fun from(filter: ReportFilter): Specification<Report> {
         specification = specification.and(equal(Report_.STATUS, status))
     }
 
-    val programFilter = filter.program
-    if (!programFilter.isNullOrBlank()) {
-        specification = specification.and { root, query, builder ->
-            query!!.distinct(true)
-            val accountJoin = root.join<Report, Account>(Report_.ACCOUNT)
-            val infoJoin = accountJoin.join<Account, UserInfo>(Account_.INFO)
-            val programJoin = infoJoin.join<UserInfo, Program>(UserInfo_.PROGRAM, JoinType.LEFT)
-            builder.equal(programJoin.get<String>("code"), programFilter)
+    filter.program
+        .let { code ->
+            when {
+                code == null -> null
+                code.isBlank() -> Specification<Report> { root, query, builder ->
+                    query!!.distinct(true)
+                    val account = root.join<Report, Account>(Report_.ACCOUNT)
+                    val info = account.join<Account, UserInfo>(Account_.INFO)
+                    val program = info.join<UserInfo, Program>(UserInfo_.PROGRAM, JoinType.LEFT)
+                    builder.isNull(program.get<String>("code"))
+                }
+                else -> Specification<Report> { root, query, builder ->
+                    query!!.distinct(true)
+                    val account = root.join<Report, Account>(Report_.ACCOUNT)
+                    val info = account.join<Account, UserInfo>(Account_.INFO)
+                    val program = info.join<UserInfo, Program>(UserInfo_.PROGRAM, JoinType.LEFT)
+                    builder.equal(program.get<String>("code"), code)
+                }
+            }
         }
-    }
+        ?.let { specification = specification.and(it) }
 
-    val projectFilter = filter.project
-    if (!projectFilter.isNullOrBlank()) {
-        specification = specification.and { root, query, builder ->
-            query!!.distinct(true)
-            val accountJoin = root.join<Report, Account>(Report_.ACCOUNT)
-            val infoJoin = accountJoin.join<Account, UserInfo>(Account_.INFO)
-            val projectJoin = infoJoin.join<UserInfo, Project>(UserInfo_.PROJECT, JoinType.LEFT)
-            builder.equal(projectJoin.get<String>("code"), projectFilter)
+    filter.project
+        .let { code ->
+            when {
+                code == null -> null
+                code.isBlank() -> Specification<Report> { root, query, builder ->
+                    query!!.distinct(true)
+                    val account = root.join<Report, Account>(Report_.ACCOUNT)
+                    val info = account.join<Account, UserInfo>(Account_.INFO)
+                    val project = info.join<UserInfo, Project>(UserInfo_.PROJECT, JoinType.LEFT)
+                    builder.isNull(project.get<String>("code"))
+                }
+                else -> Specification<Report> { root, query, builder ->
+                    query!!.distinct(true)
+                    val account = root.join<Report, Account>(Report_.ACCOUNT)
+                    val info = account.join<Account, UserInfo>(Account_.INFO)
+                    val project = info.join<UserInfo, Project>(UserInfo_.PROJECT, JoinType.LEFT)
+                    builder.equal(project.get<String>("code"), code)
+                }
+            }
         }
-    }
+        ?.let { specification = specification.and(it) }
 
     return specification
 }

@@ -35,34 +35,58 @@ fun searchSpecification(query: String, filter: UserSearchFilter?): Specification
             filterSpec = filterSpec.and(equal(Account_.ACTIVE, false))
 
         it.programCodes
-            ?.takeIf { codes -> codes.isNotEmpty() }
             ?.let { codes ->
-               val programSpec = Specification<Account> {root, _, _ ->
-                   val infoJoin: Join<Account, UserInfo> =
-                       root.join(Account_.info, JoinType.LEFT)
+                val programSpec = if (codes.isEmpty()) {
+                    Specification<Account> { root, _, builder ->
+                        val infoJoin: Join<Account, UserInfo> =
+                            root.join(Account_.info, JoinType.LEFT)
 
-                   val progJoin: Join<UserInfo, Program> =
-                       infoJoin.join(UserInfo_.program, JoinType.LEFT)
+                        val progJoin: Join<UserInfo, Program> =
+                            infoJoin.join(UserInfo_.program, JoinType.LEFT)
 
-                   progJoin.get(Program_.code)
-                       .`in`(codes)
-               }
+                        builder.isNull(progJoin.get<String>(Program_.code))
+                    }
+                } else {
+                    Specification<Account> { root, _, _ ->
+                        val infoJoin: Join<Account, UserInfo> =
+                            root.join(Account_.info, JoinType.LEFT)
+
+                        val progJoin: Join<UserInfo, Program> =
+                            infoJoin.join(UserInfo_.program, JoinType.LEFT)
+
+                        progJoin.get(Program_.code)
+                            .`in`(codes)
+                    }
+                }
+
                 filterSpec = filterSpec.and(programSpec)
             }
 
         it.projectCodes
-            ?.takeIf { codes -> codes.isNotEmpty() }
             ?.let { codes ->
-                val projectSpec = Specification<Account> {root, _, _ ->
-                    val infoJoin: Join<Account, UserInfo> =
-                        root.join(Account_.info, JoinType.LEFT)
+                val projectSpec = if (codes.isEmpty()) {
+                    Specification<Account> { root, _, builder ->
+                        val infoJoin: Join<Account, UserInfo> =
+                            root.join(Account_.info, JoinType.LEFT)
 
-                    val projJoin: Join<UserInfo, Project> =
-                        infoJoin.join(UserInfo_.project, JoinType.LEFT)
+                        val projJoin: Join<UserInfo, Project> =
+                            infoJoin.join(UserInfo_.project, JoinType.LEFT)
 
-                    projJoin.get(Project_.code)
-                        .`in`(codes)
+                        builder.isNull(projJoin.get<String>(Project_.code))
+                    }
+                } else {
+                    Specification<Account> { root, _, _ ->
+                        val infoJoin: Join<Account, UserInfo> =
+                            root.join(Account_.info, JoinType.LEFT)
+
+                        val projJoin: Join<UserInfo, Project> =
+                            infoJoin.join(UserInfo_.project, JoinType.LEFT)
+
+                        projJoin.get(Project_.code)
+                            .`in`(codes)
+                    }
                 }
+
                 filterSpec = filterSpec.and(projectSpec)
             }
 
