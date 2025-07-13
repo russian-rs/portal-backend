@@ -21,6 +21,11 @@ class OutlineServiceImpl(
 
     override fun sync(accounts: List<Account>) {
         try {
+            accounts.forEach {
+                it.email = it.email.lowercase()
+                it.username = it.username.lowercase()
+            }
+
             val ourGroups = accounts.flatMap { it.groups }.map { it.oauthGroup }.toSet()
 
             val groupsListResponse = groupsOutlineApi.groupsList(GroupsListRequest(limit = fetchAllLimit)).data
@@ -36,6 +41,10 @@ class OutlineServiceImpl(
                     limit = fetchAllLimit
                 )
             ).data ?: emptyList()
+            outlineUsers.forEach { user ->
+                user.email = user.email?.lowercase()
+                user.name = user.name?.lowercase()
+            }
 
             syncUsersToOutlineGroups(accounts, outlineUsers, outlineGroups, outlineMemberships)
 
@@ -102,7 +111,7 @@ class OutlineServiceImpl(
 
         val shouldBe: Map<UUID, Set<User>> = outlineGroups.associate { group ->
             group.id!! to ourAccounts
-                .filter { acc -> acc.groups.any { it.oauthGroup == group.name } }
+                .filter { acc -> acc.groups.any { it.oauthGroup.equals(group.name, ignoreCase = true) } }
                 .mapNotNull { outlineUsersByEmail[it.email] }
                 .toSet()
         }
