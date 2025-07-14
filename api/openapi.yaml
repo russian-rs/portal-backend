@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.19.0
+  version: 1.19.1
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -937,9 +937,11 @@ components:
         program:
           type: string
           nullable: true
+          description: Показывать только отчеты по указанной программе, пустая строка значит показать отчеты волонтеров без программ
         project:
           type: string
           nullable: true
+          description: Показывать только отчеты по указанному проекту, пустая строка значит показать отчеты волонтеров без проектов
     ReportDto:
       type: object
       nullable: false
@@ -1194,19 +1196,29 @@ components:
           default: false
           description: Показывать только неактивных пользователей
         programCodes:
+          deprecated: true
           type: array
           description: Показывать только пользователей указанных программ
           items:
             type: string
           uniqueItems: true
-          minItems: 1
+        program:
+          type: string
+          nullable: true
+          description: Показывать только пользователей по указанной программе, пустая строка значит показать пользователей без программы
+          example: "IT"
         projectCodes:
+          deprecated: true
           type: array
           description: Показывать только пользователей указанных проектов
           items:
             type: string
           uniqueItems: true
-          minItems: 1
+        project:
+          type: string
+          nullable: true
+          description: Показывать только пользователей по указанному проекту, пустая строка значит показать пользователей без проекта
+          example: "DESIGN_3D"
     ContractTypeEnum:
       type: string
       enum:
