@@ -937,9 +937,11 @@ components:
         program:
           type: string
           nullable: true
+          description: Показывать только отчеты по указанной программе, пустая строка значит показать отчеты волонтеров без программ
         project:
           type: string
           nullable: true
+          description: Показывать только отчеты по указанному проекту, пустая строка значит показать отчеты волонтеров без проектов
     ReportDto:
       type: object
       nullable: false
@@ -1194,17 +1196,29 @@ components:
           default: false
           description: Показывать только неактивных пользователей
         programCodes:
+          deprecated: true
           type: array
           description: Показывать только пользователей указанных программ
           items:
             type: string
           uniqueItems: true
+        program:
+          type: string
+          nullable: true
+          description: Показывать только пользователей по указанной программе, пустая строка значит показать пользователей без программы
+          example: "IT"
         projectCodes:
+          deprecated: true
           type: array
           description: Показывать только пользователей указанных проектов
           items:
             type: string
           uniqueItems: true
+        project:
+          type: string
+          nullable: true
+          description: Показывать только пользователей по указанному проекту, пустая строка значит показать пользователей без проекта
+          example: "DESIGN_3D"
     ContractTypeEnum:
       type: string
       enum:

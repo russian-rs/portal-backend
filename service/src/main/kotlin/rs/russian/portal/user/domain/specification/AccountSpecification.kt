@@ -31,64 +31,23 @@ fun searchSpecification(query: String, filter: UserSearchFilter?): Specification
     filter?.let {
         var filterSpec: Specification<Account> = empty()
 
-        if (filter.onlyInactive)
+        if (it.onlyInactive)
             filterSpec = filterSpec.and(equal(Account_.ACTIVE, false))
 
-        it.programCodes
-            ?.let { codes ->
-                val programSpec = if (codes.isEmpty()) {
-                    Specification<Account> { root, _, builder ->
-                        val infoJoin: Join<Account, UserInfo> =
-                            root.join(Account_.info, JoinType.LEFT)
+        it.program?.let { program ->
+            filterSpec = filterSpec.and(programEqual(program))
+        }
 
-                        val progJoin: Join<UserInfo, Program> =
-                            infoJoin.join(UserInfo_.program, JoinType.LEFT)
-
-                        builder.isNull(progJoin.get<String>(Program_.code))
-                    }
-                } else {
-                    Specification<Account> { root, _, _ ->
-                        val infoJoin: Join<Account, UserInfo> =
-                            root.join(Account_.info, JoinType.LEFT)
-
-                        val progJoin: Join<UserInfo, Program> =
-                            infoJoin.join(UserInfo_.program, JoinType.LEFT)
-
-                        progJoin.get(Program_.code)
-                            .`in`(codes)
-                    }
-                }
-
-                filterSpec = filterSpec.and(programSpec)
+        // Удалить после того как UI перейдет на API v1.19.1
+        it.programCodes?.let { programCodes ->
+            if (programCodes.isNotEmpty()) {
+                filterSpec = filterSpec.and(programEqual(programCodes.first()))
             }
+        }
 
-        it.projectCodes
-            ?.let { codes ->
-                val projectSpec = if (codes.isEmpty()) {
-                    Specification<Account> { root, _, builder ->
-                        val infoJoin: Join<Account, UserInfo> =
-                            root.join(Account_.info, JoinType.LEFT)
-
-                        val projJoin: Join<UserInfo, Project> =
-                            infoJoin.join(UserInfo_.project, JoinType.LEFT)
-
-                        builder.isNull(projJoin.get<String>(Project_.code))
-                    }
-                } else {
-                    Specification<Account> { root, _, _ ->
-                        val infoJoin: Join<Account, UserInfo> =
-                            root.join(Account_.info, JoinType.LEFT)
-
-                        val projJoin: Join<UserInfo, Project> =
-                            infoJoin.join(UserInfo_.project, JoinType.LEFT)
-
-                        projJoin.get(Project_.code)
-                            .`in`(codes)
-                    }
-                }
-
-                filterSpec = filterSpec.and(projectSpec)
-            }
+        it.project?.let { project ->
+            filterSpec = filterSpec.and(projectEqual(project))
+        }
 
         resultSpec = resultSpec.and(filterSpec)
     }
@@ -96,4 +55,24 @@ fun searchSpecification(query: String, filter: UserSearchFilter?): Specification
     return resultSpec
 }
 
+private fun programEqual(programCode: String) = Specification { root, _, builder ->
+    val infoJoin: Join<Account, UserInfo> = root.join(Account_.info, JoinType.LEFT)
+    val programJoin: Join<UserInfo, Program> = infoJoin.join(UserInfo_.program, JoinType.LEFT)
 
+    if (programCode.isBlank()) { // Выбрать пользователей без заполненной программы
+        builder.isNull(programJoin.get(Program_.code))
+    } else { // Выбрать пользователей с указанной программой
+        builder.equal(programJoin.get(Program_.code), programCode)
+    }
+}
+
+private fun projectEqual(projectCode: String) = Specification { root, _, builder ->
+    val infoJoin: Join<Account, UserInfo> = root.join(Account_.info, JoinType.LEFT)
+    val projectJoin: Join<UserInfo, Project> = infoJoin.join(UserInfo_.project, JoinType.LEFT)
+
+    if (projectCode.isBlank()) { // Выбрать пользователей без заполненного проекта
+        builder.isNull(projectJoin.get(Project_.code))
+    } else { // Выбрать пользователей с указанным проектом
+        builder.equal(projectJoin.get(Project_.code), projectCode)
+    }
+}
