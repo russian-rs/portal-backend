@@ -4,14 +4,19 @@ import jakarta.persistence.criteria.JoinType
 import org.springframework.data.jpa.domain.Specification
 import rs.russian.generated.model.ReportFilter
 import rs.russian.portal.program.domain.Program
+import rs.russian.portal.program.domain.Program_
 import rs.russian.portal.program.domain.Project
+import rs.russian.portal.program.domain.Project_
 import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.Report_
 import rs.russian.portal.report.domain.Task
 import rs.russian.portal.report.domain.Task_
 import rs.russian.portal.shared.jpa.empty
 import rs.russian.portal.shared.jpa.equal
-import rs.russian.portal.user.domain.*
+import rs.russian.portal.user.domain.Account
+import rs.russian.portal.user.domain.Account_
+import rs.russian.portal.user.domain.UserInfo
+import rs.russian.portal.user.domain.UserInfo_
 
 fun from(filter: ReportFilter): Specification<Report> {
     var specification = empty<Report>()
@@ -45,49 +50,39 @@ fun from(filter: ReportFilter): Specification<Report> {
         specification = specification.and(equal(Report_.STATUS, status))
     }
 
-    filter.program
-        .let { code ->
-            when {
-                code == null -> null
-                code.isBlank() -> Specification<Report> { root, query, builder ->
-                    query!!.distinct(true)
-                    val account = root.join<Report, Account>(Report_.ACCOUNT)
-                    val info = account.join<Account, UserInfo>(Account_.INFO)
-                    val program = info.join<UserInfo, Program>(UserInfo_.PROGRAM, JoinType.LEFT)
-                    builder.isNull(program.get<String>("code"))
-                }
-                else -> Specification<Report> { root, query, builder ->
-                    query!!.distinct(true)
-                    val account = root.join<Report, Account>(Report_.ACCOUNT)
-                    val info = account.join<Account, UserInfo>(Account_.INFO)
-                    val program = info.join<UserInfo, Program>(UserInfo_.PROGRAM, JoinType.LEFT)
-                    builder.equal(program.get<String>("code"), code)
-                }
-            }
-        }
-        ?.let { specification = specification.and(it) }
+    filter.program?.let { programCode ->
+        specification = specification.and(programEqual(programCode))
+    }
 
-    filter.project
-        .let { code ->
-            when {
-                code == null -> null
-                code.isBlank() -> Specification<Report> { root, query, builder ->
-                    query!!.distinct(true)
-                    val account = root.join<Report, Account>(Report_.ACCOUNT)
-                    val info = account.join<Account, UserInfo>(Account_.INFO)
-                    val project = info.join<UserInfo, Project>(UserInfo_.PROJECT, JoinType.LEFT)
-                    builder.isNull(project.get<String>("code"))
-                }
-                else -> Specification<Report> { root, query, builder ->
-                    query!!.distinct(true)
-                    val account = root.join<Report, Account>(Report_.ACCOUNT)
-                    val info = account.join<Account, UserInfo>(Account_.INFO)
-                    val project = info.join<UserInfo, Project>(UserInfo_.PROJECT, JoinType.LEFT)
-                    builder.equal(project.get<String>("code"), code)
-                }
-            }
-        }
-        ?.let { specification = specification.and(it) }
+    filter.project?.let { projectCode ->
+        specification = specification.and(projectEqual(projectCode))
+    }
 
     return specification
+}
+
+private fun programEqual(programCode: String) = Specification<Report> { root, query, builder ->
+    query!!.distinct(true)
+    val accountJoin = root.join<Report, Account>(Report_.ACCOUNT)
+    val infoJoin = accountJoin.join<Account, UserInfo>(Account_.INFO)
+    val programJoin = infoJoin.join<UserInfo, Program>(UserInfo_.PROGRAM, JoinType.LEFT)
+
+    if (programCode.isBlank()) { // Выбрать отчеты пользователей без заполненной программы
+        builder.isNull(programJoin.get(Program_.code))
+    } else { // Выбрать отчеты пользователей с указанной программой
+        builder.equal(programJoin.get(Program_.code), programCode)
+    }
+}
+
+private fun projectEqual(projectCode: String) = Specification<Report> { root, query, builder ->
+    query!!.distinct(true)
+    val accountJoin = root.join<Report, Account>(Report_.ACCOUNT)
+    val infoJoin = accountJoin.join<Account, UserInfo>(Account_.INFO)
+    val projectJoin = infoJoin.join<UserInfo, Project>(UserInfo_.PROJECT, JoinType.LEFT)
+
+    if (projectCode.isBlank()) { // Выбрать отчеты пользователей без заполненного проекта
+        builder.isNull(projectJoin.get(Project_.code))
+    } else { // Выбрать отчеты пользователей с указанным проектом
+        builder.equal(projectJoin.get(Project_.code), projectCode)
+    }
 }
