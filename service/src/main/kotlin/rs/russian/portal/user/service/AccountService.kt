@@ -6,7 +6,6 @@ import org.springframework.data.domain.Page
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import rs.russian.generated.api.NotFoundException
 import rs.russian.generated.model.*
 import rs.russian.portal.file.service.FileService
 import rs.russian.portal.shared.exception.NotAuthorizedException
