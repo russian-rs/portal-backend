@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.Report.Companion.GRAPH_FULL
+import java.time.OffsetDateTime
 import java.util.*
 
 interface ReportRepository : JpaRepository<Report, UUID> {
@@ -16,4 +17,7 @@ interface ReportRepository : JpaRepository<Report, UUID> {
 
     @EntityGraph(value = GRAPH_FULL)
     fun findAll(specification: Specification<Report>, pageable: Pageable): Page<Report>
+
+    @EntityGraph(value = GRAPH_FULL)
+    fun findByCreateTimeBetween(from: OffsetDateTime, to: OffsetDateTime): List<Report>
 }

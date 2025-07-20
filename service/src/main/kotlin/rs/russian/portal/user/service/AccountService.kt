@@ -20,6 +20,7 @@ import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.program.repository.ProgramRepository
 import rs.russian.portal.program.repository.ProjectRepository
+import rs.russian.portal.user.domain.enums.Gender
 import rs.russian.portal.user.service.authentik.AuthentikService
 import rs.russian.portal.user.service.wordpress.MultiWordpressUserService
 
@@ -168,7 +169,9 @@ class AccountService(
         userInfoUpdateRequest.birthDate?.let { userInfo.birthDate = it }
         userInfoUpdateRequest.telegram?.let { userInfo.telegram = it }
         userInfoUpdateRequest.phone?.let { userInfo.phone = it }
-
+        userInfoUpdateRequest.gender?.let {
+            userInfo.gender = Gender.valueOf(it.toString())
+        }
         account.info = userInfo
 
         return save(account)
