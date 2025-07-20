@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.19.1
+  version: 1.20.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -715,7 +715,6 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-
   /projects:
     get:
       operationId: getProjects
@@ -734,6 +733,29 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /statistics/{year}:
+    get:
+      operationId: getStatistics
+      tags:
+        - statistics
+      parameters:
+        - name: year
+          in: path
+          description: Год для получения статистики для мин. труд
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Статистика для мин. труд по группам за год
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+
 components:
   responses:
     ServerError:
@@ -743,6 +765,34 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
   schemas:
+    StatisticData:
+      type: object
+      properties:
+        count:
+          type: integer
+          nullable: true
+        totalTimeSpent:
+          type: number
+          format: double
+          nullable: true
+
+    Statistics:
+        type: object
+        properties:
+          socialSecurity:
+            $ref: '#/components/schemas/StatisticData'
+          media:
+            $ref: '#/components/schemas/StatisticData'
+          culture:
+            $ref: '#/components/schemas/StatisticData'
+          publicAreas:
+            $ref: '#/components/schemas/StatisticData'
+          environment:
+            $ref: '#/components/schemas/StatisticData'
+          other:
+            $ref: '#/components/schemas/StatisticData'
+          total:
+            $ref: '#/components/schemas/StatisticData'
     PageRequest:
       type: object
       description: Paging object
@@ -858,6 +908,8 @@ components:
         active:
           type: boolean
           nullable: false
+        gender:
+          type: string
         contracts:
           type: array
           default: [ ]
@@ -878,6 +930,11 @@ components:
           type: string
         phone:
           type: string
+        gender:
+          type: string
+          enum:
+            - MALE
+            - FEMALE
       additionalProperties: false
     UserPageResponse:
       type: object
