@@ -2,6 +2,7 @@ package rs.russian.portal.user.scheduler
 
 import io.authentik.model.UserTypeEnum
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
+import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import rs.russian.portal.shared.jpa.isNull
@@ -12,8 +13,10 @@ import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.AccountService
 import rs.russian.portal.user.service.AccountSynchroniser
 import rs.russian.portal.user.service.authentik.AuthentikService
-import rs.russian.portal.user.service.wordpress.MultiWordpressUserService
+import java.time.Duration
 import java.time.LocalDateTime
+
+private val log = LoggerFactory.getLogger(UserSyncScheduler::class.java)
 
 @Component
 class UserSyncScheduler(
@@ -45,6 +48,9 @@ class UserSyncScheduler(
             accountService.save(user.also { it.active = false })
             accountSynchronisers.forEach { it.delete(user) }
         }
+
+        log.info("User sync completed in ${Duration.between(syncStart, LocalDateTime.now()).toMillis()}ms: " +
+                "${usersToSync.size} users attempted to sync, ${inactiveUsers.size} users attempted to deactivate")
     }
 
 }
