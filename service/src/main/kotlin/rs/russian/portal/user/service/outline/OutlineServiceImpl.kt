@@ -24,7 +24,7 @@ class OutlineServiceImpl(
                 it.username = it.username.lowercase()
             }
 
-            val ourGroups = accounts.flatMap { it.groups }.map { it.name.lowercase() }.toSet()
+            val ourGroups = accounts.flatMap { it.groups }.map { it.oauthGroup.lowercase() }.toSet()
 
             val groupsListResponse = groupsOutlineApi.groupsList(GroupsListRequest(limit = maxFetchLimit)).data
             val existingOutlineGroups = groupsListResponse?.groups?.toMutableList() ?: mutableListOf()
@@ -99,7 +99,7 @@ class OutlineServiceImpl(
 
         val shouldBe: Map<UUID, Set<User>> = outlineGroups.associate { group ->
             group.id!! to ourAccounts
-                .filter { acc -> acc.groups.any { it.name.equals(group.name, ignoreCase = true) } }
+                .filter { acc -> acc.groups.any { it.oauthGroup.equals(group.name, ignoreCase = true) } }
                 .mapNotNull { outlineUsersByEmail[it.email] }
                 .toSet()
         }
@@ -121,7 +121,9 @@ class OutlineServiceImpl(
 
         removeUsersFromGroups(toRemove)
 
-        log.info("Synced Outline users to groups: added: ${toAdd.values.sumOf { it.size }} users to ${toAdd.keys.size} groups, removed: ${toRemove.values.sumOf { it.size }} users from ${toRemove.keys.size} groups")
+        log.info("Synced Outline users to groups: " +
+                "added: ${toAdd.values.sumOf { it.size }} users to ${toAdd.keys.size} groups, " +
+                "removed: ${toRemove.values.sumOf { it.size }} users from ${toRemove.filterValues { it.isNotEmpty() }.keys.size} groups")
     }
 
     override fun delete(account: Account) {
