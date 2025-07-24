@@ -4926,19 +4926,11 @@ components:
           type: object
           description: The abilities that are allowed by this policy, if an array is returned then the individual ID's in the array represent the memberships that grant the ability.
           additionalProperties:
-            $ref: "#/components/schemas/Ability"
+            type: object
           example:
             read: true
             update: true
             delete: false
-    Ability:
-      description: A single permission granted by a policy
-      example: true
-      oneOf:
-        - type: array
-          items:
-            type: string
-        - type: boolean
     GroupMembership:
       type: object
       properties:
