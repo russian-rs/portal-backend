@@ -4,7 +4,6 @@ import com.outline.api.GroupsOutlineApi
 import com.outline.api.UsersOutlineApi
 import com.outline.model.*
 import org.slf4j.LoggerFactory
-import org.springframework.stereotype.Service
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.service.AccountSynchroniser
 import java.math.BigDecimal
@@ -12,12 +11,11 @@ import java.util.*
 
 private val log = LoggerFactory.getLogger(OutlineServiceImpl::class.java)
 
-@Service
 class OutlineServiceImpl(
     private val groupsOutlineApi: GroupsOutlineApi,
     private val usersOutlineApi: UsersOutlineApi
 ) : AccountSynchroniser {
-    private val fetchAllLimit = BigDecimal(100_000)
+    private val maxFetchLimit = BigDecimal(100) // Outline API restriction
 
     override fun sync(accounts: List<Account>) {
         try {
@@ -26,9 +24,9 @@ class OutlineServiceImpl(
                 it.username = it.username.lowercase()
             }
 
-            val ourGroups = accounts.flatMap { it.groups }.map { it.oauthGroup }.toSet()
+            val ourGroups = accounts.flatMap { it.groups }.map { it.name.lowercase() }.toSet()
 
-            val groupsListResponse = groupsOutlineApi.groupsList(GroupsListRequest(limit = fetchAllLimit)).data
+            val groupsListResponse = groupsOutlineApi.groupsList(GroupsListRequest(limit = maxFetchLimit)).data
             val existingOutlineGroups = groupsListResponse?.groups?.toMutableList() ?: mutableListOf()
 
             val outlineGroups = syncGroupsToOutline(ourGroups, existingOutlineGroups)
@@ -38,7 +36,7 @@ class OutlineServiceImpl(
             val outlineUsers = usersOutlineApi.usersList(
                 UsersListRequest(
                     filter = UsersListRequest.Filter.active,
-                    limit = fetchAllLimit
+                    limit = maxFetchLimit
                 )
             ).data ?: emptyList()
             outlineUsers.forEach { user ->
@@ -51,6 +49,7 @@ class OutlineServiceImpl(
             log.info("Outline was synced successfully (${accounts.size} accounts, ${ourGroups.size} groups)")
         } catch (e: Exception) {
             log.error("Error during Outline sync", e)
+            // ignore
         }
     }
 
@@ -60,20 +59,9 @@ class OutlineServiceImpl(
             groupsOutlineApi.groupsCreate(GroupsCreateRequest(it)).data
         }
 
-        fun removeGroupsFromOutline(groups: List<Group>) = groups.mapNotNull {
-            val id = it.id
-            if (id == null) return@mapNotNull null
-            groupsOutlineApi.groupsDelete(CollectionsDeleteRequest(id))
-            it
-        }
-
         val outlineGroups = existingOutlineGroups.toMutableList()
         val addedGroups = addGroupsToOutline(ourGroups.minus(outlineGroups.map { it.name }))
         outlineGroups.addAll(addedGroups)
-
-        // todo: нужно ли удалять? Думаю нет, т.к. в sync может передаться впоследствии батчами
-//        val removedGroups = removeGroupsFromOutline(outlineGroups.filterNot { ourGroups.contains(it.name) } )
-//        outlineGroups.removeAll(removedGroups)
 
         log.info("Synced Outline groups: ${outlineGroups.size}, added: ${addedGroups.size} new groups")
         return outlineGroups
@@ -111,7 +99,7 @@ class OutlineServiceImpl(
 
         val shouldBe: Map<UUID, Set<User>> = outlineGroups.associate { group ->
             group.id!! to ourAccounts
-                .filter { acc -> acc.groups.any { it.oauthGroup.equals(group.name, ignoreCase = true) } }
+                .filter { acc -> acc.groups.any { it.name.equals(group.name, ignoreCase = true) } }
                 .mapNotNull { outlineUsersByEmail[it.email] }
                 .toSet()
         }
@@ -148,12 +136,7 @@ class OutlineServiceImpl(
             log.info("Successfully suspended Outline user with email: ${account.email}")
         } catch (e: Exception) {
             log.error("Error during Outline users suspend (delete)", e)
+            // ignore
         }
     }
 }
-
-private data class MiniUser(
-    val id: UUID,
-    val email: String,
-    val name: String?,
-)

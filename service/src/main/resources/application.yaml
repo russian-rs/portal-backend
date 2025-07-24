@@ -40,6 +40,9 @@ app:
     api-key: ${AUTHENTIK_API_KEY}
   wordpress:
     instances:
+  outline:
+    api-key: ${OUTLINE_API_KEY}
+    base-url: ${OUTLINE_BASE_URL}
   schedulers:
     email-outbox: "*/15 * * * * *"
     user-sync: "0 0 */1 * * *"
