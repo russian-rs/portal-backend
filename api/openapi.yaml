@@ -775,8 +775,38 @@ components:
           type: number
           format: double
           nullable: true
-
+    VolunteerStatistics:
+      type: object
+      properties:
+        femaleCount:
+          type: integer
+        maleCount:
+          type: integer
+        age15to18Count:
+          type: integer
+        age18to30Count:
+          type: integer
+        age30to40Count:
+          type: integer
+        age40to65Count:
+          type: integer
+        age65AndAboveCount:
+          type: integer
+        citizensCount:
+          type: integer
+        foreignersCount:
+          type: integer
     Statistics:
+      type: object
+      properties:
+        year:
+          type: integer
+          description: Reporting year
+        programStatistics:
+          $ref: '#/components/schemas/ProgramStatistics'
+        volunteerStatistics:
+          $ref: '#/components/schemas/VolunteerStatistics'
+    ProgramStatistics:
         type: object
         properties:
           socialSecurity:
@@ -1313,3 +1343,13 @@ components:
           type: string
         nameSr:
           type: string
+        statisticGroups:
+          type: array
+          items:
+            type: string
+            enum:
+              - MEDIJI_I_KOMUNIKACIJE
+              - SOCIJALNA_ZASTITA
+              - KULTURNA_DOBA
+              - ZIVOTNA_SREDINA
+              - JAVNE_POVRSINE
