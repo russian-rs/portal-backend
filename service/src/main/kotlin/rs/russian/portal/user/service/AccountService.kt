@@ -20,6 +20,7 @@ import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.program.repository.ProgramRepository
 import rs.russian.portal.program.repository.ProjectRepository
 import rs.russian.portal.user.domain.enums.Gender
+import rs.russian.portal.user.repository.projections.AgeSliceCountProjection
 import rs.russian.portal.user.service.authentik.AuthentikService
 import rs.russian.portal.user.service.wordpress.MultiWordpressUserService
 
@@ -200,6 +201,14 @@ class AccountService(
         account.info = userInfo
 
         return save(account)
+    }
+
+    fun getGenderStatistics(): Map<Gender?, Int> {
+        return accountRepository.countByGender().associate { it.gender to it.count }
+    }
+
+    fun getAgeSliceStatistics(): AgeSliceCountProjection {
+        return accountRepository.countByAgeSlices()
     }
 
     companion object {

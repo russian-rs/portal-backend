@@ -5,10 +5,12 @@ import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.NoteDto
+import rs.russian.generated.model.ProgramStatistics
 import rs.russian.generated.model.ReportDto
 import rs.russian.generated.model.ReportFilter
 import rs.russian.generated.model.StatisticData
 import rs.russian.generated.model.Statistics
+import rs.russian.generated.model.VolunteerStatistics
 import rs.russian.portal.file.service.FileService
 import rs.russian.portal.note.domain.Note
 import rs.russian.portal.note.domain.enums.EntityType
@@ -21,6 +23,7 @@ import rs.russian.portal.report.mapper.ReportMapper
 import rs.russian.portal.report.repository.ReportRepository
 import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.security.currentUserLogin
+import rs.russian.portal.user.domain.enums.Gender
 import rs.russian.portal.user.service.AccountService
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -126,76 +129,11 @@ class ReportService(
         val end = start.plusYears(1).minusNanos(1)
         val reports = reportRepository.findByCreateTimeBetween(start, end)
 
-        return collectStatistics(reports)
+        return collectStatistics(reports, year)
     }
 
-    private fun collectStatistics(reports: List<Report>): Statistics {
-        val byGroup: Map<String, List<Report>> = reports.groupBy {
-            CODE_TO_GROUP[it.account.info?.project?.code] ?: "other"
-        }
-
-        val statsMap: Map<String, StatisticData> = byGroup.mapValues { (_, reps) ->
-            val usersCount = reps.flatMap { listOf(it.account.username) }.toSet().size
-            val totalMinutes = reps.sumOf { it.tasks.sumOf(Task::timeSpent) }
-            StatisticData(count = usersCount, totalTimeSpent = totalMinutes / 60.0)
-        }
-        val stats = Statistics(
-            socialSecurity = statsMap["socialSecurity"] ?: StatisticData(0, 0.0),
-            media = statsMap["media"] ?: StatisticData(0, 0.0),
-            culture = statsMap["culture"] ?: StatisticData(0, 0.0),
-            publicAreas = statsMap["publicAreas"] ?: StatisticData(0, 0.0),
-            environment = statsMap["environment"] ?: StatisticData(0, 0.0),
-            other = statsMap["other"] ?: StatisticData(0, 0.0)
-        )
-
-        val totalCount = statsMap.values
-            .sumOf { it.count ?: 0 }
-
-        val totalTime = statsMap.values
-            .sumOf { it.totalTimeSpent ?: 0.0 }
-
-        stats.total = StatisticData(
-            count = totalCount,
-            totalTimeSpent = totalTime
-        )
-
-        return stats
-    }
-
-    companion object {
-        val CODE_TO_GROUP = mapOf(
-            "IT" to "other",
-            "LAYOUT" to "other",
-            "FORMS" to "other",
-            "SCRAPERS" to "other",
-            "BOTS" to "other",
-            "APPS" to "other",
-            "LAWS" to "socialSecurity",
-            "HR" to "other",
-            "DESIGN_3D" to "other",
-            "DATA_COLLECTION" to "other",
-            "RESEARCH" to "other",
-            "POSTING" to "other",
-            "ARTICLES" to "other",
-            "SMM" to "media",
-            "DESIGN" to "media",
-            "WEB_FIGMA" to "media",
-            "SOCIAL_MEDIA_DESIGN" to "media",
-            "MATERIAL_STYLE" to "media",
-            "STICKERS" to "media",
-            "GUIDE_ILLUSTRATIONS" to "media",
-            "BOOK_MURALS" to "media",
-            "VIDEO_EDITING" to "media",
-            "PHOTO" to "media",
-            "GUIDEBOOK" to "media",
-            "TRAINING" to "media",
-            "COURSE_UPLOAD" to "media",
-            "PSYCHOLOGISTS" to "media",
-            "BOOK" to "culture",
-            "LANGUAGE_COURSES" to "other",
-            "SPORT" to "other",
-            "MONITORING" to "publicAreas",
-            "CLEAN_CITY" to "environment"
-        )
+    private fun collectStatistics(reports: List<Report>, year: Int): Statistics {
+        //TODO
+        return Statistics()
     }
 }
