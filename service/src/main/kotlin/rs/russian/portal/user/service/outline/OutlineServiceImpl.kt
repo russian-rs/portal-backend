@@ -1,9 +1,9 @@
 package rs.russian.portal.user.service.outline
 
-import com.outline.api.GroupsOutlineApi
-import com.outline.api.UsersOutlineApi
 import com.outline.model.*
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Profile
+import org.springframework.stereotype.Service
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.service.AccountSynchroniser
 import java.math.BigDecimal
@@ -11,11 +11,11 @@ import java.util.*
 
 private val log = LoggerFactory.getLogger(OutlineServiceImpl::class.java)
 
+@Service
+@Profile("!local")
 class OutlineServiceImpl(
-    private val groupsOutlineApi: GroupsOutlineApi,
-    private val usersOutlineApi: UsersOutlineApi
+    private val outlineApiClient: OutlineApiClient
 ) : AccountSynchroniser {
-    private val maxFetchLimit = BigDecimal(100) // Outline API restriction
 
     override fun sync(accounts: List<Account>) {
         try {
@@ -26,19 +26,12 @@ class OutlineServiceImpl(
 
             val ourGroups = accounts.flatMap { it.groups }.map { it.oauthGroup.lowercase() }.toSet()
 
-            val groupsListResponse = groupsOutlineApi.groupsList(GroupsListRequest(limit = maxFetchLimit)).data
-            val existingOutlineGroups = groupsListResponse?.groups?.toMutableList() ?: mutableListOf()
+            val existingOutlineGroups = outlineApiClient.groupsList()
+            val outlineMemberships = outlineApiClient.groupMemberships(existingOutlineGroups)
 
             val outlineGroups = syncGroupsToOutline(ourGroups, existingOutlineGroups)
 
-            val outlineMemberships = groupsListResponse?.groupMemberships ?: emptyList()
-
-            val outlineUsers = usersOutlineApi.usersList(
-                UsersListRequest(
-                    filter = UsersListRequest.Filter.active,
-                    limit = maxFetchLimit
-                )
-            ).data ?: emptyList()
+            val outlineUsers = outlineApiClient.activeUsersList()
             outlineUsers.forEach { user ->
                 user.email = user.email?.lowercase()
                 user.name = user.name?.lowercase()
@@ -56,7 +49,7 @@ class OutlineServiceImpl(
     private fun syncGroupsToOutline(ourGroups: Set<String>, existingOutlineGroups: Collection<Group>): List<Group> {
 
         fun addGroupsToOutline(groups: Set<String?>) = groups.filterNotNull().mapNotNull {
-            groupsOutlineApi.groupsCreate(GroupsCreateRequest(it)).data
+            outlineApiClient.groupsCreate(it)
         }
 
         val outlineGroups = existingOutlineGroups.toMutableList()
@@ -71,27 +64,17 @@ class OutlineServiceImpl(
         ourAccounts: List<Account>,
         outlineUsers: List<User>,
         outlineGroups: List<Group>,
-        outlineMemberships: List<GroupMembership>
+        outlineMemberships: Map<UUID, List<User>>
     ) {
         fun addUsersToGroups(toAdd: Map<UUID, List<User>>) = toAdd.forEach { (groupId, users) ->
             users.forEach { user ->
-                groupsOutlineApi.groupsAddUser(
-                    GroupsAddUserRequest(
-                        id = groupId,
-                        userId = user.id!!,
-                    )
-                )
+                outlineApiClient.groupsAddUser(groupId, user.id!!)
             }
         }
 
         fun removeUsersFromGroups(toRemove: Map<UUID, List<User>>) = toRemove.forEach { (groupId, users) ->
             users.forEach { user ->
-                groupsOutlineApi.groupsRemoveUser(
-                    CollectionsRemoveUserRequest(
-                        id = groupId,
-                        userId = user.id!!,
-                    )
-                )
+                outlineApiClient.groupsRemoveUser(groupId, user.id!!)
             }
         }
 
@@ -104,18 +87,15 @@ class OutlineServiceImpl(
                 .toSet()
         }
 
-        val actual: Map<UUID, List<User?>> = outlineMemberships
-            .groupBy({ it.groupId!! }, GroupMembership::user)
-
         val toAdd = shouldBe.mapValues { (groupId, users) ->
-            val actualUsers = actual[groupId] ?: emptySet()
+            val actualUsers = outlineMemberships[groupId] ?: emptySet()
             users.minus(actualUsers).filterNotNull()
         }
 
         addUsersToGroups(toAdd)
 
         val toRemove = shouldBe.mapValues { (groupId, users) ->
-            val actualUsers = actual[groupId] ?: emptySet()
+            val actualUsers = outlineMemberships[groupId] ?: emptySet()
             actualUsers.minus(users).filterNotNull()
         }
 
@@ -128,13 +108,13 @@ class OutlineServiceImpl(
 
     override fun delete(account: Account) {
         try {
-            val outlineUser = usersOutlineApi.usersList(UsersListRequest(emails = mutableListOf(account.email))).data?.firstOrNull()
+            val outlineUser = outlineApiClient.userByEmail(account.email)
             if (outlineUser == null) {
                 log.warn("Nothing to delete: No Outline user found for email: ${account.email}")
                 return
             }
+            outlineApiClient.usersSuspend(outlineUser.id!!)
 
-            usersOutlineApi.usersSuspend(UsersInfoRequest(outlineUser.id!!))
             log.info("Successfully suspended Outline user with email: ${account.email}")
         } catch (e: Exception) {
             log.error("Error during Outline users suspend (delete)", e)

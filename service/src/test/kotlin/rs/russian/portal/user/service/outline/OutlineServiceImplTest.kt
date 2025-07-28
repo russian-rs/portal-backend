@@ -9,20 +9,25 @@ import io.mockk.verify
 import org.instancio.Instancio
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
+import org.slf4j.LoggerFactory
 import rs.russian.portal.urils.InstancioUtils.Companion.field
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.enums.UserGroup
 import java.math.BigDecimal
 import java.util.*
 
+val log = LoggerFactory.getLogger(OutlineServiceImplTest::class.java)
+
 class OutlineServiceImplTest {
+    private val maxFetchLimit = BigDecimal(100) // sync with OutlineApiClient
 
     private val groupsOutlineApi = mockk<GroupsOutlineApi>()
     private val usersOutlineApi = mockk<UsersOutlineApi>()
-    private var outlineService: OutlineServiceImpl = OutlineServiceImpl(groupsOutlineApi, usersOutlineApi)
+    private val outlineApiClient: OutlineApiClient = OutlineApiClient(groupsOutlineApi, usersOutlineApi)
+    private var outlineService: OutlineServiceImpl = OutlineServiceImpl(outlineApiClient)
 
     /**
-     * ### Before
+     * ### Given
      *
      * | user  | our groups                                  | outline groups               |
      * |-------|---------------------------------------------|------------------------------|
@@ -30,7 +35,7 @@ class OutlineServiceImplTest {
      * | user2 | DEVELOPER(group1), INSIDE_VOLUNTEER(group2) | INSIDE_VOLUNTEER(group2)     |
      *
      *
-     * ### After
+     * ### Expected
      *
      * - `our groups` should match `outline groups`
      *
@@ -108,7 +113,31 @@ class OutlineServiceImplTest {
         every { groupsOutlineApi.groupsList(any()) } returns GroupsList200Response(
             GroupsList200ResponseData(
                 groups = existingOutlineGroup,
-                groupMemberships = mutableListOf(unneededGroupMemberships, group1Memberships, group2Memberships)
+                groupMemberships = mutableListOf(unneededGroupMemberships) // it is cut preview of memberships
+            )
+        )
+        every {
+            groupsOutlineApi.groupsMemberships(match { it.id == unneededGroupMemberships.groupId.toString() })
+        } returns GroupsMemberships200Response(
+            GroupsMemberships200ResponseData(
+                users = mutableListOf(), // unneeded here
+                groupMemberships = mutableListOf(unneededGroupMemberships)
+            )
+        )
+        every {
+            groupsOutlineApi.groupsMemberships(match { it.id == group1Memberships.groupId.toString() })
+        } returns GroupsMemberships200Response(
+            GroupsMemberships200ResponseData(
+                users = mutableListOf(), // unneeded here
+                groupMemberships = mutableListOf(group1Memberships)
+            )
+        )
+        every {
+            groupsOutlineApi.groupsMemberships(match { it.id == group2Memberships.groupId.toString() })
+        } returns GroupsMemberships200Response(
+            GroupsMemberships200ResponseData(
+                users = mutableListOf(), // unneeded here
+                groupMemberships = mutableListOf(group2Memberships)
             )
         )
 
@@ -191,6 +220,14 @@ class OutlineServiceImplTest {
                 groupMemberships = mutableListOf(group1Memberships)
             )
         )
+        every {
+            groupsOutlineApi.groupsMemberships(match { it.id == group1Memberships.groupId.toString() })
+        } returns GroupsMemberships200Response(
+            GroupsMemberships200ResponseData(
+                users = mutableListOf(group1Memberships.user!!),
+                groupMemberships = mutableListOf(group1Memberships)
+            )
+        )
 
         // Given: returning userGroup2ToCreate created
         val createdGroup = Instancio.of(Group::class.java)
@@ -200,9 +237,10 @@ class OutlineServiceImplTest {
             groupsOutlineApi.groupsCreate(match { it.name == userGroup2ToCreate.oauthGroup })
         } returns GroupsInfo200Response(createdGroup)
 
-        println("Created group: ${createdGroup.name}, id: ${createdGroup.id}")
-        println("Group1: ${group1.name}, id: ${group1.id}")
-        println("Outline user1: ${outlineUser1.email}, id: ${outlineUser1.id}")
+        log.debug("Created group: {}, id: {}", createdGroup.name, createdGroup.id)
+        log.debug("Group1: {}, id: {}", group1.name, group1.id)
+        log.debug("Outline user1: {}, id: {}", outlineUser1.email, outlineUser1.id)
+
         // When
         outlineService.sync(listOf(accountGroup12))
 
@@ -276,10 +314,27 @@ class OutlineServiceImplTest {
                 groupMemberships = mutableListOf(group1Memberships, group2Memberships)
             )
         )
+        every {
+            groupsOutlineApi.groupsMemberships(match { it.id == group1Memberships.groupId.toString() })
+        } returns GroupsMemberships200Response(
+            GroupsMemberships200ResponseData(
+                users = mutableListOf(group1Memberships.user!!),
+                groupMemberships = mutableListOf(group1Memberships)
+            )
+        )
+        every {
+            groupsOutlineApi.groupsMemberships(match { it.id == group2Memberships.groupId.toString() })
+        } returns GroupsMemberships200Response(
+            GroupsMemberships200ResponseData(
+                users = mutableListOf(group2Memberships.user!!),
+                groupMemberships = mutableListOf(group2Memberships)
+            )
+        )
 
-        println("group2ToRemoveFrom group: ${group2ToRemoveFrom.name}, id: ${group2ToRemoveFrom.id}")
-        println("Group1: ${group1.name}, id: ${group1.id}")
-        println("Outline user1: ${outlineUser1.email}, id: ${outlineUser1.id}")
+        log.debug("group2ToRemoveFrom group: {}, id: {}", group2ToRemoveFrom.name, group2ToRemoveFrom.id)
+        log.debug("Group1: {}, id: {}", group1.name, group1.id)
+        log.debug("Outline user1: {}, id: {}", outlineUser1.email, outlineUser1.id)
+
         // When
         outlineService.sync(listOf(accountGroup12))
 
@@ -298,7 +353,7 @@ class OutlineServiceImplTest {
         val emptyAccounts = emptyList<Account>()
 
         every {
-            groupsOutlineApi.groupsList(match { it.limit == BigDecimal(100_000) })
+            groupsOutlineApi.groupsList(match { it.limit == maxFetchLimit })
         } returns GroupsList200Response(
             GroupsList200ResponseData(
                 groups = mutableListOf(),
@@ -308,7 +363,7 @@ class OutlineServiceImplTest {
 
         every {
             usersOutlineApi.usersList(match {
-                it.limit == BigDecimal(100_000) &&
+                it.limit == maxFetchLimit &&
                         it.filter == UsersListRequest.Filter.active
             })
         } returns UsersList200Response(data = mutableListOf())
