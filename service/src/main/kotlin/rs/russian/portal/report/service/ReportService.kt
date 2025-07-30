@@ -132,8 +132,8 @@ class ReportService(
     }
 
     private fun getProgramStat(year: Int): ProgramStatistics {
-        val start = OffsetDateTime.of(year,1,1,0,0,0,0, ZoneOffset.UTC)
-        val end   = start.plusYears(1).minusNanos(1)
+        val start = OffsetDateTime.of(year, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)
+        val end = start.plusYears(1).minusNanos(1)
 
         val raw = reportRepository.fetchProgramStatsByGroup(start, end)
             .associateBy({ it.groupName }, { it })
@@ -146,14 +146,14 @@ class ReportService(
 
         return ProgramStatistics().apply {
             socialSecurity = getData(StatisticGroup.SOCIJALNA_ZASTITA)
-            media          = getData(StatisticGroup.MEDIJI_I_KOMUNIKACIJE)
-            culture        = getData(StatisticGroup.KULTURNA_DOBA)
-            publicAreas    = getData(StatisticGroup.JAVNE_POVRSINE)
-            environment    = getData(StatisticGroup.ZIVOTNA_SREDINA)
-            this.other     = other
+            media = getData(StatisticGroup.MEDIJI_I_KOMUNIKACIJE)
+            culture = getData(StatisticGroup.KULTURNA_DOBA)
+            publicAreas = getData(StatisticGroup.JAVNE_POVRSINE)
+            environment = getData(StatisticGroup.ZIVOTNA_SREDINA)
+            this.other = other
 
             val totalCount = raw.values.sumOf { it.count }
-            val totalTime  = raw.values.sumOf { it.totalTimeSpent }
+            val totalTime = raw.values.sumOf { it.totalTimeSpent }
             total = StatisticData(totalCount.toInt(), totalTime)
         }
     }
@@ -161,7 +161,7 @@ class ReportService(
     private fun getVolunteerStat(): VolunteerStatistics {
         val ageSlices = accountService.getAgeSliceStatistics()
         val genderSlices = accountService.getGenderStatistics()
-        val  totalUsers = accountService.getTotalUserCount()
+        val totalUsers = accountService.getTotalUserCount()
 
         return VolunteerStatistics().apply {
             maleCount = genderSlices.get(Gender.MALE)
@@ -197,8 +197,8 @@ class ReportService(
             this.culturalAssetsCount = culturalAssetsCount
             this.naturalAssetsCount = naturalAssetsCount
             this.publicAreasCount = publicAreasCount
-            otherCount = other.toInt()
-            totalCount = totalUsers.toInt()
+            otherCount = other
+            totalCount = totalUsers
         }
     }
 }
