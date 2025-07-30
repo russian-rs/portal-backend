@@ -11,6 +11,7 @@ import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.Account.Companion.GRAPH_FULL
 import rs.russian.portal.user.repository.projections.AgeSliceCountProjection
 import rs.russian.portal.user.repository.projections.GenderCountProjection
+import rs.russian.portal.user.repository.projections.UsersStatisticGroupCountProjection
 import java.util.*
 
 @Repository
@@ -61,4 +62,16 @@ interface AccountRepository : JpaRepository<Account, Int> {
     )
     fun countByAgeSlices(): AgeSliceCountProjection
 
+    @Query(
+        value = """
+            SELECT 
+                sg.group_name AS groupName, 
+                COUNT(DISTINCT ui.username) AS userCount
+            FROM user_info ui 
+            JOIN project_statistic_group sg ON ui.project_code = sg.project_code
+            GROUP BY sg.group_name
+        """,
+        nativeQuery = true
+    )
+    fun countByStatisticGroup(): List<UsersStatisticGroupCountProjection>
 }
