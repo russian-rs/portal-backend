@@ -769,13 +769,16 @@ components:
       type: object
       properties:
         count:
+          description: number of volunteers per group
           type: integer
           nullable: true
         totalTimeSpent:
+          description: total time spent in hours of all volunteers per group
           type: number
           format: double
           nullable: true
     VolunteerStatistics:
+      description: Подаци о волонтерима
       type: object
       properties:
         femaleCount:
@@ -796,6 +799,38 @@ components:
           type: integer
         foreignersCount:
           type: integer
+    ProgramStatistics:
+      description: Подаци о програмима волонтирања
+      type: object
+      properties:
+        socialSecurity:
+          $ref: '#/components/schemas/StatisticData'
+        media:
+          $ref: '#/components/schemas/StatisticData'
+        culture:
+          $ref: '#/components/schemas/StatisticData'
+        publicAreas:
+          $ref: '#/components/schemas/StatisticData'
+        environment:
+          $ref: '#/components/schemas/StatisticData'
+        other:
+          $ref: '#/components/schemas/StatisticData'
+        total:
+          $ref: '#/components/schemas/StatisticData'
+    FinalUsersStatistics:
+      description: Подаци о крајњим корисницима волонтирања
+      type: object
+      properties:
+        culturalAssetsCount:
+          type: integer
+        naturalAssetsCount:
+          type: integer
+        publicAreasCount:
+          type: integer
+        otherCount:
+          type: integer
+        totalCount:
+          type: integer
     Statistics:
       type: object
       properties:
@@ -806,23 +841,8 @@ components:
           $ref: '#/components/schemas/ProgramStatistics'
         volunteerStatistics:
           $ref: '#/components/schemas/VolunteerStatistics'
-    ProgramStatistics:
-        type: object
-        properties:
-          socialSecurity:
-            $ref: '#/components/schemas/StatisticData'
-          media:
-            $ref: '#/components/schemas/StatisticData'
-          culture:
-            $ref: '#/components/schemas/StatisticData'
-          publicAreas:
-            $ref: '#/components/schemas/StatisticData'
-          environment:
-            $ref: '#/components/schemas/StatisticData'
-          other:
-            $ref: '#/components/schemas/StatisticData'
-          total:
-            $ref: '#/components/schemas/StatisticData'
+        finalUsersStatistics:
+          $ref: '#/components/schemas/FinalUsersStatistics'
     PageRequest:
       type: object
       description: Paging object

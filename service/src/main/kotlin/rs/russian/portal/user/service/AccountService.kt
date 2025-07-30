@@ -21,6 +21,7 @@ import rs.russian.portal.program.repository.ProgramRepository
 import rs.russian.portal.program.repository.ProjectRepository
 import rs.russian.portal.user.domain.enums.Gender
 import rs.russian.portal.user.repository.projections.AgeSliceCountProjection
+import rs.russian.portal.user.repository.projections.UsersStatisticGroupCountProjection
 import rs.russian.portal.user.service.authentik.AuthentikService
 import rs.russian.portal.user.service.wordpress.MultiWordpressUserService
 
@@ -209,6 +210,14 @@ class AccountService(
 
     fun getAgeSliceStatistics(): AgeSliceCountProjection {
         return accountRepository.countByAgeSlices()
+    }
+
+    fun getTotalUserCount(): Int {
+        return accountRepository.count().toInt()
+    }
+
+    fun getCountByStatisticGroup(): List<UsersStatisticGroupCountProjection> {
+        return accountRepository.countByStatisticGroup()
     }
 
     companion object {

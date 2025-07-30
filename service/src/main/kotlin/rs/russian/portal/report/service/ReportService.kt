@@ -4,6 +4,7 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import rs.russian.generated.model.FinalUsersStatistics
 import rs.russian.generated.model.NoteDto
 import rs.russian.generated.model.ProgramStatistics
 import rs.russian.generated.model.ReportDto
@@ -15,8 +16,8 @@ import rs.russian.portal.file.service.FileService
 import rs.russian.portal.note.domain.Note
 import rs.russian.portal.note.domain.enums.EntityType
 import rs.russian.portal.note.service.NoteService
+import rs.russian.portal.program.domain.StatisticGroup
 import rs.russian.portal.report.domain.Report
-import rs.russian.portal.report.domain.Task
 import rs.russian.portal.report.domain.enums.ReportStatus
 import rs.russian.portal.report.domain.specification.from
 import rs.russian.portal.report.mapper.ReportMapper
@@ -122,18 +123,82 @@ class ReportService(
     @Transactional(readOnly = true)
     fun getStatistics(year: Int): Statistics {
 
-        val start = OffsetDateTime.of(
-            year, 1, 1, 0, 0, 0,
-            0, ZoneOffset.UTC
-        )
-        val end = start.plusYears(1).minusNanos(1)
-        val reports = reportRepository.findByCreateTimeBetween(start, end)
-
-        return collectStatistics(reports, year)
+        return Statistics().apply {
+            programStatistics = getProgramStat(year)
+            volunteerStatistics = getVolunteerStat()
+            finalUsersStatistics = getFinalUsersStat()
+            this.year = year
+        }
     }
 
-    private fun collectStatistics(reports: List<Report>, year: Int): Statistics {
-        //TODO
-        return Statistics()
+    private fun getProgramStat(year: Int): ProgramStatistics {
+        val start = OffsetDateTime.of(year,1,1,0,0,0,0, ZoneOffset.UTC)
+        val end   = start.plusYears(1).minusNanos(1)
+
+        val raw = reportRepository.fetchProgramStatsByGroup(start, end)
+            .associateBy({ it.groupName }, { it })
+
+        fun getData(key: StatisticGroup?) = raw[key]
+            ?.let { StatisticData(it.count.toInt(), it.totalTimeSpent) }
+            ?: StatisticData(0, 0.0)
+
+        val other = getData(null)
+
+        return ProgramStatistics().apply {
+            socialSecurity = getData(StatisticGroup.SOCIJALNA_ZASTITA)
+            media          = getData(StatisticGroup.MEDIJI_I_KOMUNIKACIJE)
+            culture        = getData(StatisticGroup.KULTURNA_DOBA)
+            publicAreas    = getData(StatisticGroup.JAVNE_POVRSINE)
+            environment    = getData(StatisticGroup.ZIVOTNA_SREDINA)
+            this.other     = other
+
+            val totalCount = raw.values.sumOf { it.count }
+            val totalTime  = raw.values.sumOf { it.totalTimeSpent }
+            total = StatisticData(totalCount.toInt(), totalTime)
+        }
+    }
+
+    private fun getVolunteerStat(): VolunteerStatistics {
+        val ageSlices = accountService.getAgeSliceStatistics()
+        val genderSlices = accountService.getGenderStatistics()
+        val  totalUsers = accountService.getTotalUserCount()
+
+        return VolunteerStatistics().apply {
+            maleCount = genderSlices.get(Gender.MALE)
+            femaleCount = genderSlices.get(Gender.FEMALE)
+            age15to18Count = ageSlices.age15to18Count
+            age18to30Count = ageSlices.age18to30Count
+            age30to40Count = ageSlices.age30to40Count
+            age40to65Count = ageSlices.age40to65Count
+            age65AndAboveCount = ageSlices.age65AndAboveCount
+            //TODO(Add citizenship)
+            citizensCount = 0
+            foreignersCount = totalUsers
+        }
+    }
+
+    private fun getFinalUsersStat(): FinalUsersStatistics {
+        val usersByStatGroup = accountService.getCountByStatisticGroup()
+        val totalUsers = accountService.getTotalUserCount()
+
+        val culturalAssetsCount = usersByStatGroup
+            .filter { it.groupName == StatisticGroup.KULTURNA_DOBA }
+            .sumOf { it.userCount }
+        val naturalAssetsCount = usersByStatGroup
+            .filter { it.groupName == StatisticGroup.ZIVOTNA_SREDINA }
+            .sumOf { it.userCount }
+        val publicAreasCount = usersByStatGroup
+            .filter { it.groupName == StatisticGroup.JAVNE_POVRSINE }
+            .sumOf { it.userCount }
+
+        val other = totalUsers - (culturalAssetsCount + naturalAssetsCount + publicAreasCount)
+
+        return FinalUsersStatistics().apply {
+            this.culturalAssetsCount = culturalAssetsCount
+            this.naturalAssetsCount = naturalAssetsCount
+            this.publicAreasCount = publicAreasCount
+            otherCount = other.toInt()
+            totalCount = totalUsers.toInt()
+        }
     }
 }
