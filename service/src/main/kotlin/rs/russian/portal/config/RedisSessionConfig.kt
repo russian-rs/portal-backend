@@ -1,6 +1,7 @@
 package rs.russian.portal.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator
 import org.springframework.beans.factory.BeanClassLoaderAware
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -10,7 +11,6 @@ import org.springframework.security.jackson2.SecurityJackson2Modules
 import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisIndexedHttpSession
 import org.springframework.session.web.http.CookieSerializer
 import org.springframework.session.web.http.DefaultCookieSerializer
-
 
 @Configuration
 @EnableRedisIndexedHttpSession(
@@ -30,6 +30,10 @@ class RedisSessionConfig : BeanClassLoaderAware {
         return GenericJackson2JsonRedisSerializer(ObjectMapper().also {
             it.addMixIn(Long::class.java, LongMixin::class.java)
             it.registerModules(SecurityJackson2Modules.getModules(this.loader))
+            it.activateDefaultTyping(
+                LaissezFaireSubTypeValidator.instance,
+                ObjectMapper.DefaultTyping.NON_FINAL
+            )
         })
     }
 
