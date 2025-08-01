@@ -31,7 +31,8 @@ class ApplicationEventListener(
     @TransactionalEventListener(fallbackExecution = true)
     fun handleApplicationCreate(event: ApplicationCreatedEvent) {
         val application = applicationService.get(event.id)
-        val message = templateEngine.process("application_received",
+        val message = templateEngine.process(
+            "application_received",
             Context().also { it.setVariables(mapOf("id" to application.id)) })
         emailService.sendCommonEmail(
             application.email,
@@ -60,7 +61,7 @@ class ApplicationEventListener(
                             )
                         )
                     )
-                    accountService.updateInfo(account.id!!, applicationMapper.mapToInfo(application))
+                    accountService.updateInfo(account.id!!, applicationMapper.mapToInfo(application, account))
                 }
             }
             if (application.type == ApplicationType.PROLONGATION) {
