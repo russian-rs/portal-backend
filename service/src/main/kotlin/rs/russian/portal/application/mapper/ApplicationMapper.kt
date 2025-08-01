@@ -1,10 +1,7 @@
 package rs.russian.portal.application.mapper
 
-import org.mapstruct.Mapper
-import org.mapstruct.Mapping
+import org.mapstruct.*
 import org.mapstruct.MappingConstants.ComponentModel.SPRING
-import org.mapstruct.MappingTarget
-import org.mapstruct.Named
 import org.mapstruct.ReportingPolicy.ERROR
 import rs.russian.generated.model.ApplicationDto
 import rs.russian.generated.model.ApplicationStatusDto
@@ -18,7 +15,12 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 
-@Mapper(componentModel = SPRING, unmappedTargetPolicy = ERROR, imports = [UUID::class])
+@Mapper(
+    componentModel = SPRING,
+    imports = [UUID::class],
+    unmappedTargetPolicy = ERROR,
+    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+)
 abstract class ApplicationMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -30,9 +32,11 @@ abstract class ApplicationMapper {
     @Mapping(target = "contractFrom", source = "contract.startDate")
     @Mapping(target = "contractUntil", source = "contract.endDate")
     @Mapping(target = "contractType", source = "contract.type")
-    abstract fun map(applicationDto: ApplicationDto, @MappingTarget application: Application)
+    abstract fun toEntity(applicationDto: ApplicationDto, @MappingTarget application: Application)
 
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
+    @Mapping(target = "type", ignore = true)
     @Mapping(target = "created", ignore = true)
     @Mapping(target = "contractFrom", source = "contract.startDate")
     @Mapping(target = "contractUntil", source = "contract.endDate")
@@ -40,7 +44,7 @@ abstract class ApplicationMapper {
     abstract fun update(applicationDto: ApplicationDto, @MappingTarget application: Application)
 
     @Mapping(target = "contract", source = "application", qualifiedByName = ["contract"])
-    abstract fun map(application: Application): ApplicationDto
+    abstract fun toDto(application: Application): ApplicationDto
 
     @Mapping(target = "progress", source = "status")
     @Mapping(target = "terminated", source = "status")

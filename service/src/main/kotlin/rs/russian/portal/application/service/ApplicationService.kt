@@ -44,7 +44,7 @@ class ApplicationService(
             }
         }
         val application = Application(email = email, name = name)
-        applicationMapper.map(request, application)
+        applicationMapper.toEntity(request, application)
         val existUser = accountService.findAccountByEmail(email)
         if (existUser != null) {
             application.type = ApplicationType.PROLONGATION

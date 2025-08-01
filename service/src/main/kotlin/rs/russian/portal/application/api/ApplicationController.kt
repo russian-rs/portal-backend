@@ -51,7 +51,7 @@ class ApplicationController(
     @Authorized(allowed = [ADMIN_VOLUNTEER, INTERVIEWER])
     override fun getApplication(id: UUID): ResponseEntity<ApplicationDto> {
         val application = applicationService.get(id)
-        return ResponseEntity.ok(applicationMapper.map(application))
+        return ResponseEntity.ok(applicationMapper.toDto(application))
     }
 
     @Authorized(allowed = [ADMIN_VOLUNTEER, INTERVIEWER])
@@ -64,7 +64,7 @@ class ApplicationController(
         return ResponseEntity.ok(
             ApplicationPageResponse(
                 page = convert(page),
-                content = page.map { applicationMapper.map(it) }.toMutableList()
+                content = page.map { applicationMapper.toDto(it) }.toMutableList()
             )
         )
     }
@@ -72,7 +72,7 @@ class ApplicationController(
     @Authorized(allowed = [ADMIN_VOLUNTEER, INTERVIEWER])
     override fun updateApplication(applicationDto: ApplicationDto): ResponseEntity<ApplicationDto> {
         val application = applicationService.update(applicationDto)
-        return ResponseEntity.ok(applicationMapper.map(application))
+        return ResponseEntity.ok(applicationMapper.toDto(application))
     }
 
 }
