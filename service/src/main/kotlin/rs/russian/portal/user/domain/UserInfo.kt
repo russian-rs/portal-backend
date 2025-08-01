@@ -65,7 +65,7 @@ data class UserInfo(
             id = account.username,
             account = account,
             city = "Beograd",
-            birthDate = LocalDate.of(2000, 1, 1)
+            birthDate = LocalDate.of(1900, 1, 1)
         )
     }
 }
