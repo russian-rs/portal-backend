@@ -75,6 +75,5 @@ spring:
 logging:
   level:
     org.hibernate.orm.jdbc.bind: TRACE
-    okhttp3: DEBUG
     okhttp3.logging.HttpLoggingInterceptor: DEBUG
   config: classpath:logback-local.xml
