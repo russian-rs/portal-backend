@@ -3,11 +3,9 @@ package rs.russian.portal.user.mapper
 import io.authentik.model.User
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
-import org.mapstruct.MappingConstants.ComponentModel.SPRING
 import org.mapstruct.MappingTarget
 import org.mapstruct.Named
 import org.mapstruct.NullValuePropertyMappingStrategy.IGNORE
-import org.mapstruct.ReportingPolicy.ERROR
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo
 import rs.russian.generated.model.ContractDto
@@ -25,8 +23,6 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Mapper(
-    componentModel = SPRING,
-    unmappedTargetPolicy = ERROR,
     imports = [ArrayList::class, LocalDateTime::class, UUID::class],
     uses = [FileInfoMapper::class, ProgramMapper::class, ProjectMapper::class]
 )
