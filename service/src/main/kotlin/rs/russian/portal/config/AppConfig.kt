@@ -15,6 +15,7 @@ import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
+import org.springframework.context.annotation.Profile
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.scheduling.annotation.EnableScheduling
 import org.springframework.web.filter.CommonsRequestLoggingFilter
@@ -116,6 +117,7 @@ class AppConfig {
     }
 
     @Bean
+    @Profile("local")
     fun requestLoggingFilter(): CommonsRequestLoggingFilter {
         val filter = CommonsRequestLoggingFilter()
         filter.setIncludeQueryString(true)
