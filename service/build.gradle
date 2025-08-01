@@ -7,6 +7,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.noarg")
     id("org.jetbrains.kotlin.plugin.spring")
     id("org.jetbrains.kotlin.plugin.allopen")
+    id("org.hibernate.orm") version "6.6.23.Final"
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
@@ -89,6 +90,20 @@ dependencies {
 kotlin {
     compilerOptions {
         freeCompilerArgs.addAll("-Xjsr305=strict")
+    }
+}
+
+allOpen {
+    annotation("jakarta.persistence.Entity")
+    annotation("jakarta.persistence.MappedSuperclass")
+    annotation("jakarta.persistence.Embeddable")
+}
+
+hibernate {
+    enhancement {
+        enableLazyInitialization.set(true)
+        enableDirtyTracking.set(true)
+        enableExtendedEnhancement.set(true)
     }
 }
 

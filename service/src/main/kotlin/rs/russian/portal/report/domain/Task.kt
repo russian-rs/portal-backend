@@ -1,6 +1,7 @@
 package rs.russian.portal.report.domain
 
 import jakarta.persistence.*
+import jakarta.persistence.FetchType.LAZY
 import rs.russian.portal.file.domain.FileInfo
 import rs.russian.portal.shared.jpa.JpaEntity
 import rs.russian.portal.user.domain.Account
@@ -13,7 +14,7 @@ import java.util.*
     name = Task.GRAPH_FULL,
     attributeNodes = [NamedAttributeNode("customer"), NamedAttributeNode("files")],
 )
-data class Task(
+class Task(
     @Id
     @Column(name = "id")
     override var id: UUID? = UUID.randomUUID(),
@@ -25,11 +26,11 @@ data class Task(
     var timeSpent: Int,
     var result: String? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "report_id")
     var report: Report,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "customer_login", referencedColumnName = "username")
     var customer: Account? = null,
 
@@ -39,14 +40,14 @@ data class Task(
         joinColumns = [JoinColumn(name = "task_id")],
         inverseJoinColumns = [JoinColumn(name = "file_id")]
     )
-    var files: Set<FileInfo> = mutableSetOf()
+    var files: MutableSet<FileInfo> = mutableSetOf()
 
 ) : JpaEntity<UUID>() {
 
     override fun equalityProperties() =
-        setOf(Task::id, Task::date, Task::name, Task::description, Task::timeSpent, Task::result)
+        setOf(Task::id, Task::date, Task::name)
 
     companion object {
-        const val GRAPH_FULL = "TaskCustomerFiles"
+        const val GRAPH_FULL = "Task.Full"
     }
 }

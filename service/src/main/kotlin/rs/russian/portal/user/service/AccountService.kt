@@ -1,8 +1,12 @@
 package rs.russian.portal.user.service
 
 import io.authentik.model.User
+import jakarta.persistence.EntityManager
 import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -31,7 +35,8 @@ class AccountService(
     private val contractMapper: ContractMapper,
     private val accountRepository: AccountRepository,
     private val multiWordpressUserService: MultiWordpressUserService,
-    private val authentikUserService: AuthentikService
+    private val authentikUserService: AuthentikService,
+    private val entityManager: EntityManager
 ) {
 
     @Transactional(readOnly = true)
@@ -115,7 +120,7 @@ class AccountService(
     @Transactional(readOnly = true)
     fun search(query: String, pageRequest: PageRequest, filter: UserSearchFilter?): Page<Account> {
         val specification = searchSpecification(query, filter)
-        return accountRepository.findAll(specification, convert(pageRequest))
+        return findAllFull(specification, convert(pageRequest))
     }
 
     @Transactional(readOnly = true)
@@ -124,28 +129,31 @@ class AccountService(
     }
 
     @Transactional
-    fun setAvatar(account: Account, fileId: String): Account {
+    fun setAvatar(id: Int, fileId: String): Account {
+        val account = getAccount(id)
         val file = fileService.getFile(fileId)
         account.info?.avatar = file
-        return accountRepository.saveAndFlush(account)
+        return account
     }
 
     @Transactional
-    fun switchActiveState(account: Account, isActive: Boolean): Account {
+    fun switchActiveState(id: Int, isActive: Boolean): Account {
+        val account = getAccount(id)
         if (account.active == isActive) {
             return account
         }
         account.active = isActive
         authentikUserService.switchActiveState(account, isActive)
         multiWordpressUserService.syncToAll(listOf(account))
-        return save(account)
+        return account
     }
 
     @Transactional
-    fun updateContracts(account: Account, contractList: List<ContractDto>): Account {
+    fun updateContracts(id: Int, contractList: List<ContractDto>): Account {
+        val account = getAccount(id)
         account.contracts.clear()
         account.contracts.addAll(contractList.map { contractMapper.map(it, account) })
-        return save(account)
+        return account
     }
 
     @Transactional
@@ -159,15 +167,17 @@ class AccountService(
     }
 
     @Transactional
-    fun partialUpdateInfo(account: Account, userInfoUpdateRequest: UserInfoUpdateRequest): Account {
+    fun partialUpdateInfo(id: Int, userInfoUpdateRequest: UserInfoUpdateRequest): Account {
+        val account = getAccount(id)
         val userInfo = account.info ?: UserInfo.default(account)
         userMapper.updateInfo(userInfo, userInfoUpdateRequest)
         account.info = userInfo
-        return save(account)
+        return account
     }
 
     @Transactional
-    fun setProgram(account: Account, code: String): Account {
+    fun setProgram(id: Int, code: String): Account {
+        val account = getAccount(id)
         val userInfo = account.info ?: UserInfo.default(account)
 
         val program = programRepository.findByCode(code)
@@ -175,12 +185,12 @@ class AccountService(
 
         userInfo.program = program
         account.info = userInfo
-
-        return save(account)
+        return account
     }
 
     @Transactional
-    fun setProject(account: Account, code: String): Account {
+    fun setProject(id: Int, code: String): Account {
+        val account = getAccount(id)
         val userInfo = account.info ?: UserInfo.default(account)
 
         val project = projectRepository.findByCode(code)
@@ -188,8 +198,22 @@ class AccountService(
 
         userInfo.project = project
         account.info = userInfo
+        return account
+    }
 
-        return save(account)
+    /**
+     * Получить список пользователей с использованием EntityGraph
+     * Решает проблему, при которой невозможно одновременная работа Pageable и EntityGraph:
+     * HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+     * entityManager.detach(...) - необходим потому что findAll загружает "легковесные" объекты и
+     * сохраняет их в контекст, а findAllByIdIn уже загрузит полные объекты, однако если не очистить
+     * контекст, то они не будут перезаписаны в контексте, что повлечет дополнительные SQL запросы
+     */
+    private fun findAllFull(specification: Specification<Account>, pageable: Pageable): Page<Account> {
+        val accounts = accountRepository.findAll(specification, pageable)
+        accounts.forEach { account -> entityManager.detach(account) }
+        val accountsFull = accountRepository.findAllByIdIn(accounts.mapNotNull { it.id })
+        return PageImpl(accountsFull, accounts.pageable, accounts.totalElements)
     }
 
     companion object {

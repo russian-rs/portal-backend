@@ -123,4 +123,7 @@ spring:
 --- # Logging
 logging:
   level:
-    org.springframework.data.redis: WARN
+    org:
+      springframework:
+        web.filter.CommonsRequestLoggingFilter: DEBUG
+        data.repository.config: WARN

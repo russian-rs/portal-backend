@@ -34,6 +34,8 @@ abstract class ReportMapper {
     @Mapping(target = "user", source = "account.username")
     abstract fun map(report: Report): ReportDto
 
+    abstract fun map(reports: List<Report>): MutableList<ReportDto>
+
     @Mapping(target = "customer", ignore = true) // fulfilled in the code
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "files", expression = "java(new HashSet())") // fulfilled in the code

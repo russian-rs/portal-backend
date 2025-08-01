@@ -7,9 +7,9 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "project")
-data class Project(
+class Project(
     @Id
-    @Column(nullable = false, unique = true, name = "code")
+    @Column(name = "code", nullable = false, unique = true)
     val code: String,
 
     @Column(name = "name_ru", nullable = false)
