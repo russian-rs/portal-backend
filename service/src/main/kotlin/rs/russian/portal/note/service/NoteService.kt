@@ -15,5 +15,8 @@ class NoteService(
     fun save(note: Note): Note = repository.save(note)
 
     @Transactional
-    fun delete(noteId: UUID) = repository.deleteById(noteId)
+    fun delete(noteId: UUID) {
+        val note = repository.findById(noteId).orElseThrow()
+        note.deleted = true
+    }
 }

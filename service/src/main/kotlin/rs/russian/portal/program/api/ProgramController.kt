@@ -14,6 +14,7 @@ class ProgramController(
     private val programService: ProgramService,
     private val projectService: ProjectService
 ) : ProgramsApi, ProjectsApi {
+
     override fun getPrograms(): ResponseEntity<List<ProgramDto>> {
         return ResponseEntity.ok(programService.getPrograms())
     }

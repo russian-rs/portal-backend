@@ -1,8 +1,10 @@
 package rs.russian.portal.application.mapper
 
-import org.mapstruct.*
-import org.mapstruct.MappingConstants.ComponentModel.SPRING
-import org.mapstruct.ReportingPolicy.ERROR
+import org.mapstruct.Mapper
+import org.mapstruct.Mapping
+import org.mapstruct.MappingTarget
+import org.mapstruct.Named
+import org.mapstruct.NullValuePropertyMappingStrategy.IGNORE
 import rs.russian.generated.model.ApplicationDto
 import rs.russian.generated.model.ApplicationStatusDto
 import rs.russian.generated.model.ContractDto
@@ -15,12 +17,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 
-@Mapper(
-    componentModel = SPRING,
-    imports = [UUID::class],
-    unmappedTargetPolicy = ERROR,
-    nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
-)
+@Mapper(imports = [UUID::class], nullValuePropertyMappingStrategy = IGNORE)
 abstract class ApplicationMapper {
 
     @Mapping(target = "id", ignore = true)

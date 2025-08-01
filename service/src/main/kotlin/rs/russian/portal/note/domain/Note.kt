@@ -36,5 +36,5 @@ class Note(
 ) : JpaEntity<UUID>() {
 
     override fun equalityProperties() =
-        setOf(Note::entityId, Note::entityType, Note::createdBy, Note::text, Note::deleted)
+        setOf(Note::id, Note::text)
 }

@@ -107,6 +107,13 @@ hibernate {
     }
 }
 
+kapt {
+    arguments {
+        arg("mapstruct.defaultComponentModel", "spring")
+        arg("mapstruct.unmappedTargetPolicy", "ERROR")
+    }
+}
+
 test {
     useJUnitPlatform()
 }

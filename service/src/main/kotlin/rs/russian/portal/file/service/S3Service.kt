@@ -8,7 +8,7 @@ import org.springframework.core.io.Resource
 import org.springframework.stereotype.Service
 import rs.russian.portal.config.S3Properties
 import rs.russian.portal.file.domain.FileInfo
-import rs.russian.portal.shared.utils.CacheService
+import rs.russian.portal.shared.utils.CacheService.Companion.S3_FILE_CACHE_NAME
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
@@ -35,7 +35,7 @@ class S3Service(
         return s3Client.getObject(getObjectRequest)
     }
 
-    @Cacheable(cacheNames = [CacheService.S3_FILE_CACHE], key = "#idWithSuffix")
+    @Cacheable(cacheNames = [S3_FILE_CACHE_NAME], key = "#idWithSuffix")
     fun getUrl(idWithSuffix: String): URL {
         val getObjectRequest = GetObjectRequest.builder()
             .bucket(s3Properties.bucket)
