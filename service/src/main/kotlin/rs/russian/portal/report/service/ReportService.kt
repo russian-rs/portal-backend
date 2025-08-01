@@ -126,7 +126,7 @@ class ReportService(
     private fun findAllFull(specification: Specification<Report>, pageable: Pageable): Page<Report> {
         val reports = reportRepository.findAll(specification, pageable)
         reports.forEach { report -> entityManager.detach(report) }
-        val reportsFull = reportRepository.findAllByIdIn(reports.mapNotNull { it.id })
+        val reportsFull = reportRepository.findAllByIdIn(reports.mapNotNull { it.id }, pageable.sort)
         return PageImpl(reportsFull, reports.pageable, reports.totalElements)
     }
 }
