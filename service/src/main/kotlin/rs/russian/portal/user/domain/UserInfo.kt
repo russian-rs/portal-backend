@@ -21,7 +21,7 @@ import java.time.LocalDateTime
         NamedAttributeNode("project")
     ]
 )
-data class UserInfo(
+class UserInfo(
     @Id
     @Column(name = "username")
     override var id: String? = null,
@@ -59,7 +59,7 @@ data class UserInfo(
 
     companion object {
 
-        const val GRAPH_FULL = "UserInfoFull"
+        const val GRAPH_FULL = "UserInfo.Full"
 
         fun default(account: Account) = UserInfo(
             id = account.username,

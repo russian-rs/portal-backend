@@ -32,7 +32,7 @@ abstract class JpaEntity<ID_TYPE> : Serializable where ID_TYPE : Comparable<ID_T
      * In most cases you should override it based on yours business logic. <b>
      * The default is to return all declared public properties that are neither id nor version. <b>
      */
-    protected open fun equalityProperties(): Collection<KProperty1<out JpaEntity<ID_TYPE>, Any?>> =
+    protected fun equalityProperties(): Collection<KProperty1<out JpaEntity<ID_TYPE>, Any?>> =
         publicProperties().filter { it.name != "id" && it.name != "version" }
 
     final override fun equals(other: Any?): Boolean =

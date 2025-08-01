@@ -56,20 +56,15 @@ class UserController(
 
     override fun setAvatar(avatarId: String): ResponseEntity<UserInfoDto> {
         val currentUser = accountService.getCurrentAccount()
-        return ResponseEntity.ok(userMapper.map(accountService.setAvatar(currentUser, avatarId).info))
+        return ResponseEntity.ok(userMapper.map(accountService.setAvatar(currentUser.id!!, avatarId).info))
     }
 
     override fun setProgram(id: Int, code: String): ResponseEntity<UserInfoDto> {
-        val account = accountService.getAccount(id)
-        return ResponseEntity.ok(userMapper.map(accountService.setProgram(account, code).info))
+        return ResponseEntity.ok(userMapper.map(accountService.setProgram(id, code).info))
     }
 
-    override fun setProject(
-        id: Int,
-        code: String
-    ): ResponseEntity<UserInfoDto> {
-        val account = accountService.getAccount(id)
-        return ResponseEntity.ok(userMapper.map(accountService.setProject(account, code).info))
+    override fun setProject(id: Int, code: String): ResponseEntity<UserInfoDto> {
+        return ResponseEntity.ok(userMapper.map(accountService.setProject(id, code).info))
     }
 
     @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])
@@ -80,20 +75,17 @@ class UserController(
 
     @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])
     override fun activateAccount(id: Int): ResponseEntity<UserInfoDto> {
-        val account = accountService.getAccount(id)
-        return ResponseEntity.ok(userMapper.map(accountService.switchActiveState(account, true).info))
+        return ResponseEntity.ok(userMapper.map(accountService.switchActiveState(id, true).info))
     }
 
     @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])
     override fun deactivateAccount(id: Int): ResponseEntity<UserInfoDto> {
-        val account = accountService.getAccount(id)
-        return ResponseEntity.ok(userMapper.map(accountService.switchActiveState(account, false).info))
+        return ResponseEntity.ok(userMapper.map(accountService.switchActiveState(id, false).info))
     }
 
     @Authorized(allowed = [ADMIN_VOLUNTEER])
     override fun updateContracts(id: Int, contractDto: List<ContractDto>): ResponseEntity<UserInfoDto> {
-        val account = accountService.getAccount(id)
-        return ResponseEntity.ok(userMapper.map(accountService.updateContracts(account, contractDto).info))
+        return ResponseEntity.ok(userMapper.map(accountService.updateContracts(id, contractDto).info))
     }
 
     override fun updateInfo(login: String, userInfoUpdateRequest: UserInfoUpdateRequest): ResponseEntity<UserInfoDto> {
@@ -109,7 +101,7 @@ class UserController(
         return ResponseEntity.ok(
             userMapper.map(
                 accountService.partialUpdateInfo(
-                    targetAccount,
+                    targetAccount.id!!,
                     userInfoUpdateRequest
                 ).info
             )

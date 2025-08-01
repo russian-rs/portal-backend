@@ -51,7 +51,7 @@ class ReportController(
         return ResponseEntity.ok(
             ReportPageResponse(
                 page = convert(page),
-                content = page.map { reportMapper.map(it) }.toMutableList()
+                content = reportMapper.map(page.content)
             )
         )
     }

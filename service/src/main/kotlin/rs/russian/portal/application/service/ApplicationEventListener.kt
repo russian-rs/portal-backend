@@ -51,7 +51,7 @@ class ApplicationEventListener(
                 if (accountService.findAccountByEmail(application.email) == null) {
                     val account = accountService.create(application.email, application.name)
                     accountService.updateContracts(
-                        account,
+                        account.id!!,
                         listOf(
                             ContractDto(
                                 id = UUID.randomUUID(),
@@ -66,7 +66,7 @@ class ApplicationEventListener(
             }
             if (application.type == ApplicationType.PROLONGATION) {
                 val account = accountService.findAccountByEmail(application.email)!!
-                accountService.switchActiveState(account, true)
+                accountService.switchActiveState(account.id!!, true)
                 val contracts = contractMapper.map(account.contracts)
                 contracts.add(
                     ContractDto(
@@ -76,7 +76,7 @@ class ApplicationEventListener(
                         type = application.contractType!!
                     )
                 )
-                accountService.updateContracts(account, contracts)
+                accountService.updateContracts(account.id!!, contracts)
             }
         }
     }

@@ -2,6 +2,7 @@ package rs.russian.portal.user.domain
 
 import jakarta.persistence.*
 import jakarta.persistence.EnumType.STRING
+import jakarta.persistence.FetchType.LAZY
 import rs.russian.generated.model.ContractTypeEnum
 import rs.russian.portal.shared.jpa.JpaEntity
 import java.time.LocalDate
@@ -14,7 +15,7 @@ class Contract(
     override var id: UUID? = UUID.randomUUID(),
     override var version: LocalDateTime? = null,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "username", referencedColumnName = "username")
     var account: Account,
 

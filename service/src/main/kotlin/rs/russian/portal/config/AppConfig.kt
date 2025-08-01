@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.web.filter.CommonsRequestLoggingFilter
 import org.thymeleaf.spring6.SpringTemplateEngine
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import rs.russian.portal.shared.utils.CacheService
@@ -112,5 +113,16 @@ class AppConfig {
         val templateEngine = SpringTemplateEngine()
         templateEngine.setTemplateResolver(templateResolver)
         return templateEngine
+    }
+
+    @Bean
+    fun requestLoggingFilter(): CommonsRequestLoggingFilter {
+        val filter = CommonsRequestLoggingFilter()
+        filter.setIncludeQueryString(true)
+        filter.setIncludePayload(false)
+        filter.setIncludeHeaders(false)
+        filter.setIncludeClientInfo(false)
+        filter.setMaxPayloadLength(0)
+        return filter
     }
 }
