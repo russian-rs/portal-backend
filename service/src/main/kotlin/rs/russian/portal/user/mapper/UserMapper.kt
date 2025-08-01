@@ -6,11 +6,13 @@ import org.mapstruct.Mapping
 import org.mapstruct.MappingConstants.ComponentModel.SPRING
 import org.mapstruct.MappingTarget
 import org.mapstruct.Named
+import org.mapstruct.NullValuePropertyMappingStrategy.IGNORE
 import org.mapstruct.ReportingPolicy.ERROR
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo
 import rs.russian.generated.model.ContractDto
 import rs.russian.generated.model.UserInfoDto
+import rs.russian.generated.model.UserInfoUpdateRequest
 import rs.russian.portal.file.mapper.FileInfoMapper
 import rs.russian.portal.program.mapper.ProgramMapper
 import rs.russian.portal.program.mapper.ProjectMapper
@@ -89,6 +91,20 @@ abstract class UserMapper {
     @Mapping(target = "account", source = "account")
     @Mapping(target = "id", expression = "java(UUID.randomUUID())")
     abstract fun map(contactDto: ContractDto, account: Account): Contract
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "account", ignore = true)
+    @Mapping(target = "avatar", ignore = true)
+    @Mapping(target = "gender", ignore = true)
+    @Mapping(target = "program", ignore = true)
+    @Mapping(target = "project", ignore = true)
+    @Mapping(target = "city", nullValuePropertyMappingStrategy = IGNORE)
+    @Mapping(target = "address", nullValuePropertyMappingStrategy = IGNORE)
+    @Mapping(target = "birthDate", nullValuePropertyMappingStrategy = IGNORE)
+    @Mapping(target = "telegram", nullValuePropertyMappingStrategy = IGNORE)
+    @Mapping(target = "phone", nullValuePropertyMappingStrategy = IGNORE)
+    abstract fun updateInfo(@MappingTarget target: UserInfo, source: UserInfoUpdateRequest)
 
     @Named("mapGroups")
     fun mapGroups(oidcUserInfo: OidcUserInfo): Set<UserGroup> {

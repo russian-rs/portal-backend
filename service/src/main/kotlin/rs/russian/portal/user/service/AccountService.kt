@@ -6,9 +6,10 @@ import org.springframework.data.domain.Page
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import rs.russian.generated.api.NotFoundException
 import rs.russian.generated.model.*
 import rs.russian.portal.file.service.FileService
+import rs.russian.portal.program.repository.ProgramRepository
+import rs.russian.portal.program.repository.ProjectRepository
 import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.currentUserLogin
@@ -18,8 +19,6 @@ import rs.russian.portal.user.domain.specification.searchSpecification
 import rs.russian.portal.user.mapper.ContractMapper
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.repository.AccountRepository
-import rs.russian.portal.program.repository.ProgramRepository
-import rs.russian.portal.program.repository.ProjectRepository
 import rs.russian.portal.user.service.authentik.AuthentikService
 import rs.russian.portal.user.service.wordpress.MultiWordpressUserService
 
@@ -162,15 +161,8 @@ class AccountService(
     @Transactional
     fun partialUpdateInfo(account: Account, userInfoUpdateRequest: UserInfoUpdateRequest): Account {
         val userInfo = account.info ?: UserInfo.default(account)
-
-        userInfoUpdateRequest.city?.let { userInfo.city = it }
-        userInfoUpdateRequest.address?.let { userInfo.address = it }
-        userInfoUpdateRequest.birthDate?.let { userInfo.birthDate = it }
-        userInfoUpdateRequest.telegram?.let { userInfo.telegram = it }
-        userInfoUpdateRequest.phone?.let { userInfo.phone = it }
-
+        userMapper.updateInfo(userInfo, userInfoUpdateRequest)
         account.info = userInfo
-
         return save(account)
     }
 
