@@ -2,6 +2,7 @@ package rs.russian.portal.report.repository
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
@@ -17,7 +18,7 @@ interface ReportRepository : JpaRepository<Report, UUID> {
     override fun findById(id: UUID): Optional<Report>
 
     @EntityGraph(value = GRAPH_FULL)
-    fun findAllByIdIn(values: Collection<UUID>): List<Report>
+    fun findAllByIdIn(values: Collection<UUID>, sort: Sort): List<Report>
 
     fun findAll(specification: Specification<Report>, pageable: Pageable): Page<Report>
 }

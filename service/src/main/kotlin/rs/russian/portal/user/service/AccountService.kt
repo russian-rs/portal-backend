@@ -212,7 +212,7 @@ class AccountService(
     private fun findAllFull(specification: Specification<Account>, pageable: Pageable): Page<Account> {
         val accounts = accountRepository.findAll(specification, pageable)
         accounts.forEach { account -> entityManager.detach(account) }
-        val accountsFull = accountRepository.findAllByIdIn(accounts.mapNotNull { it.id })
+        val accountsFull = accountRepository.findAllByIdIn(accounts.mapNotNull { it.id }, pageable.sort)
         return PageImpl(accountsFull, accounts.pageable, accounts.totalElements)
     }
 
