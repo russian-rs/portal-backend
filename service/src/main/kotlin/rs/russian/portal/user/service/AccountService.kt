@@ -171,7 +171,7 @@ class AccountService(
         userInfoUpdateRequest.telegram?.let { userInfo.telegram = it }
         userInfoUpdateRequest.phone?.let { userInfo.phone = it }
         userInfoUpdateRequest.gender?.let {
-            userInfo.gender = Gender.valueOf(it.toString())
+            userInfo.gender = Gender.valueOf(it.name)
         }
         account.info = userInfo
 
@@ -216,9 +216,9 @@ class AccountService(
         return accountRepository.count().toInt()
     }
 
-    fun getCountByStatisticGroup(): List<UsersStatisticGroupCountProjection> {
-        return accountRepository.countByStatisticGroup()
-    }
+//    fun getCountByStatisticGroup(): List<UsersStatisticGroupCountProjection> {
+//        return accountRepository.countByStatisticGroup()
+//    }
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)

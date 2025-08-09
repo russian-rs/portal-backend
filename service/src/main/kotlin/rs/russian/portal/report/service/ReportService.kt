@@ -16,7 +16,6 @@ import rs.russian.portal.file.service.FileService
 import rs.russian.portal.note.domain.Note
 import rs.russian.portal.note.domain.enums.EntityType
 import rs.russian.portal.note.service.NoteService
-import rs.russian.portal.program.domain.StatisticGroup
 import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.enums.ReportStatus
 import rs.russian.portal.report.domain.specification.from
@@ -120,43 +119,40 @@ class ReportService(
         report.status = status
     }
 
-    @Transactional(readOnly = true)
-    fun getStatistics(year: Int): Statistics {
+//    @Transactional(readOnly = true)
+//    fun getStatistics(year: Int) = Statistics().apply {
+//            programStatistics = getProgramStat(year)
+//            volunteerStatistics = getVolunteerStat()
+//            finalUsersStatistics = getFinalUsersStat()
+//            this.year = year
+//        }
 
-        return Statistics().apply {
-            programStatistics = getProgramStat(year)
-            volunteerStatistics = getVolunteerStat()
-            finalUsersStatistics = getFinalUsersStat()
-            this.year = year
-        }
-    }
-
-    private fun getProgramStat(year: Int): ProgramStatistics {
-        val start = OffsetDateTime.of(year, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)
-        val end = start.plusYears(1).minusNanos(1)
-
-        val raw = reportRepository.fetchProgramStatsByGroup(start, end)
-            .associateBy({ it.groupName }, { it })
-
-        fun getData(key: StatisticGroup?) = raw[key]
-            ?.let { StatisticData(it.count.toInt(), it.totalTimeSpent) }
-            ?: StatisticData(0, 0.0)
-
-        val other = getData(null)
-
-        return ProgramStatistics().apply {
-            socialSecurity = getData(StatisticGroup.SOCIJALNA_ZASTITA)
-            media = getData(StatisticGroup.MEDIJI_I_KOMUNIKACIJE)
-            culture = getData(StatisticGroup.KULTURNA_DOBA)
-            publicAreas = getData(StatisticGroup.JAVNE_POVRSINE)
-            environment = getData(StatisticGroup.ZIVOTNA_SREDINA)
-            this.other = other
-
-            val totalCount = raw.values.sumOf { it.count }
-            val totalTime = raw.values.sumOf { it.totalTimeSpent }
-            total = StatisticData(totalCount.toInt(), totalTime)
-        }
-    }
+//    private fun getProgramStat(year: Int): ProgramStatistics {
+//        val start = OffsetDateTime.of(year, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)
+//        val end = start.plusYears(1).minusNanos(1)
+//
+//        val raw = reportRepository.fetchProgramStatsByGroup(start, end)
+//            .associateBy({ it.groupName }, { it })
+//
+//        fun getData(key: StatisticGroup?) = raw[key]
+//            ?.let { StatisticData(it.count.toInt(), it.totalTimeSpent) }
+//            ?: StatisticData(0, 0.0)
+//
+//        val other = getData(null)
+//
+//        return ProgramStatistics().apply {
+//            socialSecurity = getData(StatisticGroup.SOCIJALNA_ZASTITA)
+//            media = getData(StatisticGroup.MEDIJI_I_KOMUNIKACIJE)
+//            culture = getData(StatisticGroup.KULTURNA_DOBA)
+//            publicAreas = getData(StatisticGroup.JAVNE_POVRSINE)
+//            environment = getData(StatisticGroup.ZIVOTNA_SREDINA)
+//            this.other = other
+//
+//            val totalCount = raw.values.sumOf { it.count }
+//            val totalTime = raw.values.sumOf { it.totalTimeSpent }
+//            total = StatisticData(totalCount.toInt(), totalTime)
+//        }
+//    }
 
     private fun getVolunteerStat(): VolunteerStatistics {
         val ageSlices = accountService.getAgeSliceStatistics()
@@ -177,28 +173,28 @@ class ReportService(
         }
     }
 
-    private fun getFinalUsersStat(): FinalUsersStatistics {
-        val usersByStatGroup = accountService.getCountByStatisticGroup()
-        val totalUsers = accountService.getTotalUserCount()
-
-        val culturalAssetsCount = usersByStatGroup
-            .filter { it.groupName == StatisticGroup.KULTURNA_DOBA }
-            .sumOf { it.userCount }
-        val naturalAssetsCount = usersByStatGroup
-            .filter { it.groupName == StatisticGroup.ZIVOTNA_SREDINA }
-            .sumOf { it.userCount }
-        val publicAreasCount = usersByStatGroup
-            .filter { it.groupName == StatisticGroup.JAVNE_POVRSINE }
-            .sumOf { it.userCount }
-
-        val other = totalUsers - (culturalAssetsCount + naturalAssetsCount + publicAreasCount)
-
-        return FinalUsersStatistics().apply {
-            this.culturalAssetsCount = culturalAssetsCount
-            this.naturalAssetsCount = naturalAssetsCount
-            this.publicAreasCount = publicAreasCount
-            otherCount = other
-            totalCount = totalUsers
-        }
-    }
+//    private fun getFinalUsersStat(): FinalUsersStatistics {
+//        val usersByStatGroup = accountService.getCountByStatisticGroup()
+//        val totalUsers = accountService.getTotalUserCount()
+//
+//        val culturalAssetsCount = usersByStatGroup
+//            .filter { it.groupName == StatisticGroup.KULTURNA_DOBA }
+//            .sumOf { it.userCount }
+//        val naturalAssetsCount = usersByStatGroup
+//            .filter { it.groupName == StatisticGroup.ZIVOTNA_SREDINA }
+//            .sumOf { it.userCount }
+//        val publicAreasCount = usersByStatGroup
+//            .filter { it.groupName == StatisticGroup.JAVNE_POVRSINE }
+//            .sumOf { it.userCount }
+//
+//        val other = totalUsers - (culturalAssetsCount + naturalAssetsCount + publicAreasCount)
+//
+//        return FinalUsersStatistics().apply {
+//            this.culturalAssetsCount = culturalAssetsCount
+//            this.naturalAssetsCount = naturalAssetsCount
+//            this.publicAreasCount = publicAreasCount
+//            otherCount = other
+//            totalCount = totalUsers
+//        }
+//    }
 }

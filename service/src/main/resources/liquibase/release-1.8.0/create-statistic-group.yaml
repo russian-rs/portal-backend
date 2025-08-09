@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.8.0-create-statistic-group
+      author: Valerii Linden
+      changes:
+        - createTable:
+            tableName: statistic_group
+            columns:
+              - column:
+                  name: code
+                  type: VARCHAR(50)
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: pk_statistic_group
+              - column:
+                  name: name_ru
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name_en
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name_sr
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false

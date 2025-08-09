@@ -894,6 +894,11 @@ components:
           type: string
           description: Error description
           nullable: false
+    GenderEnumDto:
+      type: string
+      enum:
+        - MALE
+        - FEMALE
     UserCreateRequest:
       type: object
       required:
@@ -959,7 +964,7 @@ components:
           type: boolean
           nullable: false
         gender:
-          type: string
+          $ref: '#/components/schemas/GenderEnumDto'
         contracts:
           type: array
           default: [ ]
@@ -981,10 +986,7 @@ components:
         phone:
           type: string
         gender:
-          type: string
-          enum:
-            - MALE
-            - FEMALE
+          $ref: '#/components/schemas/GenderEnumDto'
       additionalProperties: false
     UserPageResponse:
       type: object
@@ -1363,13 +1365,3 @@ components:
           type: string
         nameSr:
           type: string
-        statisticGroups:
-          type: array
-          items:
-            type: string
-            enum:
-              - MEDIJI_I_KOMUNIKACIJE
-              - SOCIJALNA_ZASTITA
-              - KULTURNA_DOBA
-              - ZIVOTNA_SREDINA
-              - JAVNE_POVRSINE

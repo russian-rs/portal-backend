@@ -24,19 +24,21 @@ interface ReportRepository : JpaRepository<Report, UUID> {
     @EntityGraph(value = GRAPH_FULL)
     fun findByCreateTimeBetween(from: OffsetDateTime, to: OffsetDateTime): List<Report>
 
-    @Query("""
-    SELECT 
-      g            AS groupName,
-      COUNT(DISTINCT r.account.username)        AS count,
-      SUM(t.timeSpent) / 60.0                  AS totalTimeSpent
-    FROM Report r
-    JOIN r.tasks t
-    LEFT JOIN r.account.info.project.statisticGroups g
-    WHERE r.createTime BETWEEN :start AND :end
-    GROUP BY g
-  """)
+    @Query(
+        """
+  SELECT
+    g.code AS groupCode,
+    COUNT(DISTINCT r.account.username) AS count,
+    COALESCE(SUM(t.timeSpent), 0) / 60.0 AS totalTimeSpent
+  FROM Report r
+  LEFT JOIN r.tasks t
+  LEFT JOIN r.account.info.project.statisticGroups g
+  WHERE r.createTime BETWEEN :start AND :end
+  GROUP BY g.code
+"""
+    )
     fun fetchProgramStatsByGroup(
         @Param("start") start: OffsetDateTime,
-        @Param("end")   end:   OffsetDateTime
+        @Param("end") end: OffsetDateTime
     ): List<ProgramStatProjection>
 }

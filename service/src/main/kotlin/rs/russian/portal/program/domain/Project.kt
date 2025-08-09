@@ -1,15 +1,6 @@
 package rs.russian.portal.program.domain
 
-import jakarta.persistence.CollectionTable
-import jakarta.persistence.Column
-import jakarta.persistence.ElementCollection
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.FetchType
-import jakarta.persistence.Id
-import jakarta.persistence.JoinColumn
-import jakarta.persistence.Table
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "project")
@@ -27,12 +18,11 @@ data class Project(
     @Column(name = "name_sr", nullable = false)
     val nameSr: String,
 
-    @ElementCollection(targetClass = StatisticGroup::class, fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
-    @CollectionTable(
-    name = "project_statistic_group",
-    joinColumns = [JoinColumn(name = "project_code")]
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "project_statistic_group",
+        joinColumns = [JoinColumn(name = "project_code")],
+        inverseJoinColumns = [JoinColumn(name = "statistic_group_code")]
     )
-    @Column(name = "group_name")
-    val statisticGroups: Set<StatisticGroup> = emptySet(),
+    val statisticGroups: Set<StatisticGroup> = emptySet()
 )
