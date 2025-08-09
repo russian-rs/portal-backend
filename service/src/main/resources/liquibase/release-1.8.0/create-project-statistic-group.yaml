@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.8.2-create-project-statistic-group
+      author: Valerii Linden
+      changes:
+        - createTable:
+            tableName: project_statistic_group
+            columns:
+              - column:
+                  name: project_code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: statistic_group_code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: project_statistic_group
+            baseColumnNames: project_code
+            referencedTableName: project
+            referencedColumnNames: code
+            constraintName: fk_psg_to_project
+        - addForeignKeyConstraint:
+            baseTableName: project_statistic_group
+            baseColumnNames: statistic_group_code
+            referencedTableName: statistic_group
+            referencedColumnNames: code
+            constraintName: fk_psg_to_statistic_group
+        - addUniqueConstraint:
+            tableName: project_statistic_group
+            columnNames: project_code,statistic_group_code
+            constraintName: uq_psg_project_group
