@@ -11,7 +11,8 @@ import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.Report.Companion.GRAPH_FULL
 import rs.russian.portal.report.repository.projections.ProgramStatProjection
 import java.time.OffsetDateTime
-import java.util.*
+import java.util.Optional
+import java.util.UUID
 
 interface ReportRepository : JpaRepository<Report, UUID> {
 
@@ -26,16 +27,16 @@ interface ReportRepository : JpaRepository<Report, UUID> {
 
     @Query(
         """
-  SELECT
-    g.code AS groupCode,
-    COUNT(DISTINCT r.account.username) AS count,
-    COALESCE(SUM(t.timeSpent), 0) / 60.0 AS totalTimeSpent
-  FROM Report r
-  LEFT JOIN r.tasks t
-  LEFT JOIN r.account.info.project.statisticGroups g
-  WHERE r.createTime BETWEEN :start AND :end
-  GROUP BY g.code
-"""
+        SELECT
+            g.code AS groupCode,
+            COUNT(DISTINCT r.account.username) AS count,
+            COALESCE(SUM(t.timeSpent), 0) / 60.0 AS totalTimeSpent
+        FROM Report r
+        LEFT JOIN r.tasks t
+        LEFT JOIN r.account.info.project.statisticGroups g
+        WHERE r.createTime BETWEEN :start AND :end
+        GROUP BY g.code
+        """
     )
     fun fetchProgramStatsByGroup(
         @Param("start") start: OffsetDateTime,
