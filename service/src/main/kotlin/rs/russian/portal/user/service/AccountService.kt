@@ -216,9 +216,9 @@ class AccountService(
         return accountRepository.count().toInt()
     }
 
-//    fun getCountByStatisticGroup(): List<UsersStatisticGroupCountProjection> {
-//        return accountRepository.countByStatisticGroup()
-//    }
+    fun getCountByStatisticGroup(): List<UsersStatisticGroupCountProjection> {
+        return accountRepository.countByStatisticGroup()
+    }
 
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
