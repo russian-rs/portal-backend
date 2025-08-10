@@ -2,53 +2,95 @@ package rs.russian.portal.report.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import rs.russian.generated.model.FinalUsersStatistics
+import rs.russian.generated.model.ProgramStatItem
 import rs.russian.generated.model.ProgramStatistics
 import rs.russian.generated.model.StatisticData
 import rs.russian.generated.model.Statistics
+import rs.russian.generated.model.VolunteerStatistics
 import rs.russian.portal.report.repository.ReportRepository
-import rs.russian.portal.report.repository.projections.ProgramStatProjection
+import rs.russian.portal.user.domain.enums.Gender
+import rs.russian.portal.user.service.AccountService
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
 
 @Service
 class ReportStatisticService(
-    private val reportRepository: ReportRepository
+    private val reportRepository: ReportRepository,
+    private val accountService: AccountService
 ) {
 
     @Transactional(readOnly = true)
     fun getStatistics(year: Int) = Statistics().apply {
         programStatistics = getProgramStat(year)
+        volunteerStatistics = getVolunteerStat()
+        finalUsersStatistics = getFinalUsersStat()
         this.year = year
     }
 
+    private fun getVolunteerStat(): VolunteerStatistics {
+        val ageSlices = accountService.getAgeSliceStatistics()
+        val genderSlices = accountService.getGenderStatistics()
+        val totalUsers = accountService.getTotalUserCount()
+
+        return VolunteerStatistics().apply {
+            maleCount = genderSlices.get(Gender.MALE)
+            femaleCount = genderSlices.get(Gender.FEMALE)
+            age15to18Count = ageSlices.age15to18Count
+            age18to30Count = ageSlices.age18to30Count
+            age30to40Count = ageSlices.age30to40Count
+            age40to65Count = ageSlices.age40to65Count
+            age65AndAboveCount = ageSlices.age65AndAboveCount
+            //TODO(Add citizenship)
+            citizensCount = 0
+            foreignersCount = totalUsers
+        }
+    }
+
+    private fun getFinalUsersStat(): FinalUsersStatistics {
+        val usersByStatGroup = accountService.getCountByStatisticGroup()
+        val totalUsers = accountService.getTotalUserCount()
+
+        val culturalAssetsCount = usersByStatGroup
+            .filter { it.groupCode == "KULTURNA_DOBA" }
+            .sumOf { it.userCount }
+        val naturalAssetsCount = usersByStatGroup
+            .filter { it.groupCode == "ZIVOTNA_SREDINA" }
+            .sumOf { it.userCount }
+        val publicAreasCount = usersByStatGroup
+            .filter { it.groupCode == "JAVNE_POVRSINE" }
+            .sumOf { it.userCount }
+
+        val other = totalUsers - (culturalAssetsCount + naturalAssetsCount + publicAreasCount)
+
+        return FinalUsersStatistics().apply {
+            this.culturalAssetsCount = culturalAssetsCount
+            this.naturalAssetsCount = naturalAssetsCount
+            this.publicAreasCount = publicAreasCount
+            otherCount = other
+            totalCount = totalUsers
+        }
+    }
 
     private fun getProgramStat(year: Int): ProgramStatistics {
-        val start = OffsetDateTime.of(
-            year, 1, 1,
-            0, 0, 0, 0, ZoneOffset.UTC
-        )
+        val start = OffsetDateTime.of(year, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)
         val end = start.plusYears(1).minusNanos(1)
 
-        val rawByCode: Map<String?, ProgramStatProjection> =
-            reportRepository.fetchProgramStatsByGroup(start, end)
-                .associateBy({ it.groupCode }, { it })
+        val rows = reportRepository.fetchProgramStatsByGroup(start, end)
 
-        fun getData(code: String?) = rawByCode[code]
-            ?.let { StatisticData(it.count.toInt(), it.totalTimeSpent) }
-            ?: StatisticData(0, 0.0)
-
-        return ProgramStatistics().apply {
-            socialSecurity = getData("SOCIJALNA_ZASTITA")
-            media          = getData("MEDIJI_I_KOMUNIKACIJE")
-            culture        = getData("KULTURNA_DOBA")
-            publicAreas    = getData("JAVNE_POVRSINE")
-            environment    = getData("ZIVOTNA_SREDINA")
-            this.other     = getData(null)
-
-            val totalCount = rawByCode.values.sumOf { it.count }
-            val totalTime  = rawByCode.values.sumOf { it.totalTimeSpent }
-            total = StatisticData(totalCount.toInt(), totalTime)
+        val items = rows.map { r ->
+            ProgramStatItem(
+                code = r.groupCode,
+                data = StatisticData(r.count.toInt(), r.totalTimeSpent)
+            )
         }
+
+        val total = StatisticData(
+            rows.sumOf { it.count }.toInt(),
+            rows.sumOf { it.totalTimeSpent }
+        )
+
+        return ProgramStatistics(items = items as MutableList<ProgramStatItem>, total = total)
     }
 }

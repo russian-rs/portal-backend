@@ -765,18 +765,6 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
   schemas:
-    StatisticData:
-      type: object
-      properties:
-        count:
-          description: number of volunteers per group
-          type: integer
-          nullable: true
-        totalTimeSpent:
-          description: total time spent in hours of all volunteers per group
-          type: number
-          format: double
-          nullable: true
     VolunteerStatistics:
       description: Подаци о волонтерима
       type: object
@@ -799,24 +787,39 @@ components:
           type: integer
         foreignersCount:
           type: integer
-    ProgramStatistics:
-      description: Подаци о програмима волонтирања
+    StatisticData:
       type: object
       properties:
-        socialSecurity:
+        count:
+          type: integer
+          nullable: true
+          description: number of volunteers per group
+        totalTimeSpent:
+          type: number
+          format: double
+          nullable: true
+          description: total time spent in hours of all volunteers per group
+    ProgramStatItem:
+      type: object
+      required: [code, data]
+      properties:
+        code:
+          type: string
+          nullable: true
+          description: Код статистической программы; null = «прочее»
+        data:
           $ref: '#/components/schemas/StatisticData'
-        media:
-          $ref: '#/components/schemas/StatisticData'
-        culture:
-          $ref: '#/components/schemas/StatisticData'
-        publicAreas:
-          $ref: '#/components/schemas/StatisticData'
-        environment:
-          $ref: '#/components/schemas/StatisticData'
-        other:
-          $ref: '#/components/schemas/StatisticData'
+    ProgramStatistics:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProgramStatItem'
         total:
           $ref: '#/components/schemas/StatisticData'
+      description: Универсальная сводка по программам
     FinalUsersStatistics:
       description: Подаци о крајњим корисницима волонтирања
       type: object
