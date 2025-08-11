@@ -1,20 +1,24 @@
 package rs.russian.portal.application.domain
 
-import jakarta.persistence.Entity
-import jakarta.persistence.EntityListeners
+import jakarta.persistence.*
+import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.EnumType.STRING
-import jakarta.persistence.Enumerated
-import jakarta.persistence.Id
+import org.hibernate.annotations.SQLRestriction
 import rs.russian.generated.model.ContractTypeEnum
 import rs.russian.portal.application.domain.ApplicationStatus.CREATED
 import rs.russian.portal.application.domain.ApplicationType.NEW
 import rs.russian.portal.application.domain.listener.ApplicationEntityListener
+import rs.russian.portal.note.domain.Note
 import rs.russian.portal.shared.jpa.JpaEntity
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
 @Entity
+@NamedEntityGraph(
+    name = Application.GRAPH_FULL,
+    attributeNodes = [NamedAttributeNode("notes")]
+)
 @EntityListeners(ApplicationEntityListener::class)
 class Application(
     @Id
@@ -53,6 +57,15 @@ class Application(
     var contractFrom: LocalDate? = null,
     var contractUntil: LocalDate? = null,
     @Enumerated(STRING)
-    var contractType: ContractTypeEnum? = null
+    var contractType: ContractTypeEnum? = null,
 
-) : JpaEntity<UUID>()
+    @SQLRestriction("entity_type = 'APPLICATION'")
+    @OneToMany(mappedBy = "entityId", cascade = [ALL], orphanRemoval = true)
+    var notes: MutableSet<Note> = mutableSetOf(),
+
+    ) : JpaEntity<UUID>() {
+
+    companion object {
+        const val GRAPH_FULL = "Application.Full"
+    }
+}

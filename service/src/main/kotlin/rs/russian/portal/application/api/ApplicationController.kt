@@ -8,6 +8,7 @@ import rs.russian.generated.api.ApplicationApi
 import rs.russian.generated.model.*
 import rs.russian.portal.application.mapper.ApplicationMapper
 import rs.russian.portal.application.service.ApplicationService
+import rs.russian.portal.note.mapper.NoteMapper
 import rs.russian.portal.shared.exception.CaptchaInvalidException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.Authorized
@@ -17,10 +18,11 @@ import java.util.*
 
 @RestController
 class ApplicationController(
+    private val noteMapper: NoteMapper,
     private val applicationMapper: ApplicationMapper,
     private val applicationService: ApplicationService,
     private val captchaService: TurnstileValidationService,
-    private val httpServletRequest: HttpServletRequest
+    private val httpServletRequest: HttpServletRequest,
 ) : ApplicationApi {
 
     override fun createApplication(
@@ -58,7 +60,7 @@ class ApplicationController(
     override fun getApplications(
         pageRequest: PageRequest,
         searchQuery: String?,
-        applicationsFilter: ApplicationsFilter?
+        applicationsFilter: ApplicationsFilter?,
     ): ResponseEntity<ApplicationPageResponse> {
         val page = applicationService.getAll(searchQuery, pageRequest, applicationsFilter)
         return ResponseEntity.ok(
@@ -73,6 +75,12 @@ class ApplicationController(
     override fun updateApplication(applicationDto: ApplicationDto): ResponseEntity<ApplicationDto> {
         val application = applicationService.update(applicationDto)
         return ResponseEntity.ok(applicationMapper.toDto(application))
+    }
+
+    @Authorized(allowed = [ADMIN_VOLUNTEER, INTERVIEWER])
+    override fun addNoteToApplication(id: UUID, noteDto: NoteDto): ResponseEntity<NoteDto> {
+        val note = applicationService.addNote(id, noteDto)
+        return ResponseEntity.ok(noteMapper.map(note))
     }
 
 }

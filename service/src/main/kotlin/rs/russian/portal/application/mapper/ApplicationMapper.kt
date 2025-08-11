@@ -5,11 +5,13 @@ import org.mapstruct.Mapping
 import org.mapstruct.MappingTarget
 import org.mapstruct.Named
 import org.mapstruct.NullValuePropertyMappingStrategy.IGNORE
+import org.springframework.beans.factory.annotation.Autowired
 import rs.russian.generated.model.ApplicationDto
 import rs.russian.generated.model.ApplicationStatusDto
 import rs.russian.generated.model.ContractDto
 import rs.russian.portal.application.domain.Application
 import rs.russian.portal.application.domain.ApplicationStatus
+import rs.russian.portal.note.mapper.NoteMapper
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.UserInfo
 import java.time.LocalDateTime
@@ -17,14 +19,21 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 
-@Mapper(imports = [UUID::class], nullValuePropertyMappingStrategy = IGNORE)
+@Mapper(
+    imports = [UUID::class], nullValuePropertyMappingStrategy = IGNORE,
+    uses = [NoteMapper::class]
+)
 abstract class ApplicationMapper {
+
+    @Autowired
+    private lateinit var noteMapper: NoteMapper
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "status", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "created", ignore = true)
+    @Mapping(target = "notes", ignore = true)
     @Mapping(target = "refuseReason", ignore = true)
     @Mapping(target = "contractFrom", source = "contract.startDate")
     @Mapping(target = "contractUntil", source = "contract.endDate")
@@ -35,6 +44,7 @@ abstract class ApplicationMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "type", ignore = true)
     @Mapping(target = "created", ignore = true)
+    @Mapping(target = "notes", ignore = true)
     @Mapping(target = "contractFrom", source = "contract.startDate")
     @Mapping(target = "contractUntil", source = "contract.endDate")
     @Mapping(target = "contractType", source = "contract.type")
