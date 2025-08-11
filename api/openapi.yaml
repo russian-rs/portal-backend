@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.19.2
+  version: 1.20.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -548,6 +548,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ApplicationDto'
+  /application/{id}/note:
+    post:
+      operationId: addNoteToApplication
+      description: Добавление заметки по заявке
+      tags:
+        - application
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteDto'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteDto'
   /application/update:
     put:
       operationId: updateApplication
@@ -1106,6 +1132,11 @@ components:
           type: string
         contract:
           $ref: '#/components/schemas/ContractDto'
+        notes:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/NoteDto'
     ApplicationsFilter:
       type: object
       required:
@@ -1171,6 +1202,7 @@ components:
           format: date-time
         createdBy:
           type: string
+          description: Логин пользователя, который создал заметку
         text:
           type: string
     ChangeReportStatusRequest:

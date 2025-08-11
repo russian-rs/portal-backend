@@ -31,7 +31,7 @@ class ReportService(
     private val reportMapper: ReportMapper,
     private val noteService: NoteService,
     private val reportRepository: ReportRepository,
-    private val entityManager: EntityManager
+    private val entityManager: EntityManager,
 ) {
 
     @Transactional(readOnly = true)
@@ -87,7 +87,7 @@ class ReportService(
         val currentAccount = accountService.getAccountByLogin(currentUserLogin() ?: throw NotAuthorizedException())
         val note = noteService.save(
             Note(
-                createdBy = currentAccount,
+                createdBy = currentAccount.username,
                 entityId = reportId,
                 entityType = EntityType.REPORT,
                 text = noteDto.text
@@ -104,7 +104,7 @@ class ReportService(
             val currentAccount = accountService.getAccountByLogin(currentUserLogin() ?: throw NotAuthorizedException())
             val note = noteService.save(
                 Note(
-                    createdBy = currentAccount,
+                    createdBy = currentAccount.username,
                     entityId = reportId,
                     entityType = EntityType.REPORT,
                     text = noteText

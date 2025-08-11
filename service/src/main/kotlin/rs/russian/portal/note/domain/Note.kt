@@ -1,12 +1,12 @@
 package rs.russian.portal.note.domain
 
-import jakarta.persistence.*
+import jakarta.persistence.Entity
 import jakarta.persistence.EnumType.STRING
-import jakarta.persistence.FetchType.LAZY
+import jakarta.persistence.Enumerated
+import jakarta.persistence.Id
 import org.hibernate.annotations.SQLRestriction
 import rs.russian.portal.note.domain.enums.EntityType
 import rs.russian.portal.shared.jpa.JpaEntity
-import rs.russian.portal.user.domain.Account
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.*
@@ -20,9 +20,7 @@ class Note(
 
     var createTime: OffsetDateTime = OffsetDateTime.now(),
 
-    @ManyToOne(fetch = LAZY)
-    @JoinColumn(name = "created_by", referencedColumnName = "username")
-    var createdBy: Account,
+    var createdBy: String,
 
     var entityId: UUID,
 
@@ -31,10 +29,9 @@ class Note(
 
     var text: String,
 
-    var deleted: Boolean = false
+    var deleted: Boolean = false,
 
-) : JpaEntity<UUID>() {
+    ) : JpaEntity<UUID>() {
 
-    override fun equalityProperties() =
-        setOf(Note::id, Note::text)
+    override fun equalityProperties() = setOf(Note::id, Note::text)
 }
