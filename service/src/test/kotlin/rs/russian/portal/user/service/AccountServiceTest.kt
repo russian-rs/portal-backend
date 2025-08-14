@@ -1,6 +1,5 @@
 package rs.russian.portal.user.service
 
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -34,7 +33,7 @@ class AccountServiceTest {
             ?: throw IllegalStateException("Default user not created")
         accountLogin = account.username
 
-        accountService.setProgram(account, "IT")
+        accountService.setProgram(account.id!!, "IT")
     }
 
 

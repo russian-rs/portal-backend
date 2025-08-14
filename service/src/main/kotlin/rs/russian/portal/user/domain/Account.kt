@@ -2,9 +2,9 @@ package rs.russian.portal.user.domain
 
 import jakarta.persistence.*
 import jakarta.persistence.CascadeType.ALL
+import jakarta.persistence.FetchType.LAZY
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
-import rs.russian.portal.report.domain.Report
 import rs.russian.portal.shared.jpa.JpaEntity
 import rs.russian.portal.shared.jpa.converter.UserGroupSetConverter
 import rs.russian.portal.user.domain.enums.UserGroup
@@ -16,12 +16,20 @@ import java.time.LocalDateTime
 @NamedEntityGraph(
     name = Account.GRAPH_FULL,
     attributeNodes = [
-        NamedAttributeNode("info", subgraph = UserInfo.GRAPH_AVATAR),
+        NamedAttributeNode("info", subgraph = UserInfo.GRAPH_FULL),
         NamedAttributeNode("contracts"),
     ],
-    subgraphs = [NamedSubgraph(name = UserInfo.GRAPH_AVATAR, attributeNodes = [NamedAttributeNode("avatar")])]
+    subgraphs = [
+        NamedSubgraph(
+            name = UserInfo.GRAPH_FULL, attributeNodes = [
+                NamedAttributeNode("avatar"),
+                NamedAttributeNode("program"),
+                NamedAttributeNode("project")
+            ]
+        )
+    ]
 )
-data class Account(
+class Account(
     @Id
     override var id: Int? = null,
     override var version: LocalDateTime? = null,
@@ -30,15 +38,12 @@ data class Account(
     var email: String,
     var fullName: String,
 
-    @OneToOne(mappedBy = "account", cascade = [ALL], fetch = FetchType.LAZY, orphanRemoval = true)
+    @OneToOne(mappedBy = "account", cascade = [ALL], fetch = LAZY, orphanRemoval = true)
     var info: UserInfo? = null,
 
     @JdbcTypeCode(SqlTypes.JSON)
     @Convert(converter = UserGroupSetConverter::class)
     var groups: Set<UserGroup> = mutableSetOf(),
-
-    @OneToMany(mappedBy = "account", cascade = [ALL], orphanRemoval = true)
-    var reports: List<Report> = ArrayList(),
 
     @OneToMany(mappedBy = "account", cascade = [ALL], orphanRemoval = true)
     var contracts: MutableList<Contract> = ArrayList(),
@@ -49,9 +54,10 @@ data class Account(
 
     ) : JpaEntity<Int>() {
 
-    override fun equalityProperties() = setOf(Account::email, Account::username)
+    override fun equalityProperties() = setOf(Account::username)
 
     companion object {
-        const val GRAPH_FULL = "AccountUserInfoContracts"
+        const val GRAPH_FULL = "Account.Full"
+        const val GRAPH_USERNAME = "Account.Username"
     }
 }

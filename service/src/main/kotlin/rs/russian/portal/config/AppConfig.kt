@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
-import com.github.benmanes.caffeine.cache.Caffeine
 import net.javacrumbs.shedlock.core.LockProvider
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock
@@ -15,11 +14,13 @@ import org.springframework.cache.caffeine.CaffeineCacheManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
+import org.springframework.context.annotation.Profile
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.scheduling.annotation.EnableScheduling
+import org.springframework.web.filter.CommonsRequestLoggingFilter
 import org.thymeleaf.spring6.SpringTemplateEngine
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
-import rs.russian.portal.shared.utils.CacheService
+import rs.russian.portal.shared.utils.CacheService.Companion.CACHE_MAP
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider
 import software.amazon.awssdk.regions.Region
@@ -27,7 +28,6 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.S3Configuration
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import java.net.URI
-import java.util.concurrent.TimeUnit
 import javax.sql.DataSource
 
 @Configuration
@@ -92,13 +92,7 @@ class AppConfig {
     @Bean
     fun cacheManager(): CaffeineCacheManager {
         val cacheManager = CaffeineCacheManager()
-
-        cacheManager.registerCustomCache(
-            CacheService.S3_FILE_CACHE, Caffeine.newBuilder()
-                .expireAfterWrite(12, TimeUnit.HOURS)
-                .build()
-        )
-
+        CACHE_MAP.forEach { (name, cache) -> cacheManager.registerCustomCache(name, cache) }
         return cacheManager
     }
 
@@ -112,5 +106,17 @@ class AppConfig {
         val templateEngine = SpringTemplateEngine()
         templateEngine.setTemplateResolver(templateResolver)
         return templateEngine
+    }
+
+    @Bean
+    @Profile("local")
+    fun requestLoggingFilter(): CommonsRequestLoggingFilter {
+        val filter = CommonsRequestLoggingFilter()
+        filter.setIncludeQueryString(true)
+        filter.setIncludePayload(false)
+        filter.setIncludeHeaders(false)
+        filter.setIncludeClientInfo(false)
+        filter.setMaxPayloadLength(0)
+        return filter
     }
 }
