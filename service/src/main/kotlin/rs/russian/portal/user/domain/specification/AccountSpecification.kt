@@ -6,6 +6,8 @@ import org.springframework.data.jpa.domain.Specification
 import rs.russian.generated.model.UserSearchFilter
 import rs.russian.portal.program.domain.Program
 import rs.russian.portal.program.domain.Program_
+import rs.russian.portal.program.domain.Project
+import rs.russian.portal.program.domain.Project_
 import rs.russian.portal.shared.jpa.empty
 import rs.russian.portal.shared.jpa.equal
 import rs.russian.portal.shared.jpa.like
@@ -29,24 +31,16 @@ fun searchSpecification(query: String, filter: UserSearchFilter?): Specification
     filter?.let {
         var filterSpec: Specification<Account> = empty()
 
-        if (filter.onlyInactive)
+        if (it.onlyInactive)
             filterSpec = filterSpec.and(equal(Account_.ACTIVE, false))
 
-        it.programCodes
-            ?.takeIf { codes -> codes.isNotEmpty() }
-            ?.let { codes ->
-               val programSpec = Specification<Account> {root, _, _ ->
-                   val infoJoin: Join<Account, UserInfo> =
-                       root.join(Account_.info, JoinType.LEFT)
+        it.program?.let { program ->
+            filterSpec = filterSpec.and(programEqual(program))
+        }
 
-                   val progJoin: Join<UserInfo, Program> =
-                       infoJoin.join(UserInfo_.program, JoinType.LEFT)
-
-                   progJoin.get(Program_.code)
-                       .`in`(codes)
-               }
-                filterSpec = filterSpec.and(programSpec)
-            }
+        it.project?.let { project ->
+            filterSpec = filterSpec.and(projectEqual(project))
+        }
 
         resultSpec = resultSpec.and(filterSpec)
     }
@@ -54,4 +48,24 @@ fun searchSpecification(query: String, filter: UserSearchFilter?): Specification
     return resultSpec
 }
 
+private fun programEqual(programCode: String) = Specification { root, _, builder ->
+    val infoJoin: Join<Account, UserInfo> = root.join(Account_.info, JoinType.LEFT)
+    val programJoin: Join<UserInfo, Program> = infoJoin.join(UserInfo_.program, JoinType.LEFT)
 
+    if (programCode.isBlank()) { // Выбрать пользователей без заполненной программы
+        builder.isNull(programJoin.get(Program_.code))
+    } else { // Выбрать пользователей с указанной программой
+        builder.equal(programJoin.get(Program_.code), programCode)
+    }
+}
+
+private fun projectEqual(projectCode: String) = Specification { root, _, builder ->
+    val infoJoin: Join<Account, UserInfo> = root.join(Account_.info, JoinType.LEFT)
+    val projectJoin: Join<UserInfo, Project> = infoJoin.join(UserInfo_.project, JoinType.LEFT)
+
+    if (projectCode.isBlank()) { // Выбрать пользователей без заполненного проекта
+        builder.isNull(projectJoin.get(Project_.code))
+    } else { // Выбрать пользователей с указанным проектом
+        builder.equal(projectJoin.get(Project_.code), projectCode)
+    }
+}

@@ -31,7 +31,8 @@ class ApplicationEventListener(
     @TransactionalEventListener(fallbackExecution = true)
     fun handleApplicationCreate(event: ApplicationCreatedEvent) {
         val application = applicationService.get(event.id)
-        val message = templateEngine.process("application_received",
+        val message = templateEngine.process(
+            "application_received",
             Context().also { it.setVariables(mapOf("id" to application.id)) })
         emailService.sendCommonEmail(
             application.email,
@@ -50,7 +51,7 @@ class ApplicationEventListener(
                 if (accountService.findAccountByEmail(application.email) == null) {
                     val account = accountService.create(application.email, application.name)
                     accountService.updateContracts(
-                        account,
+                        account.id!!,
                         listOf(
                             ContractDto(
                                 id = UUID.randomUUID(),
@@ -60,12 +61,12 @@ class ApplicationEventListener(
                             )
                         )
                     )
-                    accountService.updateInfo(account.id!!, applicationMapper.mapToInfo(application))
+                    accountService.updateInfo(account.id!!, applicationMapper.mapToInfo(application, account))
                 }
             }
             if (application.type == ApplicationType.PROLONGATION) {
                 val account = accountService.findAccountByEmail(application.email)!!
-                accountService.switchActiveState(account, true)
+                accountService.switchActiveState(account.id!!, true)
                 val contracts = contractMapper.map(account.contracts)
                 contracts.add(
                     ContractDto(
@@ -75,7 +76,7 @@ class ApplicationEventListener(
                         type = application.contractType!!
                     )
                 )
-                accountService.updateContracts(account, contracts)
+                accountService.updateContracts(account.id!!, contracts)
             }
         }
     }

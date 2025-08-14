@@ -6,8 +6,8 @@ import jakarta.persistence.Id
 import jakarta.persistence.Table
 
 @Entity
-@Table(name = "program")
-class Program(
+@Table(name = "project")
+class Project(
     @Id
     @Column(name = "code", nullable = false, unique = true)
     val code: String,

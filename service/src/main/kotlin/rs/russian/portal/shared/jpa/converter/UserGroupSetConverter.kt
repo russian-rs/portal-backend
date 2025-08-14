@@ -7,9 +7,9 @@ import jakarta.persistence.Converter
 import rs.russian.portal.user.domain.enums.UserGroup
 
 @Converter
-class UserGroupSetConverter(
-    private val objectMapper: ObjectMapper
-) : AttributeConverter<Set<UserGroup>, String> {
+class UserGroupSetConverter : AttributeConverter<Set<UserGroup>, String> {
+
+    private val objectMapper = ObjectMapper()
 
     override fun convertToDatabaseColumn(attribute: Set<UserGroup>): String {
         return objectMapper.writeValueAsString(attribute)

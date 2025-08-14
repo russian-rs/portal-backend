@@ -1,7 +1,10 @@
 package rs.russian.portal.report.service
 
+import jakarta.persistence.EntityManager
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.NoteDto
@@ -27,7 +30,8 @@ class ReportService(
     private val fileService: FileService,
     private val reportMapper: ReportMapper,
     private val noteService: NoteService,
-    private val reportRepository: ReportRepository
+    private val reportRepository: ReportRepository,
+    private val entityManager: EntityManager,
 ) {
 
     @Transactional(readOnly = true)
@@ -41,7 +45,7 @@ class ReportService(
         val tasks = reportDto.tasks.map { taskDto ->
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
-                task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toSet())
+                task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toMutableSet())
             }
         }
         return reportRepository.save(report.also { it.tasks = tasks.toMutableSet() })
@@ -69,7 +73,7 @@ class ReportService(
 
     @Transactional(readOnly = true)
     fun getReports(reportFilter: ReportFilter, pageable: Pageable): Page<Report> {
-        return reportRepository.findAll(from(reportFilter), pageable)
+        return findAllFull(from(reportFilter), pageable)
     }
 
     @Transactional
@@ -83,7 +87,7 @@ class ReportService(
         val currentAccount = accountService.getAccountByLogin(currentUserLogin() ?: throw NotAuthorizedException())
         val note = noteService.save(
             Note(
-                createdBy = currentAccount,
+                createdBy = currentAccount.username,
                 entityId = reportId,
                 entityType = EntityType.REPORT,
                 text = noteDto.text
@@ -100,7 +104,7 @@ class ReportService(
             val currentAccount = accountService.getAccountByLogin(currentUserLogin() ?: throw NotAuthorizedException())
             val note = noteService.save(
                 Note(
-                    createdBy = currentAccount,
+                    createdBy = currentAccount.username,
                     entityId = reportId,
                     entityType = EntityType.REPORT,
                     text = noteText
@@ -109,5 +113,20 @@ class ReportService(
             report.notes.add(note)
         }
         report.status = status
+    }
+
+    /**
+     * Получить список отчетов с использованием EntityGraph
+     * Решает проблему, при которой невозможно одновременная работа Pageable и EntityGraph:
+     * HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+     * entityManager.detach(...) - необходим потому что findAll загружает "легковесные" объекты и
+     * сохраняет их в контекст, а findAllByIdIn уже загрузит полные объекты, однако если не очистить
+     * контекст, то они не будут перезаписаны в контексте, что повлечет дополнительные SQL запросы
+     */
+    private fun findAllFull(specification: Specification<Report>, pageable: Pageable): Page<Report> {
+        val reports = reportRepository.findAll(specification, pageable)
+        reports.forEach { report -> entityManager.detach(report) }
+        val reportsFull = reportRepository.findAllByIdIn(reports.mapNotNull { it.id }, pageable.sort)
+        return PageImpl(reportsFull, reports.pageable, reports.totalElements)
     }
 }
