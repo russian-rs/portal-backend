@@ -23,6 +23,7 @@ dependencies {
     implementation(project(":server-api"))
     implementation(project(":authentik-api"))
     implementation(project(":wordpress-api"))
+    implementation(project(":outline-api"))
 
     // Spring
     implementation("org.springframework.boot:spring-boot-starter")
@@ -50,6 +51,13 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:$KOTLINX_VERSION")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$JACKSON_KOTLIN_VERSION")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
+
+    // Testing
+    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine")
+    implementation("io.github.serpro69:kotlin-faker:2.0.0-rc.10")
+    testImplementation("org.instancio:instancio-core:5.4.1")
 
     // S3
     implementation("software.amazon.awssdk:s3:2.30.31")
@@ -85,6 +93,8 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.mockk:mockk:1.14.0")
+    testImplementation("org.testcontainers:postgresql:1.19.6")
+    testImplementation("org.testcontainers:junit-jupiter:1.19.6")
 }
 
 kotlin {

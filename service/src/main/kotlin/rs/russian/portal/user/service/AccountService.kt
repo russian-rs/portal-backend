@@ -24,7 +24,6 @@ import rs.russian.portal.user.mapper.ContractMapper
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.authentik.AuthentikService
-import rs.russian.portal.user.service.wordpress.MultiWordpressUserService
 
 @Service
 class AccountService(
@@ -34,7 +33,6 @@ class AccountService(
     private val fileService: FileService,
     private val contractMapper: ContractMapper,
     private val accountRepository: AccountRepository,
-    private val multiWordpressUserService: MultiWordpressUserService,
     private val authentikUserService: AuthentikService,
     private val entityManager: EntityManager
 ) {
@@ -72,7 +70,6 @@ class AccountService(
         account.info = UserInfo.default(account)
         account.contracts = mutableListOf(userMapper.map(request.contract, account))
         account = accountRepository.saveAndFlush(account)
-        multiWordpressUserService.syncToAll(listOf(account))
         return account
     }
 
@@ -83,7 +80,6 @@ class AccountService(
         var account = userMapper.map(ssoUser)
         account.info = UserInfo.default(account)
         account = accountRepository.saveAndFlush(account)
-        multiWordpressUserService.syncToAll(listOf(account))
         return account
     }
 
@@ -144,7 +140,6 @@ class AccountService(
         }
         account.active = isActive
         authentikUserService.switchActiveState(account, isActive)
-        multiWordpressUserService.syncToAll(listOf(account))
         return account
     }
 

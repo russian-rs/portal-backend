@@ -36,7 +36,7 @@ import javax.sql.DataSource
 @EnableSchedulerLock(defaultLockAtLeastFor = "PT1M", defaultLockAtMostFor = "PT59M")
 @EnableConfigurationProperties(
     value = [
-        AppProperties::class, S3Properties::class, AuthentikProperties::class, WordpressProperties::class]
+        AppProperties::class, S3Properties::class, AuthentikProperties::class, WordpressProperties::class, OutlineProperties::class]
 )
 class AppConfig {
 
