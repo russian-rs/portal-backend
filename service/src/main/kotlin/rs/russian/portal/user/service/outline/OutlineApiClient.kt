@@ -16,13 +16,17 @@ class OutlineApiClient(
         groupsOutlineApi.groupsList(GroupsListRequest(offset = offset, limit = maxFetchLimit)).data?.groups
     }
 
-    fun groupMemberships(groups: List<Group>): Map<UUID, List<User>> =
+    /**
+     * Returns a map group ID -> to list of user IDs that are members of that group.
+     */
+    fun groupMemberships(groups: List<Group>): Map<UUID, List<UUID>> =
         groups.mapNotNull(Group::id).associateWith { groupId ->
             groupsOutlineApi
                 .groupsMemberships(GroupsMembershipsRequest(id = groupId.toString(), limit = maxFetchLimit))
                 .data
                 ?.groupMemberships
                 ?.mapNotNull(GroupMembership::user)
+                ?.mapNotNull(User::id) // This endpoint return cropped user objects, so we need to extract IDs
                 ?: emptyList()
         }
 
