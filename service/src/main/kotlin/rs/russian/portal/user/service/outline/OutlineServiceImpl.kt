@@ -1,12 +1,12 @@
 package rs.russian.portal.user.service.outline
 
-import com.outline.model.*
+import com.outline.model.Group
+import com.outline.model.User
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.service.AccountSynchroniser
-import java.math.BigDecimal
 import java.util.*
 
 private val log = LoggerFactory.getLogger(OutlineServiceImpl::class.java)
@@ -64,39 +64,40 @@ class OutlineServiceImpl(
         ourAccounts: List<Account>,
         outlineUsers: List<User>,
         outlineGroups: List<Group>,
-        outlineMemberships: Map<UUID, List<User>>
+        outlineMemberships: Map<UUID, List<UUID>>
     ) {
-        fun addUsersToGroups(toAdd: Map<UUID, List<User>>) = toAdd.forEach { (groupId, users) ->
-            users.forEach { user ->
-                outlineApiClient.groupsAddUser(groupId, user.id!!)
+        fun addUsersToGroups(toAdd: Map<UUID, Collection<UUID>>) = toAdd.forEach { (groupId, users) ->
+            users.forEach { userId ->
+                outlineApiClient.groupsAddUser(groupId, userId)
             }
         }
 
-        fun removeUsersFromGroups(toRemove: Map<UUID, List<User>>) = toRemove.forEach { (groupId, users) ->
-            users.forEach { user ->
-                outlineApiClient.groupsRemoveUser(groupId, user.id!!)
+        fun removeUsersFromGroups(toRemove: Map<UUID, Collection<UUID>>) = toRemove.forEach { (groupId, users) ->
+            users.forEach { userId ->
+                outlineApiClient.groupsRemoveUser(groupId, userId)
             }
         }
 
         val outlineUsersByEmail = outlineUsers.associateBy { it.email }
 
-        val shouldBe: Map<UUID, Set<User>> = outlineGroups.associate { group ->
+        val shouldBe: Map<UUID, Set<UUID>> = outlineGroups.associate { group ->
             group.id!! to ourAccounts
                 .filter { acc -> acc.groups.any { it.oauthGroup.equals(group.name, ignoreCase = true) } }
                 .mapNotNull { outlineUsersByEmail[it.email] }
+                .mapNotNull { it.id }
                 .toSet()
         }
 
         val toAdd = shouldBe.mapValues { (groupId, users) ->
             val actualUsers = outlineMemberships[groupId] ?: emptySet()
-            users.minus(actualUsers).filterNotNull()
+            users.minus(actualUsers)
         }
 
         addUsersToGroups(toAdd)
 
         val toRemove = shouldBe.mapValues { (groupId, users) ->
             val actualUsers = outlineMemberships[groupId] ?: emptySet()
-            actualUsers.minus(users).filterNotNull()
+            actualUsers.minus(users)
         }
 
         removeUsersFromGroups(toRemove)
