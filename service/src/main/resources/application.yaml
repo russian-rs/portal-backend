@@ -130,3 +130,5 @@ logging:
       springframework:
         web.filter.CommonsRequestLoggingFilter: DEBUG
         data.repository.config: WARN
+  exception-conversion-word: "%wEx{full, java.lang.reflect.Method, io.undertow, org.apache.catalina, org.springframework.aop, org.springframework.cglib, org.springframework.transaction, org.springframework.boot, org.apache.tomcat, sun.reflect, net.sf.cglib, java.util.concurrent, org.hibernate, jakarta.servlet, ch.qos.logback, ByCGLIB}"
+
