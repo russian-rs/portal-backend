@@ -13,11 +13,38 @@
                         {
                         "level":"%level",
                         "loggerName":"%c:%M",
-                        "message":"%0.-512message",
-                        "throwable":"%0.-2048throwable"
+                        "message":"%0.-512message"
                         }
                     </pattern>
                 </pattern>
+                <stackTrace>
+                    <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                        <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                        <maxLength>2048</maxLength>
+                        <shortenedClassNameLength>35</shortenedClassNameLength>
+                        <exclude>java\.lang\.reflect\.Method</exclude>
+                        <exclude>io\.undertow</exclude>
+                        <exclude>org\.apache\.catalina</exclude>
+                        <exclude>org\.springframework\.aop</exclude>
+                        <exclude>org\.springframework\.cglib</exclude>
+                        <exclude>org\.springframework\.transaction</exclude>
+                        <exclude>org\.springframework\.boot</exclude>
+                        <exclude>org\.springframework\.scheduling</exclude>
+                        <exclude>org\.apache\.tomcat</exclude>
+                        <exclude>sun\.reflect</exclude>
+                        <exclude>net\.sf\.cglib</exclude>
+                        <exclude>java\.util\.concurrent</exclude>
+                        <exclude>java\.base</exclude>
+                        <exclude>java\.lang</exclude>
+                        <exclude>org\.hibernate</exclude>
+                        <exclude>jakarta\.servlet</exclude>
+                        <exclude>ch\.qos\.logback</exclude>
+                        <exclude>.*ByCGLIB.*</exclude>
+                        <exclude>org\.springframework\.web\.servlet</exclude>
+                        <exclude>org\.springframework\.web\.method</exclude>
+                        <rootCauseFirst>true</rootCauseFirst>
+                    </throwableConverter>
+                </stackTrace>
             </providers>
         </encoder>
     </appender>
