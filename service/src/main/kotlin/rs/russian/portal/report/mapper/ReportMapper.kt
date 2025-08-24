@@ -2,9 +2,7 @@ package rs.russian.portal.report.mapper
 
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
-import org.mapstruct.MappingConstants.ComponentModel.SPRING
 import org.mapstruct.Named
-import org.mapstruct.ReportingPolicy.ERROR
 import org.springframework.beans.factory.annotation.Autowired
 import rs.russian.generated.model.ReportDto
 import rs.russian.generated.model.TaskDto
@@ -17,8 +15,6 @@ import java.time.temporal.WeekFields
 import java.util.*
 
 @Mapper(
-    componentModel = SPRING,
-    unmappedTargetPolicy = ERROR,
     imports = [UUID::class, LocalDateTime::class, HashSet::class],
     uses = [FileInfoMapper::class, NoteMapper::class]
 )
@@ -33,6 +29,8 @@ abstract class ReportMapper {
     @Mapping(target = "week", source = "report", qualifiedByName = ["reportWeek"])
     @Mapping(target = "user", source = "account.username")
     abstract fun map(report: Report): ReportDto
+
+    abstract fun map(reports: List<Report>): MutableList<ReportDto>
 
     @Mapping(target = "customer", ignore = true) // fulfilled in the code
     @Mapping(target = "version", ignore = true)

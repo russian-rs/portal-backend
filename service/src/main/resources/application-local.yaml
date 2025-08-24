@@ -10,6 +10,11 @@ app:
     endpoint: ${S3_ENDPOINT:http://localhost:9000}
     bucket: ${S3_BUCKET:portal-files}
     bucket-service: ${S3_BUCKET_SERVICE:portal-data}
+  authentik:
+    base-url: https://id-test.russian.rs
+    # Можно взять тут
+    # https://coolify-test.russian.rs/project/d4w8o84c0gkscc0gk00kwgg4/environment/z048g80woo4wc8cswgswkkso/application/nk88co4wog8gowogwwcksssc/environment-variables
+    api-key: ${AUTHENTIK_API_KEY}
   wordpress:
     instances:
   schedulers:
@@ -44,9 +49,20 @@ spring:
   security:
     oauth2:
       client:
+        provider:
+          authentik:
+            issuer-uri: https://id-test.russian.rs/application/o/${spring.application.name}/
+            authorization-uri: https://id-test.russian.rs/application/o/authorize/
+            token-uri: https://id-test.russian.rs/application/o/token/
+            user-info-uri: https://id-test.russian.rs/application/o/userinfo/
+            jwk-set-uri: https://id-test.russian.rs/application/o/${spring.application.name}/jwks/
         registration:
           authentik:
-            redirect-uri: ${FRONTEND_URL:http://localhost:3000}/api/oauth2/code
+            # Можно взять тут
+            # https://coolify-test.russian.rs/project/d4w8o84c0gkscc0gk00kwgg4/environment/z048g80woo4wc8cswgswkkso/application/nk88co4wog8gowogwwcksssc/environment-variables
+            client-id: ${OAUTH2_CLIENT_ID}
+            client-secret: ${OAUTH2_CLIENT_SECRET}
+            redirect-uri: http://localhost:3000/api/oauth2/code
 
 --- # Mail
 spring:
@@ -59,6 +75,5 @@ spring:
 logging:
   level:
     org.hibernate.orm.jdbc.bind: TRACE
-    okhttp3: DEBUG
     okhttp3.logging.HttpLoggingInterceptor: DEBUG
   config: classpath:logback-local.xml

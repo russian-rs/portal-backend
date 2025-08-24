@@ -3,14 +3,14 @@ package rs.russian.portal.user.mapper
 import io.authentik.model.User
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
-import org.mapstruct.MappingConstants.ComponentModel.SPRING
 import org.mapstruct.MappingTarget
 import org.mapstruct.Named
-import org.mapstruct.ReportingPolicy.ERROR
+import org.mapstruct.NullValuePropertyMappingStrategy.IGNORE
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.oauth2.core.oidc.OidcUserInfo
 import rs.russian.generated.model.ContractDto
 import rs.russian.generated.model.UserInfoDto
+import rs.russian.generated.model.UserInfoUpdateRequest
 import rs.russian.portal.file.mapper.FileInfoMapper
 import rs.russian.portal.program.mapper.ProgramMapper
 import rs.russian.portal.program.mapper.ProjectMapper
@@ -23,8 +23,6 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Mapper(
-    componentModel = SPRING,
-    unmappedTargetPolicy = ERROR,
     imports = [ArrayList::class, LocalDateTime::class, UUID::class],
     uses = [FileInfoMapper::class, ProgramMapper::class, ProjectMapper::class]
 )
@@ -38,7 +36,6 @@ abstract class UserMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "active", constant = "true")
     @Mapping(target = "username", source = "nickName")
-    @Mapping(target = "reports", expression = "java(new ArrayList<>())")
     @Mapping(target = "contracts", expression = "java(new ArrayList<>())")
     @Mapping(target = "lastSynced", expression = "java(LocalDateTime.now())")
     @Mapping(target = "fullName", source = "oidcUserInfo", qualifiedByName = ["nameOidc"])
@@ -48,7 +45,6 @@ abstract class UserMapper {
     @Mapping(target = "id", source = "pk")
     @Mapping(target = "info", ignore = true)
     @Mapping(target = "version", ignore = true)
-    @Mapping(target = "reports", expression = "java(new ArrayList<>())")
     @Mapping(target = "contracts", expression = "java(new ArrayList<>())")
     @Mapping(target = "fullName", source = "ssoUser", qualifiedByName = ["nameSso"])
     @Mapping(target = "lastSynced", expression = "java(LocalDateTime.now())")
@@ -58,7 +54,6 @@ abstract class UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "info", ignore = true)
     @Mapping(target = "version", ignore = true)
-    @Mapping(target = "reports", ignore = true)
     @Mapping(target = "contracts", ignore = true)
     @Mapping(target = "active", constant = "true")
     @Mapping(target = "username", source = "nickName")
@@ -70,7 +65,6 @@ abstract class UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "info", ignore = true)
     @Mapping(target = "version", ignore = true)
-    @Mapping(target = "reports", ignore = true)
     @Mapping(target = "contracts", ignore = true)
     @Mapping(target = "lastSynced", expression = "java(LocalDateTime.now())")
     @Mapping(target = "fullName", source = "ssoUser", qualifiedByName = ["nameSso"])
@@ -89,6 +83,20 @@ abstract class UserMapper {
     @Mapping(target = "account", source = "account")
     @Mapping(target = "id", expression = "java(UUID.randomUUID())")
     abstract fun map(contactDto: ContractDto, account: Account): Contract
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "account", ignore = true)
+    @Mapping(target = "avatar", ignore = true)
+    @Mapping(target = "gender", ignore = true)
+    @Mapping(target = "program", ignore = true)
+    @Mapping(target = "project", ignore = true)
+    @Mapping(target = "city", nullValuePropertyMappingStrategy = IGNORE)
+    @Mapping(target = "address", nullValuePropertyMappingStrategy = IGNORE)
+    @Mapping(target = "birthDate", nullValuePropertyMappingStrategy = IGNORE)
+    @Mapping(target = "telegram", nullValuePropertyMappingStrategy = IGNORE)
+    @Mapping(target = "phone", nullValuePropertyMappingStrategy = IGNORE)
+    abstract fun updateInfo(@MappingTarget target: UserInfo, source: UserInfoUpdateRequest)
 
     @Named("mapGroups")
     fun mapGroups(oidcUserInfo: OidcUserInfo): Set<UserGroup> {

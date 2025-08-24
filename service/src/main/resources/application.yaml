@@ -40,6 +40,9 @@ app:
     api-key: ${AUTHENTIK_API_KEY}
   wordpress:
     instances:
+  outline:
+    base-url: ${OUTLINE_BASE_URL}
+    api-key: ${OUTLINE_API_KEY} # outline -> preferences -> api&apps -> new api key with scopes: "groups.* users.*"
   schedulers:
     email-outbox: "*/15 * * * * *"
     user-sync: "0 0 */1 * * *"
@@ -119,3 +122,11 @@ spring:
   autoconfigure:
     exclude:
       - org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
+
+--- # Logging
+logging:
+  level:
+    org:
+      springframework:
+        web.filter.CommonsRequestLoggingFilter: DEBUG
+        data.repository.config: WARN
