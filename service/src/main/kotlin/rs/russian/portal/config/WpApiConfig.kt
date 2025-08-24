@@ -2,7 +2,6 @@ package rs.russian.portal.config
 
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -26,9 +25,10 @@ class WpApiConfig(
     private val tokenWordpressApis: Map<String, TokenWordpressApi>,
     private val env: Environment
 ) {
-    private val tokens: MutableMap<String, String?> = if (env.activeProfiles.any { "local".equals(it, ignoreCase = true) }) {
-        mutableMapOf("local" to "")
-    } else ConcurrentHashMap()
+    private val tokens: MutableMap<String, String?> =
+        if (env.activeProfiles.any { "local".equals(it, ignoreCase = true) }) {
+            mutableMapOf("local" to "")
+        } else ConcurrentHashMap()
 
     private fun receiveTokenByInstance(instance: WordpressInstance): String? {
         val tokenApi = tokenWordpressApis[instance.name]
@@ -77,13 +77,8 @@ class WpApiConfig(
             chain.proceed(request)
         }
 
-        val loggingInterceptor = HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
-        }
-
         return OkHttpClient.Builder()
             .addInterceptor(authInterceptor)
-            .addInterceptor(loggingInterceptor)
             .build()
     }
 

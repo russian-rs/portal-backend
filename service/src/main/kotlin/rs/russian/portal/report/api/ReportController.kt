@@ -1,7 +1,6 @@
 package rs.russian.portal.report.api
 
 import org.springframework.http.ResponseEntity
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.RestController
 import rs.russian.generated.api.ReportApi
 import rs.russian.generated.model.*
@@ -18,16 +17,14 @@ import java.util.*
 class ReportController(
     private val reportService: ReportService,
     private val reportMapper: ReportMapper,
-    private val noteMapper: NoteMapper
+    private val noteMapper: NoteMapper,
 ) : ReportApi {
 
-    @Transactional(readOnly = true)
     override fun getReport(id: UUID): ResponseEntity<ReportDto> {
         val report = reportService.getReport(id)
         return ResponseEntity.ok(reportMapper.map(report))
     }
 
-    @Transactional
     override fun createReport(reportDto: ReportDto): ResponseEntity<ReportDto> {
         val report = reportService.createReport(reportDto)
         return ResponseEntity.ok(reportMapper.map(report))
@@ -39,31 +36,27 @@ class ReportController(
         return ResponseEntity.ok().build()
     }
 
-    @Transactional
     override fun updateReport(reportDto: ReportDto): ResponseEntity<ReportDto> {
         val report = reportService.updateReport(reportDto)
         return ResponseEntity.ok(reportMapper.map(report))
     }
 
-    @Transactional(readOnly = true)
     override fun getReports(pageRequest: PageRequest, reportFilter: ReportFilter): ResponseEntity<ReportPageResponse> {
         val page = reportService.getReports(reportFilter, convert(pageRequest))
         return ResponseEntity.ok(
             ReportPageResponse(
                 page = convert(page),
-                content = page.map { reportMapper.map(it) }.toMutableList()
+                content = reportMapper.map(page.content)
             )
         )
     }
 
-    @Transactional
     @Authorized(allowed = [ADMIN_VOLUNTEER])
     override fun addNote(id: UUID, noteDto: NoteDto): ResponseEntity<NoteDto> {
         val note = reportService.addNote(id, noteDto)
         return ResponseEntity.ok(noteMapper.map(note))
     }
 
-    @Transactional
     @Authorized(allowed = [ADMIN_VOLUNTEER])
     override fun changeStatus(id: UUID, changeReportStatusRequest: ChangeReportStatusRequest): ResponseEntity<Unit> {
         reportService.changeStatus(

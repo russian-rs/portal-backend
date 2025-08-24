@@ -126,7 +126,7 @@ paths:
           schema:
             type: integer
             nullable: false
-            default: 1
+            default: 0
       responses:
         '200':
           description: OK

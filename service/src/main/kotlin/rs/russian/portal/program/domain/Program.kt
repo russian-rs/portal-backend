@@ -1,12 +1,15 @@
 package rs.russian.portal.program.domain
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 
 @Entity
 @Table(name = "program")
-data class Program(
+class Program(
     @Id
-    @Column(nullable = false, unique = true, name = "code")
+    @Column(name = "code", nullable = false, unique = true)
     val code: String,
 
     @Column(name = "name_ru", nullable = false)

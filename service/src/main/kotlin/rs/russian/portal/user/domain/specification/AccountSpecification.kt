@@ -38,13 +38,6 @@ fun searchSpecification(query: String, filter: UserSearchFilter?): Specification
             filterSpec = filterSpec.and(programEqual(program))
         }
 
-        // Удалить после того как UI перейдет на API v1.19.1
-        it.programCodes?.let { programCodes ->
-            if (programCodes.isNotEmpty()) {
-                filterSpec = filterSpec.and(programEqual(programCodes.first()))
-            }
-        }
-
         it.project?.let { project ->
             filterSpec = filterSpec.and(projectEqual(project))
         }

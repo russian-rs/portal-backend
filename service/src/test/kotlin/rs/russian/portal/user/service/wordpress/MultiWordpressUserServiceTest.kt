@@ -34,7 +34,7 @@ class MultiWordpressUserServiceTest {
     }
 
     @Test
-    fun `syncToAll should sync user to all WordPress instances`() {
+    fun `sync() should sync user to all WordPress instances`() {
         // Arrange
         val updatingWpUser = WpUser(1, "", "", mutableListOf())
         val creatingWpUser = WpUser(0, "", "", mutableListOf())
@@ -48,7 +48,7 @@ class MultiWordpressUserServiceTest {
         every { secondaryService.createUser(creatingWpUser) } returns creatingWpUser
         
         // Act
-        multiWordpressUserService.syncToAll(listOf(account))
+        multiWordpressUserService.sync(listOf(account))
         
         // Assert
         verify { mainService.getUser("testuser") }
@@ -61,7 +61,7 @@ class MultiWordpressUserServiceTest {
     }
     
     @Test
-    fun `syncToAll should handle exceptions per instance`() {
+    fun `sync() should handle exceptions per instance`() {
         // Arrange
         every { mainService.getUser("testuser") } throws RuntimeException("API error")
         every { secondaryService.getUser("testuser") } returns null
@@ -69,7 +69,7 @@ class MultiWordpressUserServiceTest {
         every { secondaryService.createUser(any()) } returns mockk()
         
         // Act - this should not throw even though one service fails
-        multiWordpressUserService.syncToAll(listOf(account))
+        multiWordpressUserService.sync(listOf(account))
         
         // Assert
         verify { mainService.getUser("testuser") }
@@ -79,13 +79,13 @@ class MultiWordpressUserServiceTest {
     }
     
     @Test
-    fun `deleteFromAll should delete user from all WordPress instances`() {
+    fun `delete() should delete user from all WordPress instances`() {
         // Arrange
         every { mainService.deleteUser("testuser") } returns Unit
         every { secondaryService.deleteUser("testuser") } returns Unit
         
         // Act
-        multiWordpressUserService.deleteFromAll(account)
+        multiWordpressUserService.delete(account)
         
         // Assert
         verify { mainService.deleteUser("testuser") }
@@ -93,13 +93,13 @@ class MultiWordpressUserServiceTest {
     }
     
     @Test
-    fun `deleteFromAll should handle exceptions per instance`() {
+    fun `delete() should handle exceptions per instance`() {
         // Arrange
         every { mainService.deleteUser("testuser") } throws RuntimeException("API error")
         every { secondaryService.deleteUser("testuser") } returns Unit
         
         // Act - this should not throw even though one service fails
-        multiWordpressUserService.deleteFromAll(account)
+        multiWordpressUserService.delete(account)
         
         // Assert
         verify { mainService.deleteUser("testuser") }

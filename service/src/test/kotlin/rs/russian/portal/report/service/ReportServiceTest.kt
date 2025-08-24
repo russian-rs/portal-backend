@@ -6,14 +6,14 @@ import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
 import rs.russian.generated.model.ReportFilter
+import rs.russian.portal.config.DefaultUserFilter
 import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.Task
-import rs.russian.portal.user.service.AccountService
-import rs.russian.portal.config.DefaultUserFilter
-import org.springframework.security.core.context.SecurityContextHolder
 import rs.russian.portal.report.domain.enums.ReportStatus
+import rs.russian.portal.user.service.AccountService
 import java.time.LocalDate
 
 @SpringBootTest
@@ -41,23 +41,27 @@ class ReportServiceTest {
             ?: throw IllegalStateException("Default user not created")
         accountLogin = account.username
 
-        accountService.setProgram(account, "IT")
+        accountService.setProgram(account.id!!, "IT")
 
         val report = Report(account = account, status = ReportStatus.CREATED)
-        report.tasks.add(Task(
-            date = LocalDate.now(),
-            name = "Test task 1",
-            description = "First",
-            timeSpent = 10,
-            report = report
-        ))
-        report.tasks.add(Task(
-            date = LocalDate.now(),
-            name = "Test task 2",
-            description = "Second",
-            timeSpent = 20,
-            report = report
-        ))
+        report.tasks.add(
+            Task(
+                date = LocalDate.now(),
+                name = "Test task 1",
+                description = "First",
+                timeSpent = 10,
+                report = report
+            )
+        )
+        report.tasks.add(
+            Task(
+                date = LocalDate.now(),
+                name = "Test task 2",
+                description = "Second",
+                timeSpent = 20,
+                report = report
+            )
+        )
         reportService.save(report)
     }
 

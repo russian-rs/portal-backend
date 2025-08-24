@@ -3,6 +3,7 @@ package rs.russian.portal.report.domain
 import jakarta.persistence.*
 import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.EnumType.STRING
+import jakarta.persistence.FetchType.LAZY
 import org.hibernate.annotations.SQLRestriction
 import rs.russian.portal.note.domain.Note
 import rs.russian.portal.report.domain.enums.ReportStatus
@@ -20,17 +21,23 @@ import java.util.*
     name = Report.GRAPH_FULL,
     attributeNodes = [
         NamedAttributeNode("tasks", subgraph = Task.GRAPH_FULL),
-        NamedAttributeNode("account", subgraph = Account.GRAPH_FULL),
+        NamedAttributeNode("account", subgraph = Account.GRAPH_USERNAME),
         NamedAttributeNode("notes")],
     subgraphs = [
-        NamedSubgraph(name = Account.GRAPH_FULL, attributeNodes = [NamedAttributeNode("info")]),
+        NamedSubgraph(
+            name = Account.GRAPH_USERNAME,
+            attributeNodes = [NamedAttributeNode("username")]
+        ),
         NamedSubgraph(
             name = Task.GRAPH_FULL,
-            attributeNodes = [NamedAttributeNode("customer"), NamedAttributeNode("files")]
+            attributeNodes = [
+                NamedAttributeNode("customer"),
+                NamedAttributeNode("files")
+            ]
         )
     ]
 )
-data class Report(
+class Report(
     @Id
     override var id: UUID? = UUID.randomUUID(),
     override var version: LocalDateTime? = null,
@@ -43,7 +50,7 @@ data class Report(
     @OneToMany(mappedBy = "report", cascade = [ALL], orphanRemoval = true)
     var tasks: MutableSet<Task> = mutableSetOf(),
 
-    @ManyToOne
+    @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_login", referencedColumnName = "username")
     var account: Account,
 
@@ -58,6 +65,6 @@ data class Report(
     override fun equalityProperties() = setOf(Report::id, Report::status, Report::deleted)
 
     companion object {
-        const val GRAPH_FULL = "TasksAccountNotes"
+        const val GRAPH_FULL = "Report.Full"
     }
 }

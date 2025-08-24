@@ -1,12 +1,15 @@
 package rs.russian.portal.program.domain
 
-import jakarta.persistence.*
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.Id
+import jakarta.persistence.Table
 
 @Entity
 @Table(name = "project")
-data class Project(
+class Project(
     @Id
-    @Column(nullable = false, unique = true, name = "code")
+    @Column(name = "code", nullable = false, unique = true)
     val code: String,
 
     @Column(name = "name_ru", nullable = false)
@@ -16,13 +19,5 @@ data class Project(
     val nameEn: String,
 
     @Column(name = "name_sr", nullable = false)
-    val nameSr: String,
-
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-        name = "project_statistic_group",
-        joinColumns = [JoinColumn(name = "project_code")],
-        inverseJoinColumns = [JoinColumn(name = "statistic_group_code")]
-    )
-    val statisticGroups: Set<StatisticGroup> = emptySet()
+    val nameSr: String
 )

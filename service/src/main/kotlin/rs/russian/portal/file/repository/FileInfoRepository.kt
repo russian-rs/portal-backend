@@ -7,5 +7,5 @@ import rs.russian.portal.file.domain.FileInfo
 @Repository
 interface FileInfoRepository : JpaRepository<FileInfo, String> {
 
-    fun findAllByIdIn(ids: Set<String>): Set<FileInfo>
+    fun findAllByIdIn(ids: Set<String>): MutableSet<FileInfo>
 }

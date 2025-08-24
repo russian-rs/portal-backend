@@ -1,17 +1,15 @@
 package rs.russian.portal.report.service
 
+import jakarta.persistence.EntityManager
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import rs.russian.generated.model.FinalUsersStatistics
 import rs.russian.generated.model.NoteDto
-import rs.russian.generated.model.ProgramStatistics
 import rs.russian.generated.model.ReportDto
 import rs.russian.generated.model.ReportFilter
-import rs.russian.generated.model.StatisticData
-import rs.russian.generated.model.Statistics
-import rs.russian.generated.model.VolunteerStatistics
 import rs.russian.portal.file.service.FileService
 import rs.russian.portal.note.domain.Note
 import rs.russian.portal.note.domain.enums.EntityType
@@ -23,10 +21,7 @@ import rs.russian.portal.report.mapper.ReportMapper
 import rs.russian.portal.report.repository.ReportRepository
 import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.security.currentUserLogin
-import rs.russian.portal.user.domain.enums.Gender
 import rs.russian.portal.user.service.AccountService
-import java.time.OffsetDateTime
-import java.time.ZoneOffset
 import java.util.*
 
 @Service
@@ -35,7 +30,8 @@ class ReportService(
     private val fileService: FileService,
     private val reportMapper: ReportMapper,
     private val noteService: NoteService,
-    private val reportRepository: ReportRepository
+    private val reportRepository: ReportRepository,
+    private val entityManager: EntityManager,
 ) {
 
     @Transactional(readOnly = true)
@@ -49,7 +45,7 @@ class ReportService(
         val tasks = reportDto.tasks.map { taskDto ->
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
-                task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toSet())
+                task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toMutableSet())
             }
         }
         return reportRepository.save(report.also { it.tasks = tasks.toMutableSet() })
@@ -77,7 +73,7 @@ class ReportService(
 
     @Transactional(readOnly = true)
     fun getReports(reportFilter: ReportFilter, pageable: Pageable): Page<Report> {
-        return reportRepository.findAll(from(reportFilter), pageable)
+        return findAllFull(from(reportFilter), pageable)
     }
 
     @Transactional
@@ -91,7 +87,7 @@ class ReportService(
         val currentAccount = accountService.getAccountByLogin(currentUserLogin() ?: throw NotAuthorizedException())
         val note = noteService.save(
             Note(
-                createdBy = currentAccount,
+                createdBy = currentAccount.username,
                 entityId = reportId,
                 entityType = EntityType.REPORT,
                 text = noteDto.text
@@ -108,7 +104,7 @@ class ReportService(
             val currentAccount = accountService.getAccountByLogin(currentUserLogin() ?: throw NotAuthorizedException())
             val note = noteService.save(
                 Note(
-                    createdBy = currentAccount,
+                    createdBy = currentAccount.username,
                     entityId = reportId,
                     entityType = EntityType.REPORT,
                     text = noteText
@@ -119,82 +115,18 @@ class ReportService(
         report.status = status
     }
 
-//    @Transactional(readOnly = true)
-//    fun getStatistics(year: Int) = Statistics().apply {
-//            programStatistics = getProgramStat(year)
-//            volunteerStatistics = getVolunteerStat()
-//            finalUsersStatistics = getFinalUsersStat()
-//            this.year = year
-//        }
-
-//    private fun getProgramStat(year: Int): ProgramStatistics {
-//        val start = OffsetDateTime.of(year, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC)
-//        val end = start.plusYears(1).minusNanos(1)
-//
-//        val raw = reportRepository.fetchProgramStatsByGroup(start, end)
-//            .associateBy({ it.groupName }, { it })
-//
-//        fun getData(key: StatisticGroup?) = raw[key]
-//            ?.let { StatisticData(it.count.toInt(), it.totalTimeSpent) }
-//            ?: StatisticData(0, 0.0)
-//
-//        val other = getData(null)
-//
-//        return ProgramStatistics().apply {
-//            socialSecurity = getData(StatisticGroup.SOCIJALNA_ZASTITA)
-//            media = getData(StatisticGroup.MEDIJI_I_KOMUNIKACIJE)
-//            culture = getData(StatisticGroup.KULTURNA_DOBA)
-//            publicAreas = getData(StatisticGroup.JAVNE_POVRSINE)
-//            environment = getData(StatisticGroup.ZIVOTNA_SREDINA)
-//            this.other = other
-//
-//            val totalCount = raw.values.sumOf { it.count }
-//            val totalTime = raw.values.sumOf { it.totalTimeSpent }
-//            total = StatisticData(totalCount.toInt(), totalTime)
-//        }
-//    }
-
-    private fun getVolunteerStat(): VolunteerStatistics {
-        val ageSlices = accountService.getAgeSliceStatistics()
-        val genderSlices = accountService.getGenderStatistics()
-        val totalUsers = accountService.getTotalUserCount()
-
-        return VolunteerStatistics().apply {
-            maleCount = genderSlices.get(Gender.MALE)
-            femaleCount = genderSlices.get(Gender.FEMALE)
-            age15to18Count = ageSlices.age15to18Count
-            age18to30Count = ageSlices.age18to30Count
-            age30to40Count = ageSlices.age30to40Count
-            age40to65Count = ageSlices.age40to65Count
-            age65AndAboveCount = ageSlices.age65AndAboveCount
-            //TODO(Add citizenship)
-            citizensCount = 0
-            foreignersCount = totalUsers
-        }
+    /**
+     * Получить список отчетов с использованием EntityGraph
+     * Решает проблему, при которой невозможно одновременная работа Pageable и EntityGraph:
+     * HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+     * entityManager.detach(...) - необходим потому что findAll загружает "легковесные" объекты и
+     * сохраняет их в контекст, а findAllByIdIn уже загрузит полные объекты, однако если не очистить
+     * контекст, то они не будут перезаписаны в контексте, что повлечет дополнительные SQL запросы
+     */
+    private fun findAllFull(specification: Specification<Report>, pageable: Pageable): Page<Report> {
+        val reports = reportRepository.findAll(specification, pageable)
+        reports.forEach { report -> entityManager.detach(report) }
+        val reportsFull = reportRepository.findAllByIdIn(reports.mapNotNull { it.id }, pageable.sort)
+        return PageImpl(reportsFull, reports.pageable, reports.totalElements)
     }
-
-//    private fun getFinalUsersStat(): FinalUsersStatistics {
-//        val usersByStatGroup = accountService.getCountByStatisticGroup()
-//        val totalUsers = accountService.getTotalUserCount()
-//
-//        val culturalAssetsCount = usersByStatGroup
-//            .filter { it.groupName == StatisticGroup.KULTURNA_DOBA }
-//            .sumOf { it.userCount }
-//        val naturalAssetsCount = usersByStatGroup
-//            .filter { it.groupName == StatisticGroup.ZIVOTNA_SREDINA }
-//            .sumOf { it.userCount }
-//        val publicAreasCount = usersByStatGroup
-//            .filter { it.groupName == StatisticGroup.JAVNE_POVRSINE }
-//            .sumOf { it.userCount }
-//
-//        val other = totalUsers - (culturalAssetsCount + naturalAssetsCount + publicAreasCount)
-//
-//        return FinalUsersStatistics().apply {
-//            this.culturalAssetsCount = culturalAssetsCount
-//            this.naturalAssetsCount = naturalAssetsCount
-//            this.publicAreasCount = publicAreasCount
-//            otherCount = other
-//            totalCount = totalUsers
-//        }
-//    }
 }

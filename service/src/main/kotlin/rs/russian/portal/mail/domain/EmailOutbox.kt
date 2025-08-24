@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Entity
-data class EmailOutbox(
+class EmailOutbox(
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     override var id: UUID? = UUID.randomUUID(),
@@ -28,5 +28,5 @@ data class EmailOutbox(
 
 ) : JpaEntity<UUID>() {
 
-    override fun equalityProperties() = setOf(EmailOutbox::id, EmailOutbox::status, EmailOutbox::properties)
+    override fun equalityProperties() = setOf(EmailOutbox::id)
 }

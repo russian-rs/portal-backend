@@ -23,4 +23,7 @@ project(":authentik-api").projectDir = file("api/authentik-api")
 include(":wordpress-api")
 project(":wordpress-api").projectDir = file("api/wordpress-api")
 
+include(":outline-api")
+project(":outline-api").projectDir = file("api/outline-api")
+
 include(":service")

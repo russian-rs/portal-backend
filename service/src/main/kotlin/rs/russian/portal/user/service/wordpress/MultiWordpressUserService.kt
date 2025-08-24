@@ -5,18 +5,19 @@ import org.springframework.stereotype.Service
 import org.wordpress.model.WpUser
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.mapper.WordpressUserMapper
+import rs.russian.portal.user.service.AccountSynchroniser
 
 @Service
 class MultiWordpressUserService(
     private val wordpressUserServices: Map<String, WordpressUserService>,
     private val wordpressUserMapper: WordpressUserMapper
-) {
-    fun syncToAll(account: List<Account>) {
+): AccountSynchroniser {
+   override fun sync(accounts: List<Account>) {
         wordpressUserServices.forEach { (_, service) ->
             try {
                 val existingRoles = service.getAvailableRoles().map { it.slug }
-                val count = account.map { createOrUpdateWpUser(service, it, existingRoles) }.count { it }
-                log.info("Successfully synced $count of ${account.size} users to WordPress instance ${service.instanceName}")
+                val count = accounts.map { createOrUpdateWpUser(service, it, existingRoles) }.count { it }
+                log.info("Successfully synced $count of ${accounts.size} users to WordPress instance ${service.instanceName}")
             } catch (ex: Exception) {
                 log.error("Failed to sync users to WordPress instance ${service.instanceName}, skipping instance", ex)
             }
@@ -47,7 +48,7 @@ class MultiWordpressUserService(
         .roles
         .retainAll(existingRoles)
 
-    fun deleteFromAll(account: Account) {
+    override fun delete(account: Account) {
         wordpressUserServices.forEach { (name, service) ->
             try {
                 service.deleteUser(account.username)

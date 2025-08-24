@@ -36,3 +36,9 @@ data class WordpressInstance(
     val username: String,
     val password: String
 )
+
+@ConfigurationProperties(prefix = "app.outline")
+data class OutlineProperties(
+    val apiKey: String,
+    val baseUrl: String
+)
