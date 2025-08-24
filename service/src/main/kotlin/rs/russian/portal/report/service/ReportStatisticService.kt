@@ -10,6 +10,9 @@ import rs.russian.generated.model.Statistics
 import rs.russian.generated.model.VolunteerStatistics
 import rs.russian.portal.report.repository.ReportRepository
 import rs.russian.portal.user.domain.enums.Gender
+import rs.russian.portal.user.repository.AccountRepository
+import rs.russian.portal.user.repository.projections.AgeSliceCountProjection
+import rs.russian.portal.user.repository.projections.UsersStatisticGroupCountProjection
 import rs.russian.portal.user.service.AccountService
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -18,7 +21,7 @@ import java.time.ZoneOffset
 @Service
 class ReportStatisticService(
     private val reportRepository: ReportRepository,
-    private val accountService: AccountService
+    private val accountRepository: AccountRepository
 ) {
 
     @Transactional(readOnly = true)
@@ -30,9 +33,9 @@ class ReportStatisticService(
     }
 
     private fun getVolunteerStat(): VolunteerStatistics {
-        val ageSlices = accountService.getAgeSliceStatistics()
-        val genderSlices = accountService.getGenderStatistics()
-        val totalUsers = accountService.getTotalUserCount()
+        val ageSlices = getAgeSliceStatistics()
+        val genderSlices = getGenderStatistics()
+        val totalUsers = getTotalUserCount()
 
         return VolunteerStatistics().apply {
             maleCount = genderSlices.get(Gender.MALE)
@@ -49,8 +52,8 @@ class ReportStatisticService(
     }
 
     private fun getFinalUsersStat(): FinalUsersStatistics {
-        val usersByStatGroup = accountService.getCountByStatisticGroup()
-        val totalUsers = accountService.getTotalUserCount()
+        val usersByStatGroup = getCountByStatisticGroup()
+        val totalUsers = getTotalUserCount()
 
         val culturalAssetsCount = usersByStatGroup
             .filter { it.groupCode == "KULTURNA_DOBA" }
@@ -92,5 +95,21 @@ class ReportStatisticService(
         )
 
         return ProgramStatistics(items = items as MutableList<ProgramStatItem>, total = total)
+    }
+
+    fun getGenderStatistics(): Map<Gender?, Int> {
+        return accountRepository.countByGender().associate { it.gender to it.count }
+    }
+
+    fun getAgeSliceStatistics(): AgeSliceCountProjection {
+        return accountRepository.countByAgeSlices()
+    }
+
+    fun getTotalUserCount(): Int {
+        return accountRepository.count().toInt()
+    }
+
+    fun getCountByStatisticGroup(): List<UsersStatisticGroupCountProjection> {
+        return accountRepository.countByStatisticGroup()
     }
 }
