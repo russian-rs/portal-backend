@@ -13,7 +13,6 @@ import rs.russian.portal.user.domain.enums.Gender
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.repository.projections.AgeSliceCountProjection
 import rs.russian.portal.user.repository.projections.UsersStatisticGroupCountProjection
-import rs.russian.portal.user.service.AccountService
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
