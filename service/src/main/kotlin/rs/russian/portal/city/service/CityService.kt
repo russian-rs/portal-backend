@@ -21,8 +21,13 @@ class CityService(
         return cityMapper.toDtoList(cities)
     }
 
-    fun getCityByName(name: String): CityDto? {
-        val city = cityRepository.findByNameIgnoreCase(name)
+    fun findCityByName(searchTerm: String): CityDto? {
+        val city = cityRepository.findByNameOrNameCyrillic(searchTerm)
+        return city?.let { cityMapper.toDto(it) }
+    }
+
+    fun findCityByCode(code: String): CityDto? {
+        val city = cityRepository.findById(code).orElse(null)
         return city?.let { cityMapper.toDto(it) }
     }
 }
