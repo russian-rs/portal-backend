@@ -785,9 +785,33 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /cities/{code}:
+    get:
+      operationId: findCityByCode
+      tags:
+        - dictionary
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+          description: City code (e.g., 'belgrade', 'novi-sad')
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CityDto'
+        '404':
+          description: City not found
+        '500':
+          $ref: '#/components/responses/ServerError'
+
   /cities/search:
     get:
-      operationId: searchCity
+      operationId: findCityByName
       tags:
         - dictionary
       parameters:
@@ -796,7 +820,7 @@ paths:
           required: true
           schema:
             type: string
-          description: City name to search
+          description: City name to search (supports both Latin and Cyrillic, e.g., 'Beograd', 'Белград')
       responses:
         '200':
           description: Success
@@ -804,6 +828,8 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CityDto'
+        '404':
+          description: City not found
         '500':
           $ref: '#/components/responses/ServerError'
 

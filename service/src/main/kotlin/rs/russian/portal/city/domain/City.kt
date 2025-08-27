@@ -1,5 +1,6 @@
 package rs.russian.portal.city.domain
 
+import jakarta.persistence.AttributeOverride
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
@@ -10,6 +11,7 @@ import java.util.UUID
 
 @Entity
 @Table(name = "city")
+@AttributeOverride(name = "id", column = Column(name = "code"))
 class City(
     @Id
     @Column(name = "code")

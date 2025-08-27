@@ -12,4 +12,7 @@ interface CityRepository : JpaRepository<City, String> {
     fun findAllActive(): List<City>
 
     fun findByNameIgnoreCase(name: String): City?
+    
+    @Query("SELECT c FROM City c WHERE LOWER(c.name) = LOWER(:searchTerm) OR LOWER(c.nameCyrillic) = LOWER(:searchTerm)")
+    fun findByNameOrNameCyrillic(searchTerm: String): City?
 }

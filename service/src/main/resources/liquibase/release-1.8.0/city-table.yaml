@@ -40,3 +40,4 @@ databaseChangeLog:
                     nullable: false
                   name: version
                   type: DATETIME
+                  defaultValueComputed: CURRENT_TIMESTAMP
