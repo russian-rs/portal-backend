@@ -92,6 +92,7 @@ abstract class UserMapper {
     @Mapping(target = "program", ignore = true)
     @Mapping(target = "project", ignore = true)
     @Mapping(target = "city", nullValuePropertyMappingStrategy = IGNORE)
+    @Mapping(target = "postalCode", nullValuePropertyMappingStrategy = IGNORE)
     @Mapping(target = "address", nullValuePropertyMappingStrategy = IGNORE)
     @Mapping(target = "birthDate", nullValuePropertyMappingStrategy = IGNORE)
     @Mapping(target = "telegram", nullValuePropertyMappingStrategy = IGNORE)

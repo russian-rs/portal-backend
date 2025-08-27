@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.8.0-city-data
+      author: alexey
+      changes:
+        - loadData:
+            tableName: city
+            file: liquibase/release-1.8.0/city-data.csv
+            separator: ","
+            encoding: UTF-8
+            columns:
+              - column: {name: code, type: STRING}
+              - column: {name: name, type: STRING}
+              - column: {name: name_cyrillic, type: STRING}
+              - column: {name: has_mup, type: BOOLEAN}
+              - column: {name: active, type: BOOLEAN}
+              - column: {name: version, type: COMPUTED}
