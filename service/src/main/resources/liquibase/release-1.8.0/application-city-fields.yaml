@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.8.0-application-city-fields
+      author: alexey
+      changes:
+        - addColumn:
+            tableName: application
+            columns:
+              - column:
+                  name: city
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: postal_code
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: true

@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.8.0-city-table
+      author: alexey
+      changes:
+        - createTable:
+            tableName: city
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_city
+                  name: code
+                  type: VARCHAR(50)
+              - column:
+                  name: name
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name_cyrillic
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: has_mup
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+              - column:
+                  constraints:
+                    nullable: false
+                  name: version
+                  type: DATETIME
