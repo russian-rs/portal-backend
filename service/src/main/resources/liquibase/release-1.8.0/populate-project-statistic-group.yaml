@@ -1,0 +1,113 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.8.3-populate-project-statistic-group
+      author: Valerii Linden
+      runOnChange: true
+      changes:
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: LAWS }
+              - column: { name: statistic_group_code, value: SOCIJALNA_ZASTITA }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: SMM }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: DESIGN }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: WEB_FIGMA }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: SOCIAL_MEDIA_DESIGN }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: MATERIAL_STYLE }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: STICKERS }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: GUIDE_ILLUSTRATIONS }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: BOOK_MURALS }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: VIDEO_EDITING }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: PHOTO }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: GUIDEBOOK }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: TRAINING }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: COURSE_UPLOAD }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: PSYCHOLOGISTS }
+              - column: { name: statistic_group_code, value: MEDIJI_I_KOMUNIKACIJE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: BOOK }
+              - column: { name: statistic_group_code, value: KULTURNA_DOBA }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: MONITORING }
+              - column: { name: statistic_group_code, value: JAVNE_POVRSINE }
+
+        - insert:
+            tableName: project_statistic_group
+            columns:
+              - column: { name: project_code, value: CLEAN_CITY }
+              - column: { name: statistic_group_code, value: ZIVOTNA_SREDINA }

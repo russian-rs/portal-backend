@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/release-1.8.0/create-statistic-group.yaml
+  - include:
+      file: liquibase/release-1.8.0/populate-statistic-group.yaml
+  - include:
+      file: liquibase/release-1.8.0/create-project-statistic-group.yaml
+  - include:
+      file: liquibase/release-1.8.0/populate-project-statistic-group.yaml
