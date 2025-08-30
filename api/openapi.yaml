@@ -741,7 +741,6 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-
   /projects:
     get:
       operationId: getProjects
@@ -760,6 +759,29 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /statistics/{year}:
+    get:
+      operationId: getStatistics
+      tags:
+        - statistics
+      parameters:
+        - name: year
+          in: path
+          description: Год для получения статистики для мин. труд
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Статистика для мин. труд по группам за год
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Statistics'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+
 components:
   responses:
     ServerError:
@@ -769,6 +791,87 @@ components:
           schema:
             $ref: '#/components/schemas/ErrorResponse'
   schemas:
+    VolunteerStatistics:
+      description: Информация о волонтерах
+      type: object
+      properties:
+        femaleCount:
+          type: integer
+        maleCount:
+          type: integer
+        age15to18Count:
+          type: integer
+        age18to30Count:
+          type: integer
+        age30to40Count:
+          type: integer
+        age40to65Count:
+          type: integer
+        age65AndAboveCount:
+          type: integer
+        citizensCount:
+          type: integer
+        foreignersCount:
+          type: integer
+    StatisticData:
+      type: object
+      properties:
+        count:
+          type: integer
+          nullable: true
+          description: количество волонтеров в группе
+        totalTimeSpent:
+          type: number
+          format: double
+          nullable: true
+          description: общее время, затраченное в часах всеми волонтерами в группе
+    ProgramStatItem:
+      type: object
+      required: [code, data]
+      properties:
+        code:
+          type: string
+          nullable: true
+          description: Код статистической программы; null = «прочее»
+        data:
+          $ref: '#/components/schemas/StatisticData'
+    ProgramStatistics:
+      type: object
+      required: [items, total]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProgramStatItem'
+        total:
+          $ref: '#/components/schemas/StatisticData'
+      description: Универсальная сводка по программам
+    FinalUsersStatistics:
+      description: Данные о конечных пользователях волонтерской деятельности
+      type: object
+      properties:
+        culturalAssetsCount:
+          type: integer
+        naturalAssetsCount:
+          type: integer
+        publicAreasCount:
+          type: integer
+        otherCount:
+          type: integer
+        totalCount:
+          type: integer
+    Statistics:
+      type: object
+      properties:
+        year:
+          type: integer
+          description: Отчетный год
+        programStatistics:
+          $ref: '#/components/schemas/ProgramStatistics'
+        volunteerStatistics:
+          $ref: '#/components/schemas/VolunteerStatistics'
+        finalUsersStatistics:
+          $ref: '#/components/schemas/FinalUsersStatistics'
     PageRequest:
       type: object
       description: Paging object
@@ -812,14 +915,19 @@ components:
           format: int64
     ErrorResponse:
       type: object
-      description: Common object for error responses
+      description: Общий объект для сообщений об ошибках
       required:
         - message
       properties:
         message:
           type: string
-          description: Error description
+          description: Описание ошибки
           nullable: false
+    GenderEnumDto:
+      type: string
+      enum:
+        - MALE
+        - FEMALE
     UserCreateRequest:
       type: object
       required:
@@ -838,7 +946,7 @@ components:
           $ref: '#/components/schemas/ContractDto'
     UserInfoDto:
       type: object
-      description: User additional info
+      description: Дополнительная информация о пользователе
       required:
         - id
         - username
@@ -884,6 +992,8 @@ components:
         active:
           type: boolean
           nullable: false
+        gender:
+          $ref: '#/components/schemas/GenderEnumDto'
         contracts:
           type: array
           default: [ ]
@@ -891,7 +1001,7 @@ components:
             $ref: '#/components/schemas/ContractDto'
     UserInfoUpdateRequest:
       type: object
-      description: update user info
+      description: обновить информацию о пользователе
       properties:
         city:
           type: string
@@ -904,6 +1014,8 @@ components:
           type: string
         phone:
           type: string
+        gender:
+          $ref: '#/components/schemas/GenderEnumDto'
       additionalProperties: false
     UserPageResponse:
       type: object
@@ -1014,7 +1126,7 @@ components:
         date:
           type: string
           format: date
-          description: When task was completed
+          description: Когда задача была выполнена
         name:
           type: string
         description:
