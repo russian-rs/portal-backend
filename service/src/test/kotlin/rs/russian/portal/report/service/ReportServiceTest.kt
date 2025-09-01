@@ -1,9 +1,11 @@
 package rs.russian.portal.report.service
 
+import io.zonky.test.db.AutoConfigureEmbeddedDatabase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.core.context.SecurityContextHolder
@@ -17,6 +19,8 @@ import rs.russian.portal.user.service.AccountService
 import java.time.LocalDate
 
 @SpringBootTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@AutoConfigureEmbeddedDatabase
 @ActiveProfiles("local", "no-auth", "test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ReportServiceTest {
