@@ -1,9 +1,0 @@
-databaseChangeLog:
-  - include:
-      file: liquibase/release-1.8.0/city-table.yaml
-  - include:
-      file: liquibase/release-1.8.0/user-info-postal-code.yaml
-  - include:
-      file: liquibase/release-1.8.0/application-city-fields.yaml
-  - include:
-      file: liquibase/release-1.8.0/city-data.yaml
