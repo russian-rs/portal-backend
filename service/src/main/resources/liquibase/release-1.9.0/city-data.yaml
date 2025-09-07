@@ -5,7 +5,7 @@ databaseChangeLog:
       changes:
         - loadData:
             tableName: city
-            file: liquibase/release-1.8.0/city-data.csv
+            file: liquibase/release-1.9.0/city-data.csv
             separator: ","
             encoding: UTF-8
             columns:
