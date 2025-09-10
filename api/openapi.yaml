@@ -764,15 +764,7 @@ paths:
     get:
       operationId: getCities
       tags:
-        - dictionary
-      parameters:
-        - name: onlyWithMup
-          in: query
-          required: false
-          schema:
-            type: boolean
-            default: false
-          description: Return only cities with MUP offices
+        - cities
       responses:
         '200':
           description: Success
@@ -789,7 +781,7 @@ paths:
     get:
       operationId: findCityByCode
       tags:
-        - dictionary
+        - cities
       parameters:
         - name: code
           in: path
@@ -813,7 +805,7 @@ paths:
     get:
       operationId: findCityByName
       tags:
-        - dictionary
+        - cities
       parameters:
         - name: name
           in: query
@@ -827,9 +819,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CityDto'
-        '404':
-          description: City not found
+                type: array
+                items:
+                  $ref: '#/components/schemas/CityDto'
         '500':
           $ref: '#/components/responses/ServerError'
 

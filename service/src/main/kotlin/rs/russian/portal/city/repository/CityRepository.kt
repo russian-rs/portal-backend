@@ -11,6 +11,6 @@ interface CityRepository : JpaRepository<City, String> {
     @Query("SELECT c FROM City c WHERE c.active = true ORDER BY c.name")
     fun findAllActive(): List<City>
     
-    @Query("SELECT c FROM City c WHERE LOWER(c.name) = LOWER(:searchTerm) OR LOWER(c.nameCyrillic) = LOWER(:searchTerm)")
-    fun findByNameOrNameCyrillic(searchTerm: String): City?
+    @Query("SELECT c FROM City c WHERE c.active = true AND (LOWER(c.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR LOWER(c.nameCyrillic) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) ORDER BY c.name")
+    fun findByNameOrNameCyrillic(searchTerm: String): List<City>
 }
