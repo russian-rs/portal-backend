@@ -1,42 +1,25 @@
 package rs.russian.portal.city.controller
 
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import rs.russian.portal.city.dto.CityDto
 import rs.russian.portal.city.service.CityService
+import rs.russian.generated.api.CitiesApi
+import rs.russian.generated.model.CityDto
 
 @RestController
-@RequestMapping("/api/cities")
 class CityController(
     private val cityService: CityService
-) {
+) : CitiesApi {
 
-    @GetMapping
-    fun getAllCities(): List<CityDto> {
-        return cityService.getAllActiveCities()
+    override fun getCities(): ResponseEntity<List<CityDto>> {
+        return ResponseEntity.ok(cityService.getAllActiveCities())
     }
 
-    @GetMapping("/{code}")
-    fun findCityByCode(@PathVariable code: String): ResponseEntity<CityDto> {
-        val city = cityService.findCityByCode(code)
-        return if (city != null) {
-            ResponseEntity.ok(city)
-        } else {
-            ResponseEntity.notFound().build()
-        }
+    override fun findCityByCode(code: String): ResponseEntity<CityDto> {
+        return ResponseEntity.ok(cityService.findCityByCode(code))
     }
 
-    @GetMapping("/search")
-    fun findCityByName(@RequestParam name: String): ResponseEntity<CityDto> {
-        val city = cityService.findCityByName(name)
-        return if (city != null) {
-            ResponseEntity.ok(city)
-        } else {
-            ResponseEntity.notFound().build()
-        }
+    override fun findCityByName(name: String): ResponseEntity<List<CityDto>> {
+        return ResponseEntity.ok(cityService.findCitiesByName(name))
     }
 }

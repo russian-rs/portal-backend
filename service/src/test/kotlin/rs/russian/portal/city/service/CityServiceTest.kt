@@ -3,14 +3,15 @@ package rs.russian.portal.city.service
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import jakarta.persistence.EntityNotFoundException
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import rs.russian.portal.city.domain.City
-import rs.russian.portal.city.dto.CityDto
 import rs.russian.portal.city.mapper.CityMapper
 import rs.russian.portal.city.repository.CityRepository
-import java.time.LocalDateTime
+import rs.russian.generated.model.CityDto
+import java.util.Optional
 
 class CityServiceTest {
 
@@ -29,20 +30,18 @@ class CityServiceTest {
     fun `getAllActiveCities should return mapped list of active cities`() {
         val cities = listOf(
             City(
-                id = "belgrade",
+                code = "belgrade",
                 name = "Beograd",
                 nameCyrillic = "Белград",
                 hasMup = true,
-                active = true,
-                version = LocalDateTime.now()
+                active = true
             ),
             City(
-                id = "novi-sad",
+                code = "novi-sad",
                 name = "Novi Sad",
                 nameCyrillic = "Нови Сад",
                 hasMup = true,
-                active = true,
-                version = LocalDateTime.now()
+                active = true
             )
         )
         
@@ -78,6 +77,7 @@ class CityServiceTest {
         verify(exactly = 1) { cityMapper.toDtoList(cities) }
     }
 
+
     @Test
     fun `getAllActiveCities should return empty list when no active cities`() {
         every { cityRepository.findAllActive() } returns emptyList()
@@ -90,119 +90,59 @@ class CityServiceTest {
     }
 
     @Test
-    fun `findCityByName should return mapped city when found using Latin name`() {
-        val city = City(
-            id = "nis",
-            name = "Niš",
-            nameCyrillic = "Ниш",
-            hasMup = true,
-            active = true,
-            version = LocalDateTime.now()
+    fun `findCitiesByName should return mapped cities when found`() {
+        val cities = listOf(
+            City(
+                code = "nis",
+                name = "Niš",
+                nameCyrillic = "Ниш",
+                hasMup = true,
+                active = true
+            )
         )
         
-        val cityDto = CityDto(
-            code = "nis",
-            name = "Niš",
-            nameCyrillic = "Ниш",
-            hasMup = true
+        val cityDtos = listOf(
+            CityDto(
+                code = "nis",
+                name = "Niš",
+                nameCyrillic = "Ниш",
+                hasMup = true
+            )
         )
 
-        every { cityRepository.findByNameOrNameCyrillic("Niš") } returns city
-        every { cityMapper.toDto(city) } returns cityDto
+        every { cityRepository.findByNameOrNameCyrillic("Niš") } returns cities
+        every { cityMapper.toDtoList(cities) } returns cityDtos
 
-        val result = cityService.findCityByName("Niš")
+        val result = cityService.findCitiesByName("Niš")
 
-        assertNotNull(result)
-        assertEquals("nis", result?.code)
-        assertEquals("Niš", result?.name)
-        assertEquals("Ниш", result?.nameCyrillic)
+        assertEquals(1, result.size)
+        assertEquals("nis", result[0].code)
+        assertEquals("Niš", result[0].name)
+        assertEquals("Ниш", result[0].nameCyrillic)
 
         verify(exactly = 1) { cityRepository.findByNameOrNameCyrillic("Niš") }
-        verify(exactly = 1) { cityMapper.toDto(city) }
+        verify(exactly = 1) { cityMapper.toDtoList(cities) }
     }
 
     @Test
-    fun `findCityByName should return mapped city when found using Cyrillic name`() {
-        val city = City(
-            id = "belgrade",
-            name = "Beograd",
-            nameCyrillic = "Белград",
-            hasMup = true,
-            active = true,
-            version = LocalDateTime.now()
-        )
-        
-        val cityDto = CityDto(
-            code = "belgrade",
-            name = "Beograd",
-            nameCyrillic = "Белград",
-            hasMup = true
-        )
+    fun `findCitiesByName should return empty list when no cities found`() {
+        every { cityRepository.findByNameOrNameCyrillic("NonExistent") } returns emptyList()
+        every { cityMapper.toDtoList(emptyList()) } returns emptyList()
 
-        every { cityRepository.findByNameOrNameCyrillic("Белград") } returns city
-        every { cityMapper.toDto(city) } returns cityDto
+        val result = cityService.findCitiesByName("NonExistent")
 
-        val result = cityService.findCityByName("Белград")
-
-        assertNotNull(result)
-        assertEquals("belgrade", result?.code)
-        assertEquals("Beograd", result?.name)
-        assertEquals("Белград", result?.nameCyrillic)
-
-        verify(exactly = 1) { cityRepository.findByNameOrNameCyrillic("Белград") }
-        verify(exactly = 1) { cityMapper.toDto(city) }
-    }
-
-    @Test
-    fun `findCityByName should return null when city not found`() {
-        every { cityRepository.findByNameOrNameCyrillic("NonExistent") } returns null
-
-        val result = cityService.findCityByName("NonExistent")
-
-        assertNull(result)
+        assertTrue(result.isEmpty())
         verify(exactly = 1) { cityRepository.findByNameOrNameCyrillic("NonExistent") }
-        verify(exactly = 0) { cityMapper.toDto(any()) }
-    }
-
-    @Test
-    fun `findCityByName should handle case insensitive search`() {
-        val city = City(
-            id = "cacak",
-            name = "Čačak",
-            nameCyrillic = "Чачак",
-            hasMup = true,
-            active = true,
-            version = LocalDateTime.now()
-        )
-        
-        val cityDto = CityDto(
-            code = "cacak",
-            name = "Čačak",
-            nameCyrillic = "Чачак",
-            hasMup = true
-        )
-
-        every { cityRepository.findByNameOrNameCyrillic("ČAČAK") } returns city
-        every { cityMapper.toDto(city) } returns cityDto
-
-        val result = cityService.findCityByName("ČAČAK")
-
-        assertNotNull(result)
-        assertEquals("cacak", result?.code)
-        assertEquals("Čačak", result?.name)
-
-        verify(exactly = 1) { cityRepository.findByNameOrNameCyrillic("ČAČAK") }
     }
 
     @Test
     fun `findCityByCode should return mapped city when found`() {
         val city = City(
-            id = "belgrade",
+            code = "belgrade",
             name = "Beograd",
             nameCyrillic = "Белград",
             hasMup = true,
-            active = true,
-            version = LocalDateTime.now()
+            active = true
         )
         
         val cityDto = CityDto(
@@ -212,28 +152,29 @@ class CityServiceTest {
             hasMup = true
         )
 
-        every { cityRepository.findById("belgrade") } returns java.util.Optional.of(city)
+        every { cityRepository.findById("belgrade") } returns Optional.of(city)
         every { cityMapper.toDto(city) } returns cityDto
 
         val result = cityService.findCityByCode("belgrade")
 
-        assertNotNull(result)
-        assertEquals("belgrade", result?.code)
-        assertEquals("Beograd", result?.name)
-        assertEquals("Белград", result?.nameCyrillic)
+        assertEquals("belgrade", result.code)
+        assertEquals("Beograd", result.name)
+        assertEquals("Белград", result.nameCyrillic)
+        assertTrue(result.hasMup)
 
         verify(exactly = 1) { cityRepository.findById("belgrade") }
         verify(exactly = 1) { cityMapper.toDto(city) }
     }
 
     @Test
-    fun `findCityByCode should return null when city not found`() {
-        every { cityRepository.findById("non-existent") } returns java.util.Optional.empty()
+    fun `findCityByCode should throw EntityNotFoundException when city not found`() {
+        every { cityRepository.findById("non-existent") } returns Optional.empty()
 
-        val result = cityService.findCityByCode("non-existent")
+        val exception = assertThrows(EntityNotFoundException::class.java) {
+            cityService.findCityByCode("non-existent")
+        }
 
-        assertNull(result)
+        assertEquals("City with code 'non-existent' not found", exception.message)
         verify(exactly = 1) { cityRepository.findById("non-existent") }
-        verify(exactly = 0) { cityMapper.toDto(any()) }
     }
 }

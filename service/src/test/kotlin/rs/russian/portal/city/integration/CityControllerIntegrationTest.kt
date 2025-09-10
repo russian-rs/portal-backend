@@ -45,35 +45,35 @@ class CityControllerIntegrationTest {
         
         val testCities = listOf(
             City(
-                id = "belgrade",
+                code = "belgrade",
                 name = "Beograd",
                 nameCyrillic = "Белград",
                 hasMup = true,
                 active = true
             ),
             City(
-                id = "novi-sad",
+                code = "novi-sad",
                 name = "Novi Sad",
                 nameCyrillic = "Нови Сад",
                 hasMup = true,
                 active = true
             ),
             City(
-                id = "nis",
+                code = "nis",
                 name = "Niš",
                 nameCyrillic = "Ниш",
                 hasMup = false,
                 active = true
             ),
             City(
-                id = "cacak",
+                code = "cacak",
                 name = "Čačak",
                 nameCyrillic = "Чачак",
                 hasMup = true,
                 active = true
             ),
             City(
-                id = "inactive-city",
+                code = "inactive-city",
                 name = "Inactive City",
                 nameCyrillic = "Неактивни Град",
                 hasMup = false,
@@ -178,10 +178,11 @@ class CityControllerIntegrationTest {
         } Then {
             statusCode(200)
             contentType(ContentType.JSON)
-            body("code", equalTo("belgrade"))
-            body("name", equalTo("Beograd"))
-            body("nameCyrillic", equalTo("Белград"))
-            body("hasMup", equalTo(true))
+            body("size()", equalTo(1))
+            body("[0].code", equalTo("belgrade"))
+            body("[0].name", equalTo("Beograd"))
+            body("[0].nameCyrillic", equalTo("Белград"))
+            body("[0].hasMup", equalTo(true))
         }
     }
 
@@ -195,9 +196,10 @@ class CityControllerIntegrationTest {
         } Then {
             statusCode(200)
             contentType(ContentType.JSON)
-            body("code", equalTo("belgrade"))
-            body("name", equalTo("Beograd"))
-            body("nameCyrillic", equalTo("Белград"))
+            body("size()", equalTo(1))
+            body("[0].code", equalTo("belgrade"))
+            body("[0].name", equalTo("Beograd"))
+            body("[0].nameCyrillic", equalTo("Белград"))
         }
     }
 
@@ -210,8 +212,9 @@ class CityControllerIntegrationTest {
             get("/api/cities/search")
         } Then {
             statusCode(200)
-            body("code", equalTo("belgrade"))
-            body("name", equalTo("Beograd"))
+            body("size()", equalTo(1))
+            body("[0].code", equalTo("belgrade"))
+            body("[0].name", equalTo("Beograd"))
         }
     }
 
@@ -224,8 +227,9 @@ class CityControllerIntegrationTest {
             get("/api/cities/search")
         } Then {
             statusCode(200)
-            body("code", equalTo("belgrade"))
-            body("nameCyrillic", equalTo("Белград"))
+            body("size()", equalTo(1))
+            body("[0].code", equalTo("belgrade"))
+            body("[0].nameCyrillic", equalTo("Белград"))
         }
     }
 
@@ -238,26 +242,28 @@ class CityControllerIntegrationTest {
             get("/api/cities/search")
         } Then {
             statusCode(200)
-            body("code", equalTo("cacak"))
-            body("name", equalTo("Čačak"))
-            body("nameCyrillic", equalTo("Чачак"))
+            body("size()", equalTo(1))
+            body("[0].code", equalTo("cacak"))
+            body("[0].name", equalTo("Čačak"))
+            body("[0].nameCyrillic", equalTo("Чачак"))
         }
     }
 
     @Test
-    fun `GET search should return 404 when city not found`() {
+    fun `GET search should return empty array when city not found`() {
         Given {
             contentType(ContentType.JSON)
             queryParam("name", "NonExistent")
         } When {
             get("/api/cities/search")
         } Then {
-            statusCode(404)
+            statusCode(200)
+            body("size()", equalTo(0))
         }
     }
 
     @Test
-    fun `GET search should find inactive cities`() {
+    fun `GET search should not find inactive cities due to active filter`() {
         Given {
             contentType(ContentType.JSON)
             queryParam("name", "Inactive City")
@@ -265,8 +271,7 @@ class CityControllerIntegrationTest {
             get("/api/cities/search")
         } Then {
             statusCode(200)
-            body("code", equalTo("inactive-city"))
-            body("name", equalTo("Inactive City"))
+            body("size()", equalTo(0))
         }
     }
 
@@ -279,8 +284,9 @@ class CityControllerIntegrationTest {
             get("/api/cities/search")
         } Then {
             statusCode(200)
-            body("code", equalTo("novi-sad"))
-            body("name", equalTo("Novi Sad"))
+            body("size()", equalTo(1))
+            body("[0].code", equalTo("novi-sad"))
+            body("[0].name", equalTo("Novi Sad"))
         }
     }
 
@@ -309,8 +315,9 @@ class CityControllerIntegrationTest {
             get("/api/cities/search")
         } Then {
             statusCode(200)
-            body("code", equalTo(firstCityCode))
-            body("name", equalTo(firstCityName))
+            body("size()", equalTo(1))
+            body("[0].code", equalTo(firstCityCode))
+            body("[0].name", equalTo(firstCityName))
         }
 
         // Step 3: Get the same city by code

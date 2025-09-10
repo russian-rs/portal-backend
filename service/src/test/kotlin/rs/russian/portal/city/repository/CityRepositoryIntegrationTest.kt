@@ -1,7 +1,6 @@
 package rs.russian.portal.city.repository
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase
-import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -31,28 +30,28 @@ class CityRepositoryIntegrationTest {
         
         val testCities = listOf(
             City(
-                id = "belgrade",
+                code = "belgrade",
                 name = "Beograd",
                 nameCyrillic = "Белград",
                 hasMup = true,
                 active = true
             ),
             City(
-                id = "novi-sad",
+                code = "novi-sad",
                 name = "Novi Sad",
                 nameCyrillic = "Нови Сад",
                 hasMup = true,
                 active = true
             ),
             City(
-                id = "nis",
+                code = "nis",
                 name = "Niš",
                 nameCyrillic = "Ниш",
                 hasMup = true,
                 active = true
             ),
             City(
-                id = "inactive-city",
+                code = "inactive-city",
                 name = "Inactive City",
                 nameCyrillic = "Неактивни Град",
                 hasMup = false,
@@ -80,20 +79,22 @@ class CityRepositoryIntegrationTest {
 
     @Test
     fun `findByNameOrNameCyrillic should find city by Latin name`() {
-        val city = cityRepository.findByNameOrNameCyrillic("Beograd")
+        val cities = cityRepository.findByNameOrNameCyrillic("Beograd")
         
-        assertNotNull(city)
-        assertEquals("belgrade", city.id)
+        assertEquals(1, cities.size)
+        val city = cities[0]
+        assertEquals("belgrade", city.code)
         assertEquals("Beograd", city.name)
         assertEquals("Белград", city.nameCyrillic)
     }
 
     @Test
     fun `findByNameOrNameCyrillic should find city by Cyrillic name`() {
-        val city = cityRepository.findByNameOrNameCyrillic("Белград")
+        val cities = cityRepository.findByNameOrNameCyrillic("Белград")
         
-        assertNotNull(city)
-        assertEquals("belgrade", city.id)
+        assertEquals(1, cities.size)
+        val city = cities[0]
+        assertEquals("belgrade", city.code)
         assertEquals("Beograd", city.name)
         assertEquals("Белград", city.nameCyrillic)
     }
@@ -101,34 +102,34 @@ class CityRepositoryIntegrationTest {
     @Test
     fun `findByNameOrNameCyrillic should be case insensitive`() {
         // Latin name
-        var city = cityRepository.findByNameOrNameCyrillic("BEOGRAD")
+        var cities = cityRepository.findByNameOrNameCyrillic("BEOGRAD")
         
-        assertNotNull(city)
-        assertEquals("belgrade", city.id)
+        assertEquals(1, cities.size)
+        var city = cities[0]
+        assertEquals("belgrade", city.code)
         assertEquals("Beograd", city.name)
 
         // Cyrillic name
-        city = cityRepository.findByNameOrNameCyrillic("белград")
+        cities = cityRepository.findByNameOrNameCyrillic("белград")
         
-        assertNotNull(city)
-        assertEquals("belgrade", city.id)
+        assertEquals(1, cities.size)
+        city = cities[0]
+        assertEquals("belgrade", city.code)
         assertEquals("Белград", city.nameCyrillic)
     }
 
     @Test
-    fun `findByNameOrNameCyrillic should return null when city not found`() {
-        val city = cityRepository.findByNameOrNameCyrillic("NonExistent")
+    fun `findByNameOrNameCyrillic should return empty list when city not found`() {
+        val cities = cityRepository.findByNameOrNameCyrillic("NonExistent")
         
-        assertNull(city)
+        assertTrue(cities.isEmpty())
     }
 
     @Test
-    fun `findByNameOrNameCyrillic should find inactive city`() {
-        val city = cityRepository.findByNameOrNameCyrillic("Inactive City")
+    fun `findByNameOrNameCyrillic should not find inactive city because of active filter`() {
+        val cities = cityRepository.findByNameOrNameCyrillic("Inactive City")
         
-        assertNotNull(city)
-        assertEquals("inactive-city", city.id)
-        assertEquals(false, city.active)
+        assertTrue(cities.isEmpty())
     }
 
     @Test
@@ -153,7 +154,7 @@ class CityRepositoryIntegrationTest {
         cityRepository.deleteAll()
 
         val testCity = City(
-            id = "test-belgrade",
+            code = "test-belgrade",
             name = "Test Beograd",
             nameCyrillic = "Тест Белград",
             hasMup = true,
@@ -170,25 +171,25 @@ class CityRepositoryIntegrationTest {
         assertTrue(savedCity.active)
 
         val foundByName = cityRepository.findByNameOrNameCyrillic("Test Beograd")
-        assertNotNull(foundByName)
-        assertEquals("test-belgrade", foundByName.id)
+        assertEquals(1, foundByName.size)
+        assertEquals("test-belgrade", foundByName[0].code)
 
         val foundByCyrillic = cityRepository.findByNameOrNameCyrillic("Тест Белград")
-        assertNotNull(foundByCyrillic)
-        assertEquals("test-belgrade", foundByCyrillic.id)
+        assertEquals(1, foundByCyrillic.size)
+        assertEquals("test-belgrade", foundByCyrillic[0].code)
 
         val caseInsensitive = cityRepository.findByNameOrNameCyrillic("TEST BEOGRAD")
-        assertNotNull(caseInsensitive)
-        assertEquals("test-belgrade", caseInsensitive.id)
+        assertEquals(1, caseInsensitive.size)
+        assertEquals("test-belgrade", caseInsensitive[0].code)
 
         val notFound = cityRepository.findByNameOrNameCyrillic("NonExistent")
-        assertNull(notFound)
+        assertTrue(notFound.isEmpty())
 
         val activeCities = cityRepository.findAllActive()
-        assertTrue(activeCities.any { it.id == "test-belgrade" })
+        assertTrue(activeCities.any { it.code == "test-belgrade" })
 
         val inactiveCity = City(
-            id = "inactive-test",
+            code = "inactive-test",
             name = "Inactive Test",
             nameCyrillic = "Неактивни Тест",
             hasMup = false,
@@ -197,7 +198,7 @@ class CityRepositoryIntegrationTest {
         cityRepository.save(inactiveCity)
 
         val allActiveCities = cityRepository.findAllActive()
-        assertTrue(allActiveCities.none { it.id == "inactive-test" })
-        assertTrue(allActiveCities.any { it.id == "test-belgrade" })
+        assertTrue(allActiveCities.none { it.code == "inactive-test" })
+        assertTrue(allActiveCities.any { it.code == "test-belgrade" })
     }
 }
