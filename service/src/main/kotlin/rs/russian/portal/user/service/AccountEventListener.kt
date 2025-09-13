@@ -1,5 +1,6 @@
 package rs.russian.portal.user.service
 
+import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -11,6 +12,7 @@ import rs.russian.portal.user.event.UserCreatedEvent
 import rs.russian.portal.user.service.authentik.AuthentikService
 
 @Component
+@Profile("!local")
 class AccountEventListener(
     private val emailService: EmailService,
     private val accountService: AccountService,

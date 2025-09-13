@@ -1,9 +1,11 @@
 package rs.russian.portal.user.service
 
+import io.zonky.test.db.AutoConfigureEmbeddedDatabase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.test.context.ActiveProfiles
@@ -13,6 +15,8 @@ import rs.russian.portal.config.DefaultUserFilter
 
 
 @SpringBootTest
+@AutoConfigureTestDatabase
+@AutoConfigureEmbeddedDatabase
 @ActiveProfiles("local", "no-auth", "test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AccountServiceTest {
@@ -46,7 +50,7 @@ class AccountServiceTest {
                 pageNumber = 0
             ),
             filter = UserSearchFilter(
-                programCodes = mutableSetOf("IT")
+                program = "IT"
             )
         )
 
@@ -62,7 +66,7 @@ class AccountServiceTest {
                 pageNumber = 0
             ),
             filter = UserSearchFilter(
-                programCodes = mutableSetOf("MEDIA")
+                program = "MEDIA"
             )
         )
 

@@ -17,11 +17,13 @@ class CacheService {
         const val S3_FILE_CACHE_NAME = "s3_cache"
         const val PROGRAM_DICT_CACHE_NAME = "program_dict_cache"
         const val PROJECT_DICT_CACHE_NAME = "project_dict_cache"
+        const val CITIES_CACHE_NAME = "cities_cache"
 
         val CACHE_MAP = mapOf<String, Cache<Any, Any>>(
             S3_FILE_CACHE_NAME to Caffeine.newBuilder().expireAfterWrite(12, HOURS).build(),
             PROGRAM_DICT_CACHE_NAME to Caffeine.newBuilder().expireAfterWrite(1, HOURS).build(),
             PROJECT_DICT_CACHE_NAME to Caffeine.newBuilder().expireAfterWrite(1, HOURS).build(),
+            CITIES_CACHE_NAME to Caffeine.newBuilder().expireAfterWrite(1, HOURS).build(),
         )
     }
 }

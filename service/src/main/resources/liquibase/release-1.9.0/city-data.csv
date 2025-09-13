@@ -1,0 +1,28 @@
+code,name,name_cyrillic,has_mup,active,version
+belgrade,Beograd,Белград,true,true,CURRENT_TIMESTAMP
+bor,Bor,Бор,true,true,CURRENT_TIMESTAMP
+valjevo,Valjevo,Ваљево,true,true,CURRENT_TIMESTAMP
+vranje,Vranje,Врање,true,true,CURRENT_TIMESTAMP
+zajecar,Zaječar,Зајечар,true,true,CURRENT_TIMESTAMP
+zrenjanin,Zrenjanin,Зрењанин,true,true,CURRENT_TIMESTAMP
+jagodina,Jagodina,Јагодина,true,true,CURRENT_TIMESTAMP
+kikinda,Kikinda,Кикинда,true,true,CURRENT_TIMESTAMP
+kragujevac,Kragujevac,Крагујевац,true,true,CURRENT_TIMESTAMP
+kraljevo,Kraljevo,Краљево,true,true,CURRENT_TIMESTAMP
+krusevac,Kruševac,Крушевац,true,true,CURRENT_TIMESTAMP
+leskovac,Leskovac,Лесковац,true,true,CURRENT_TIMESTAMP
+nis,Niš,Ниш,true,true,CURRENT_TIMESTAMP
+novi-pazar,Novi Pazar,Нови Пазар,true,true,CURRENT_TIMESTAMP
+novi-sad,Novi Sad,Нови Сад,true,true,CURRENT_TIMESTAMP
+pancevo,Pančevo,Панчево,true,true,CURRENT_TIMESTAMP
+pirot,Pirot,Пирот,true,true,CURRENT_TIMESTAMP
+pozarevac,Požarevac,Пожаревац,true,true,CURRENT_TIMESTAMP
+prijepolje,Prijepolje,Пријепоље,true,true,CURRENT_TIMESTAMP
+prokuplje,Prokuplje,Прокупље,true,true,CURRENT_TIMESTAMP
+smederevo,Smederevo,Смедерево,true,true,CURRENT_TIMESTAMP
+sombor,Sombor,Сомбор,true,true,CURRENT_TIMESTAMP
+sremska-mitrovica,Sremska Mitrovica,Сремска Митровица,true,true,CURRENT_TIMESTAMP
+subotica,Subotica,Суботица,true,true,CURRENT_TIMESTAMP
+uzice,Užice,Ужице,true,true,CURRENT_TIMESTAMP
+cacak,Čačak,Чачак,true,true,CURRENT_TIMESTAMP
+sabac,Šabac,Шабац,true,true,CURRENT_TIMESTAMP
