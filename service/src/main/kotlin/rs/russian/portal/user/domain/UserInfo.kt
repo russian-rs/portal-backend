@@ -28,6 +28,7 @@ class UserInfo(
     override var version: LocalDateTime? = null,
 
     var city: String? = null,
+    var postalCode: String? = null,
     var address: String? = null,
     var birthDate: LocalDate? = null,
     var telegram: String? = null,

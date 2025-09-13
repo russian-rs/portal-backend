@@ -40,6 +40,8 @@ class Application(
     var telegram: String? = null,
     var inSerbia: Boolean? = null,
     var enterDate: LocalDate? = null,
+    var city: String? = null,
+    var postalCode: String? = null,
     var address: String? = null,
     var phone: String? = null,
     var residenceRequired: Boolean? = null,

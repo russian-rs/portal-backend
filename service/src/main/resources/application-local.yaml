@@ -33,7 +33,7 @@ spring:
     username: ${DB_USER:admin}
     password: ${DB_PASS:123456}
   jpa:
-    show-sql: true
+#    show-sql: true
     properties:
       hibernate:
         format_sql: true

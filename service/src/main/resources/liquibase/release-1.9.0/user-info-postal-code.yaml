@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.8.0-user-info-postal-code
+      author: alexey
+      changes:
+        - addColumn:
+            tableName: user_info
+            columns:
+              - column:
+                  name: postal_code
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: true

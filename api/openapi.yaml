@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.21.0
+  version: 1.22.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -741,6 +741,7 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+
   /projects:
     get:
       operationId: getProjects
@@ -756,6 +757,71 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProjectDto'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /cities:
+    get:
+      operationId: getCities
+      tags:
+        - cities
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CityDto'
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /cities/{code}:
+    get:
+      operationId: findCityByCode
+      tags:
+        - cities
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+          description: City code (e.g., 'belgrade', 'novi-sad')
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CityDto'
+        '404':
+          description: City not found
+        '500':
+          $ref: '#/components/responses/ServerError'
+
+  /cities/search:
+    get:
+      operationId: findCityByName
+      tags:
+        - cities
+      parameters:
+        - name: name
+          in: query
+          required: true
+          schema:
+            type: string
+          description: City name to search (supports both Latin and Cyrillic, e.g., 'Beograd', 'Белград')
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CityDto'
         '500':
           $ref: '#/components/responses/ServerError'
 
@@ -969,6 +1035,8 @@ components:
           nullable: false
         city:
           type: string
+        postalCode:
+          type: string
         address:
           type: string
         birthDate:
@@ -1004,6 +1072,8 @@ components:
       description: обновить информацию о пользователе
       properties:
         city:
+          type: string
+        postalCode:
           type: string
         address:
           type: string
@@ -1218,6 +1288,10 @@ components:
         enterDate:
           type: string
           format: date
+        city:
+          type: string
+        postalCode:
+          type: string
         address:
           type: string
         phone:
@@ -1368,6 +1442,26 @@ components:
       enum:
         - ASSOCIATED
         - REGULAR
+    CityDto:
+      type: object
+      required:
+        - code
+        - name
+        - nameCyrillic
+        - hasMup
+      properties:
+        code:
+          type: string
+          description: City code (lowercase latin name)
+        name:
+          type: string
+          description: City name in Serbian Latin
+        nameCyrillic:
+          type: string
+          description: City name in Cyrillic
+        hasMup:
+          type: boolean
+          description: Whether the city has a MUP office
     ProgramDto:
       type: object
       required:
