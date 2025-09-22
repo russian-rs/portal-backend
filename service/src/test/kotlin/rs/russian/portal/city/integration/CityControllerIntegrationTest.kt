@@ -16,25 +16,24 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.web.server.LocalServerPort
+import org.springframework.cache.CacheManager
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.transaction.annotation.Propagation
+import org.springframework.test.annotation.Commit
+import org.springframework.test.annotation.DirtiesContext
 import rs.russian.portal.city.domain.City
 import rs.russian.portal.city.repository.CityRepository
+import rs.russian.portal.testconfig.AbstractIntegrationTest
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@AutoConfigureEmbeddedDatabase
-@ActiveProfiles("local", "no-auth", "test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class CityControllerIntegrationTest {
-
-    @LocalServerPort
-    private var port: Int = 0
+class CityControllerIntegrationTest: AbstractIntegrationTest() {
 
     @Autowired
     private lateinit var cityRepository: CityRepository
 
     @BeforeAll
-    fun setUpRestAssured() {
+    fun setUpRestAssured(@LocalServerPort port: Int) {
         RestAssured.port = port
         RestAssured.baseURI = "http://localhost"
     }
@@ -42,7 +41,7 @@ class CityControllerIntegrationTest {
     @BeforeEach
     fun setUp() {
         cityRepository.deleteAll()
-        
+
         val testCities = listOf(
             City(
                 code = "belgrade",
@@ -90,7 +89,7 @@ class CityControllerIntegrationTest {
         Given {
             contentType(ContentType.JSON)
         } When {
-            get("/api/cities")
+            get("/cities")
         } Then {
             statusCode(200)
             contentType(ContentType.JSON)
@@ -117,7 +116,7 @@ class CityControllerIntegrationTest {
         Given {
             contentType(ContentType.JSON)
         } When {
-            get("/api/cities")
+            get("/cities")
         } Then {
             statusCode(200)
             body("code", not(hasItem("inactive-city")))
@@ -130,7 +129,7 @@ class CityControllerIntegrationTest {
         Given {
             contentType(ContentType.JSON)
         } When {
-            get("/api/cities/belgrade")
+            get("/cities/belgrade")
         } Then {
             statusCode(200)
             contentType(ContentType.JSON)
@@ -146,7 +145,7 @@ class CityControllerIntegrationTest {
         Given {
             contentType(ContentType.JSON)
         } When {
-            get("/api/cities/non-existent")
+            get("/cities/non-existent")
         } Then {
             statusCode(404)
         }
@@ -157,7 +156,7 @@ class CityControllerIntegrationTest {
         Given {
             contentType(ContentType.JSON)
         } When {
-            get("/api/cities/inactive-city")
+            get("/cities/inactive-city")
         } Then {
             statusCode(200)
             contentType(ContentType.JSON)
@@ -174,7 +173,7 @@ class CityControllerIntegrationTest {
             contentType(ContentType.JSON)
             queryParam("name", "Beograd")
         } When {
-            get("/api/cities/search")
+            get("/cities/search")
         } Then {
             statusCode(200)
             contentType(ContentType.JSON)
@@ -192,7 +191,7 @@ class CityControllerIntegrationTest {
             contentType(ContentType.JSON)
             queryParam("name", "Белград")
         } When {
-            get("/api/cities/search")
+            get("/cities/search")
         } Then {
             statusCode(200)
             contentType(ContentType.JSON)
@@ -209,7 +208,7 @@ class CityControllerIntegrationTest {
             contentType(ContentType.JSON)
             queryParam("name", "BEOGRAD")
         } When {
-            get("/api/cities/search")
+            get("/cities/search")
         } Then {
             statusCode(200)
             body("size()", equalTo(1))
@@ -224,7 +223,7 @@ class CityControllerIntegrationTest {
             contentType(ContentType.JSON)
             queryParam("name", "белград")
         } When {
-            get("/api/cities/search")
+            get("/cities/search")
         } Then {
             statusCode(200)
             body("size()", equalTo(1))
@@ -239,7 +238,7 @@ class CityControllerIntegrationTest {
             contentType(ContentType.JSON)
             queryParam("name", "Čačak")
         } When {
-            get("/api/cities/search")
+            get("/cities/search")
         } Then {
             statusCode(200)
             body("size()", equalTo(1))
@@ -255,7 +254,7 @@ class CityControllerIntegrationTest {
             contentType(ContentType.JSON)
             queryParam("name", "NonExistent")
         } When {
-            get("/api/cities/search")
+            get("/cities/search")
         } Then {
             statusCode(200)
             body("size()", equalTo(0))
@@ -268,7 +267,7 @@ class CityControllerIntegrationTest {
             contentType(ContentType.JSON)
             queryParam("name", "Inactive City")
         } When {
-            get("/api/cities/search")
+            get("/cities/search")
         } Then {
             statusCode(200)
             body("size()", equalTo(0))
@@ -281,7 +280,7 @@ class CityControllerIntegrationTest {
             contentType(ContentType.JSON)
             queryParam("name", "Novi Sad")
         } When {
-            get("/api/cities/search")
+            get("/cities/search")
         } Then {
             statusCode(200)
             body("size()", equalTo(1))
@@ -296,7 +295,7 @@ class CityControllerIntegrationTest {
         val allCities = Given {
             contentType(ContentType.JSON)
         } When {
-            get("/api/cities")
+            get("/cities")
         } Then {
             statusCode(200)
             body("size()", equalTo(4))
@@ -312,7 +311,7 @@ class CityControllerIntegrationTest {
             contentType(ContentType.JSON)
             queryParam("name", firstCityName)
         } When {
-            get("/api/cities/search")
+            get("/cities/search")
         } Then {
             statusCode(200)
             body("size()", equalTo(1))
@@ -324,7 +323,7 @@ class CityControllerIntegrationTest {
         Given {
             contentType(ContentType.JSON)
         } When {
-            get("/api/cities/$firstCityCode")
+            get("/cities/$firstCityCode")
         } Then {
             statusCode(200)
             body("code", equalTo(firstCityCode))
