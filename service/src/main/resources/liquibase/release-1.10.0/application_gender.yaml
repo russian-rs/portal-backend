@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.10.0-application-add-gender
+      author: Valerii Linden
+      changes:
+        - addColumn:
+            tableName: application
+            columns:
+              - column:
+                  name: gender
+                  type: VARCHAR(10)
+                  constraints:
+                    nullable: true
