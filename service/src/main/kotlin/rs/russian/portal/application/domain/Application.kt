@@ -10,6 +10,7 @@ import rs.russian.portal.application.domain.ApplicationType.NEW
 import rs.russian.portal.application.domain.listener.ApplicationEntityListener
 import rs.russian.portal.note.domain.Note
 import rs.russian.portal.shared.jpa.JpaEntity
+import rs.russian.portal.user.domain.enums.Gender
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
@@ -46,6 +47,9 @@ class Application(
     var phone: String? = null,
     var residenceRequired: Boolean? = null,
     var occupation: String? = null,
+    @Enumerated(STRING)
+    @Column(name = "gender")
+    var gender: Gender? = null,
     var hasExperience: Boolean? = null,
     var experience: String? = null,
     var languages: String? = null,
