@@ -9,13 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired
 import rs.russian.generated.model.ApplicationDto
 import rs.russian.generated.model.ApplicationStatusDto
 import rs.russian.generated.model.ContractDto
-import rs.russian.generated.model.GenderEnumDto
 import rs.russian.portal.application.domain.Application
 import rs.russian.portal.application.domain.ApplicationStatus
 import rs.russian.portal.note.mapper.NoteMapper
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.UserInfo
-import rs.russian.portal.user.domain.enums.Gender
 import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -40,7 +38,6 @@ abstract class ApplicationMapper {
     @Mapping(target = "contractFrom", source = "contract.startDate")
     @Mapping(target = "contractUntil", source = "contract.endDate")
     @Mapping(target = "contractType", source = "contract.type")
-    @Mapping(target = "gender", source = "gender", qualifiedByName = ["toDomainGender"])
     abstract fun toEntity(applicationDto: ApplicationDto, @MappingTarget application: Application)
 
     @Mapping(target = "id", ignore = true)
@@ -51,11 +48,9 @@ abstract class ApplicationMapper {
     @Mapping(target = "contractFrom", source = "contract.startDate")
     @Mapping(target = "contractUntil", source = "contract.endDate")
     @Mapping(target = "contractType", source = "contract.type")
-    @Mapping(target = "gender", source = "gender", qualifiedByName = ["toDomainGender"])
     abstract fun update(applicationDto: ApplicationDto, @MappingTarget application: Application)
 
     @Mapping(target = "contract", source = "application", qualifiedByName = ["contract"])
-    @Mapping(target = "gender", source = "gender", qualifiedByName = ["toDtoGender"])
     abstract fun toDto(application: Application): ApplicationDto
 
     @Mapping(target = "progress", source = "status")
@@ -81,12 +76,6 @@ abstract class ApplicationMapper {
     fun map(value: LocalDateTime): OffsetDateTime {
         return OffsetDateTime.of(value, ZoneOffset.UTC)
     }
-
-    @Named("toDomainGender")
-    fun toDomainGender(v: GenderEnumDto?): Gender? = v?.name?.let(Gender::valueOf)
-
-    @Named("toDtoGender")
-    fun toDtoGender(v: Gender?): GenderEnumDto? = v?.name?.let(GenderEnumDto::valueOf)
 
     @Named("contract")
     fun mapContract(application: Application): ContractDto? {

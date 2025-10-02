@@ -48,7 +48,6 @@ class Application(
     var residenceRequired: Boolean? = null,
     var occupation: String? = null,
     @Enumerated(STRING)
-    @Column(name = "gender")
     var gender: Gender? = null,
     var hasExperience: Boolean? = null,
     var experience: String? = null,
