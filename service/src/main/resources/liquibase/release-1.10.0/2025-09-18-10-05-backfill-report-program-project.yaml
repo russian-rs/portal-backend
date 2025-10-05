@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.10.0-backfill-report-program-project
+      author: Alexey
+      changes:
+        - sql:
+            comment: Backfill existing reports with program and project codes from user_info
+            sql: |
+              UPDATE report
+              SET program_code = ui.program_code,
+                  project_code = ui.project_code
+              FROM user_info ui
+              WHERE report.user_login = ui.username
+              AND (ui.program_code IS NOT NULL OR ui.project_code IS NOT NULL)
+      rollback:
+        - sql:
+            comment: Clear program and project codes from reports
+            sql: |
+              UPDATE report
+              SET program_code = NULL,
+                  project_code = NULL
+              WHERE program_code IS NOT NULL
+              OR project_code IS NOT NULL

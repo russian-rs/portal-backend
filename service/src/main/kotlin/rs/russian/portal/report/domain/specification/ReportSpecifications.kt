@@ -15,8 +15,6 @@ import rs.russian.portal.shared.jpa.empty
 import rs.russian.portal.shared.jpa.equal
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.Account_
-import rs.russian.portal.user.domain.UserInfo
-import rs.russian.portal.user.domain.UserInfo_
 
 fun from(filter: ReportFilter): Specification<Report> {
     var specification = empty<Report>()
@@ -62,27 +60,21 @@ fun from(filter: ReportFilter): Specification<Report> {
 }
 
 private fun programEqual(programCode: String) = Specification<Report> { root, query, builder ->
-    query!!.distinct(true)
-    val accountJoin = root.join<Report, Account>(Report_.ACCOUNT)
-    val infoJoin = accountJoin.join<Account, UserInfo>(Account_.INFO)
-    val programJoin = infoJoin.join<UserInfo, Program>(UserInfo_.PROGRAM, JoinType.LEFT)
+    val programJoin = root.join<Report, Program>(Report_.PROGRAM, JoinType.LEFT)
 
-    if (programCode.isBlank()) { // Выбрать отчеты пользователей без заполненной программы
+    if (programCode.isBlank()) { // Выбрать отчеты без заполненной программы
         builder.isNull(programJoin.get(Program_.code))
-    } else { // Выбрать отчеты пользователей с указанной программой
+    } else { // Выбрать отчеты с указанной программой
         builder.equal(programJoin.get(Program_.code), programCode)
     }
 }
 
 private fun projectEqual(projectCode: String) = Specification<Report> { root, query, builder ->
-    query!!.distinct(true)
-    val accountJoin = root.join<Report, Account>(Report_.ACCOUNT)
-    val infoJoin = accountJoin.join<Account, UserInfo>(Account_.INFO)
-    val projectJoin = infoJoin.join<UserInfo, Project>(UserInfo_.PROJECT, JoinType.LEFT)
+    val projectJoin = root.join<Report, Project>(Report_.PROJECT, JoinType.LEFT)
 
-    if (projectCode.isBlank()) { // Выбрать отчеты пользователей без заполненного проекта
+    if (projectCode.isBlank()) { // Выбрать отчеты без заполненного проекта
         builder.isNull(projectJoin.get(Project_.code))
-    } else { // Выбрать отчеты пользователей с указанным проектом
+    } else { // Выбрать отчеты с указанным проектом
         builder.equal(projectJoin.get(Project_.code), projectCode)
     }
 }

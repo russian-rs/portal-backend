@@ -45,7 +45,7 @@ class DefaultUserFilter(
         claims["sub"] = USERNAME
         claims["name"] = FULL_NAME
         claims["nickname"] = USERNAME
-        claims["preferredUsername"] = USERNAME
+        claims["preferred_username"] = USERNAME
         claims["groups"] = UserGroup.entries.map { it.oauthGroup }
 
         val oidcUser = DefaultOidcUser(
