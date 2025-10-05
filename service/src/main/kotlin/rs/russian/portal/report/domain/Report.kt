@@ -74,7 +74,7 @@ class Report(
 
 ) : JpaEntity<UUID>() {
 
-    override fun equalityProperties() = setOf(Report::id, Report::status, Report::deleted, Report::program, Report::project)
+    override fun equalityProperties() = setOf(Report::id, Report::status, Report::deleted)
 
     companion object {
         const val GRAPH_FULL = "Report.Full"
