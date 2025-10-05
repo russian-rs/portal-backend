@@ -1,32 +1,30 @@
 package rs.russian.portal.report.service
 
-import io.zonky.test.db.AutoConfigureEmbeddedDatabase
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
-import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.test.context.ActiveProfiles
 import rs.russian.generated.model.ReportFilter
 import rs.russian.portal.config.DefaultUserFilter
 import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.Task
 import rs.russian.portal.report.domain.enums.ReportStatus
+import rs.russian.portal.report.repository.ReportRepository
+import rs.russian.portal.testconfig.AbstractIntegrationTest
+import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.AccountService
 import java.time.LocalDate
 
-@SpringBootTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@AutoConfigureEmbeddedDatabase
-@ActiveProfiles("local", "no-auth", "test")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ReportServiceTest {
+class ReportServiceTest : AbstractIntegrationTest() {
 
     @Autowired
     lateinit var reportService: ReportService
+
+    @Autowired
+    lateinit var reportRepository: ReportRepository
 
     @Autowired
     lateinit var accountService: AccountService
@@ -38,16 +36,23 @@ class ReportServiceTest {
 
     @BeforeAll
     fun setup() {
+        reportRepository.deleteAll()
+
         SecurityContextHolder.getContext().authentication =
             defaultUserFilter.getDefaultOAuth2Token()
 
-        val account = accountService.findAccountByLogin(DefaultUserFilter.USERNAME)
+        var account = accountService.findAccountByLogin(DefaultUserFilter.USERNAME)
             ?: throw IllegalStateException("Default user not created")
         accountLogin = account.username
 
-        accountService.setProgram(account.id!!, "IT")
+        account = accountService.setProgram(account.id!!, "IT")
 
-        val report = Report(account = account, status = ReportStatus.CREATED)
+        val report = Report(
+            account = account,
+            status = ReportStatus.CREATED,
+            program = account.info?.program,
+            project = account.info?.project
+        )
         report.tasks.add(
             Task(
                 date = LocalDate.now(),

@@ -8,16 +8,14 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.ActiveProfiles
 import rs.russian.portal.city.domain.City
+import rs.russian.portal.testconfig.AbstractIntegrationTest
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
-@SpringBootTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@AutoConfigureEmbeddedDatabase
 @ActiveProfiles("local", "no-auth", "test")
-class CityRepositoryIntegrationTest {
+class CityRepositoryIntegrationTest: AbstractIntegrationTest() {
 
     @Autowired
     private lateinit var cityRepository: CityRepository

@@ -6,6 +6,8 @@ import jakarta.persistence.EnumType.STRING
 import jakarta.persistence.FetchType.LAZY
 import org.hibernate.annotations.SQLRestriction
 import rs.russian.portal.note.domain.Note
+import rs.russian.portal.program.domain.Program
+import rs.russian.portal.program.domain.Project
 import rs.russian.portal.report.domain.enums.ReportStatus
 import rs.russian.portal.report.domain.listener.ReportEntityListener
 import rs.russian.portal.shared.jpa.JpaEntity
@@ -22,7 +24,9 @@ import java.util.*
     attributeNodes = [
         NamedAttributeNode("tasks", subgraph = Task.GRAPH_FULL),
         NamedAttributeNode("account", subgraph = Account.GRAPH_USERNAME),
-        NamedAttributeNode("notes")],
+        NamedAttributeNode("notes"),
+        NamedAttributeNode("program"),
+        NamedAttributeNode("project")],
     subgraphs = [
         NamedSubgraph(
             name = Account.GRAPH_USERNAME,
@@ -53,6 +57,14 @@ class Report(
     @ManyToOne(fetch = LAZY)
     @JoinColumn(name = "user_login", referencedColumnName = "username")
     var account: Account,
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "program_code")
+    var program: Program? = null,
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "project_code")
+    var project: Project? = null,
 
     @SQLRestriction("entity_type = 'REPORT'")
     @OneToMany(mappedBy = "entityId", cascade = [ALL], orphanRemoval = true)
