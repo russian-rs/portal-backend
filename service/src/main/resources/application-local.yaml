@@ -12,8 +12,7 @@ app:
     bucket-service: ${S3_BUCKET_SERVICE:portal-data}
   authentik:
     base-url: https://REDACTED_HOST
-    # Можно взять тут
-    # REDACTED_URL
+    # Можно взять в Coolify в настройках окружения
     api-key: ${AUTHENTIK_API_KEY}
   wordpress:
     instances:
@@ -58,8 +57,7 @@ spring:
             jwk-set-uri: https://REDACTED_HOST/application/o/${spring.application.name}/jwks/
         registration:
           authentik:
-            # Можно взять тут
-            # REDACTED_URL
+            # Можно взять в Coolify в настройках окружения
             client-id: ${OAUTH2_CLIENT_ID}
             client-secret: ${OAUTH2_CLIENT_SECRET}
             redirect-uri: http://localhost:3000/api/oauth2/code
