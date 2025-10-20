@@ -14,7 +14,7 @@ private val log = LoggerFactory.getLogger(OutlineServiceImpl::class.java)
 @Service
 @Profile("!local")
 class OutlineServiceImpl(
-    private val outlineApiClient: OutlineApiClient
+    private val outlineApiClient: OutlineApiClient,
 ) : AccountSynchroniser {
 
     override fun sync(accounts: List<Account>) {
@@ -64,7 +64,7 @@ class OutlineServiceImpl(
         ourAccounts: List<Account>,
         outlineUsers: List<User>,
         outlineGroups: List<Group>,
-        outlineMemberships: Map<UUID, List<UUID>>
+        outlineMemberships: Map<UUID, List<UUID>>,
     ) {
         fun addUsersToGroups(toAdd: Map<UUID, Collection<UUID>>) = toAdd.forEach { (groupId, users) ->
             users.forEach { userId ->
@@ -102,16 +102,18 @@ class OutlineServiceImpl(
 
         removeUsersFromGroups(toRemove)
 
-        log.info("Synced Outline users to groups: " +
+        log.info(
+            "Synced Outline users to groups: " +
                 "added: ${toAdd.values.sumOf { it.size }} users to ${toAdd.keys.size} groups, " +
-                "removed: ${toRemove.values.sumOf { it.size }} users from ${toRemove.filterValues { it.isNotEmpty() }.keys.size} groups")
+                "removed: ${toRemove.values.sumOf { it.size }} users from ${toRemove.filterValues { it.isNotEmpty() }.keys.size} groups"
+        )
     }
 
     override fun delete(account: Account) {
         try {
             val outlineUser = outlineApiClient.userByEmail(account.email)
             if (outlineUser == null) {
-                log.warn("Nothing to delete: No Outline user found for email: ${account.email}")
+                //log.warn("Nothing to delete: No Outline user found for email: ${account.email}")
                 return
             }
             outlineApiClient.usersSuspend(outlineUser.id!!)
