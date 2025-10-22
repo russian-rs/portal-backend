@@ -65,7 +65,7 @@ abstract class ApplicationMapper {
     @Mapping(target = "postalCode", source = "application.postalCode")
     @Mapping(target = "program", ignore = true)
     @Mapping(target = "project", ignore = true)
-    @Mapping(target = "gender", ignore = true)
+    @Mapping(target = "gender", source = "application.gender")
     @Mapping(target = "avatar", ignore = true)
     abstract fun mapToInfo(application: Application, account: Account): UserInfo
 
