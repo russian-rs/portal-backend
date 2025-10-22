@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.10.0-report-add-program-project-fields
+      author: Alexey
+      changes:
+        - addColumn:
+            tableName: report
+            columns:
+              - column:
+                  name: program_code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: project_code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: report
+            baseColumnNames: program_code
+            referencedTableName: program
+            referencedColumnNames: code
+            constraintName: fk_report_program
+        - addForeignKeyConstraint:
+            baseTableName: report
+            baseColumnNames: project_code
+            referencedTableName: project
+            referencedColumnNames: code
+            constraintName: fk_report_project
+      rollback:
+        - dropForeignKeyConstraint:
+            baseTableName: report
+            constraintName: fk_report_project
+        - dropForeignKeyConstraint:
+            baseTableName: report
+            constraintName: fk_report_program
+        - dropColumn:
+            tableName: report
+            columnName: project_code
+        - dropColumn:
+            tableName: report
+            columnName: program_code

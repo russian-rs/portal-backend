@@ -41,7 +41,13 @@ class ReportService(
 
     @Transactional
     fun createReport(reportDto: ReportDto): Report {
-        val report = Report(account = accountService.getCurrentAccount(), status = ReportStatus.CREATED)
+        val currentAccount = accountService.getCurrentAccount()
+        val report = Report(
+            account = currentAccount,
+            status = ReportStatus.CREATED,
+            program = currentAccount.info?.program,
+            project = currentAccount.info?.project
+        )
         val tasks = reportDto.tasks.map { taskDto ->
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
