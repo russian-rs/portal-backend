@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: 1.10.0-application-add-gender
+      id: 1.11.0-application-add-gender
       author: Valerii Linden
       changes:
         - addColumn:
