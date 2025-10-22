@@ -1,3 +1,0 @@
-databaseChangeLog:
-  - include:
-      file: liquibase/release-1.10.0/application_gender.yaml
