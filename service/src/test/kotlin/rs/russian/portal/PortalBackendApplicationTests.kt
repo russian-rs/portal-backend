@@ -1,16 +1,11 @@
 package rs.russian.portal
 
-import io.zonky.test.db.AutoConfigureEmbeddedDatabase
 import org.junit.jupiter.api.Test
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
+import rs.russian.portal.testconfig.AbstractIntegrationTest
 
 @SpringBootTest
-@AutoConfigureTestDatabase
-@AutoConfigureEmbeddedDatabase
-@ActiveProfiles("local", "no-auth", "test")
-class PortalBackendApplicationTests {
+class PortalBackendApplicationTests: AbstractIntegrationTest() {
 
     @Test
     fun contextLoads() {
