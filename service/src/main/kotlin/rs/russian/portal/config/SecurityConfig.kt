@@ -18,13 +18,13 @@ import rs.russian.portal.user.service.AccountService
 @EnableWebSecurity
 class SecurityConfig(
     private val accountService: AccountService,
-    private val appProperties: AppProperties
+    private val appProperties: AppProperties,
 ) {
 
     @Bean
     @Profile("!no-auth")
     fun securityFilterChain(
-        httpSecurity: HttpSecurity
+        httpSecurity: HttpSecurity,
     ): SecurityFilterChain = httpSecurity
         .csrf {
             it.disable()
@@ -62,7 +62,7 @@ class SecurityConfig(
     @Profile("no-auth")
     fun securityFilterChainNoAuth(
         httpSecurity: HttpSecurity,
-        defaultUserFilter: DefaultUserFilter
+        defaultUserFilter: DefaultUserFilter,
     ): SecurityFilterChain = httpSecurity
         .csrf {
             it.disable()
@@ -82,7 +82,10 @@ class SecurityConfig(
             "/application/create",
             "/application/status/{id}",
             "/application/searchByEmail",
-            "/turnstile"
+            "/turnstile",
+            "/cities",
+            "/cities/search",
+            "/cities/{code}"
         )
     }
 
