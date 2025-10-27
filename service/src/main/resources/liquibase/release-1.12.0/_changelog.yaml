@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/release-1.12.0/create-program-project-map.yaml
+  - include:
+      file: liquibase/release-1.12.0/populate-program-project-map.yaml

@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.22.1
+  version: 1.22.2
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -137,7 +137,7 @@ paths:
   /user/account/{id}/contracts:
     post:
       operationId: updateContracts
-      description: Обновить список договоров волонтера
+      description: Update the list of volunteer agreements
       tags:
         - user
       parameters:
@@ -551,7 +551,7 @@ paths:
   /application/{id}/note:
     post:
       operationId: addNoteToApplication
-      description: Добавление заметки по заявке
+      description: Adding a note on a request
       tags:
         - application
       parameters:
@@ -728,10 +728,10 @@ paths:
       operationId: getPrograms
       tags:
         - programs
-      summary: Получить список всех доступных программ
+      summary: Get a list of all programs
       responses:
         '200':
-          description: Список программ
+          description: list of all programs
           content:
             application/json:
               schema:
@@ -740,17 +740,32 @@ paths:
                   $ref: '#/components/schemas/ProgramDto'
         '500':
           $ref: '#/components/responses/ServerError'
-
+  /programs/mapping:
+    get:
+      operationId: getProgramProjectMapping
+      tags: [ programs ]
+      summary: Mapping of program to project codes
+      responses:
+        '200':
+          description: List of mappings program to projects
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProgramMapDto'
+        '500':
+          $ref: '#/components/responses/ServerError'
 
   /projects:
     get:
       operationId: getProjects
       tags:
         - projects
-      summary: Получить список всех доступных проектов
+      summary: Get a list of all projects
       responses:
         '200':
-          description: Список проектов
+          description: List of projects
           content:
             application/json:
               schema:
@@ -759,6 +774,40 @@ paths:
                   $ref: '#/components/schemas/ProjectDto'
         '500':
           $ref: '#/components/responses/ServerError'
+  /projects/by-program/{code}:
+    get:
+      operationId: getProjectsByProgram
+      tags: [ projects ]
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProjectDto' }
+  /programs/by-project/{code}:
+    get:
+      operationId: getProgramsByProject
+      tags: [ programs ]
+      parameters:
+        - in: path
+          name: code
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ProgramDto' }
 
   /cities:
     get:
@@ -833,13 +882,13 @@ paths:
       parameters:
         - name: year
           in: path
-          description: Год для получения статистики для мин. труд
+          description: A year of mintrud statistics
           required: true
           schema:
             type: integer
       responses:
         '200':
-          description: Статистика для мин. труд по группам за год
+          description: Mintrud stat for a specified year
           content:
             application/json:
               schema:
@@ -858,7 +907,7 @@ components:
             $ref: '#/components/schemas/ErrorResponse'
   schemas:
     VolunteerStatistics:
-      description: Информация о волонтерах
+      description: Info on volunteers
       type: object
       properties:
         femaleCount:
@@ -885,12 +934,12 @@ components:
         count:
           type: integer
           nullable: true
-          description: количество волонтеров в группе
+          description: amount of volunteers in a group
         totalTimeSpent:
           type: number
           format: double
           nullable: true
-          description: общее время, затраченное в часах всеми волонтерами в группе
+          description: total amount of tasks time of all volunteers in a group
     ProgramStatItem:
       type: object
       required: [code, data]
@@ -898,7 +947,7 @@ components:
         code:
           type: string
           nullable: true
-          description: Код статистической программы; null = «прочее»
+          description: Code of a stat program; null = «other»
         data:
           $ref: '#/components/schemas/StatisticData'
     ProgramStatistics:
@@ -911,9 +960,9 @@ components:
             $ref: '#/components/schemas/ProgramStatItem'
         total:
           $ref: '#/components/schemas/StatisticData'
-      description: Универсальная сводка по программам
+      description: Stat by a program
     FinalUsersStatistics:
-      description: Данные о конечных пользователях волонтерской деятельности
+      description: Data on final users of volunteer's activity
       type: object
       properties:
         culturalAssetsCount:
@@ -931,7 +980,7 @@ components:
       properties:
         year:
           type: integer
-          description: Отчетный год
+          description: Statistic year
         programStatistics:
           $ref: '#/components/schemas/ProgramStatistics'
         volunteerStatistics:
@@ -981,13 +1030,13 @@ components:
           format: int64
     ErrorResponse:
       type: object
-      description: Общий объект для сообщений об ошибках
+      description: Common error message object
       required:
         - message
       properties:
         message:
           type: string
-          description: Описание ошибки
+          description: Error description
           nullable: false
     GenderEnumDto:
       type: string
@@ -1012,7 +1061,7 @@ components:
           $ref: '#/components/schemas/ContractDto'
     UserInfoDto:
       type: object
-      description: Дополнительная информация о пользователе
+      description: Additional info on volunteer
       required:
         - id
         - username
@@ -1069,7 +1118,7 @@ components:
             $ref: '#/components/schemas/ContractDto'
     UserInfoUpdateRequest:
       type: object
-      description: обновить информацию о пользователе
+      description: update user info
       properties:
         city:
           type: string
@@ -1145,11 +1194,11 @@ components:
         program:
           type: string
           nullable: true
-          description: Показывать только отчеты по указанной программе. Фильтр работает по программе, указанной в самом отчете (на момент создания отчета), а не по текущей программе волонтера. Пустая строка значит показать отчеты без заполненной программы.
+          description: Show only reports for the specified program. The filter works by the program specified in the report itself (at the time the report was created), not the volunteer's current program. An empty line means reports without a completed program will be shown.
         project:
           type: string
           nullable: true
-          description: Показывать только отчеты по указанному проекту. Фильтр работает по проекту, указанному в самом отчете (на момент создания отчета), а не по текущему проекту волонтера. Пустая строка значит показать отчеты без заполненного проекта.
+          description: Show only reports for the specified project. The filter applies to the project specified in the report itself (at the time the report was created), not the volunteer's current project. An empty line displays reports without a completed project.
     ReportDto:
       type: object
       nullable: false
@@ -1196,7 +1245,7 @@ components:
         date:
           type: string
           format: date
-          description: Когда задача была выполнена
+          description: When the task was completed
         name:
           type: string
         description:
@@ -1333,7 +1382,7 @@ components:
         showCompleted:
           type: boolean
           default: false
-          description: Показывать обработанные заявки
+          description: Show only completed applications
     ApplicationStatusDto:
       type: object
       required:
@@ -1390,7 +1439,7 @@ components:
           format: date-time
         createdBy:
           type: string
-          description: Логин пользователя, который создал заметку
+          description: Login of a users who created the note
         text:
           type: string
     ChangeReportStatusRequest:
@@ -1414,30 +1463,30 @@ components:
           type: boolean
           nullable: false
           default: false
-          description: Показывать только неактивных пользователей
+          description: Show only inactive users
         programCodes:
           deprecated: true
           type: array
-          description: Показывать только пользователей указанных программ
+          description: Show only users of specified programs
           items:
             type: string
           uniqueItems: true
         program:
           type: string
           nullable: true
-          description: Показывать только пользователей по указанной программе, пустая строка значит показать пользователей без программы
+          description: Show only users of a specified program, if not specified it lists only users without a program
           example: "IT"
         projectCodes:
           deprecated: true
           type: array
-          description: Показывать только пользователей указанных проектов
+          description: Show only users of specified projects
           items:
             type: string
           uniqueItems: true
         project:
           type: string
           nullable: true
-          description: Показывать только пользователей по указанному проекту, пустая строка значит показать пользователей без проекта
+          description: Show only users of a specified project, if not specified it lists only users without a project
           example: "DESIGN_3D"
     ContractTypeEnum:
       type: string
@@ -1496,3 +1545,18 @@ components:
           type: string
         nameSr:
           type: string
+    ProgramMapDto:
+      type: object
+      additionalProperties: false
+      required: [ programCode, projectCodes ]
+      properties:
+        programCode:
+          type: string
+          description: Program code (e.g., IT, MEDIA)
+        projectCodes:
+          type: array
+          description: Projects allowed for the program
+          uniqueItems: true
+          items:
+            type: string
+            description: Project code (e.g., APPS, LAYOUT)

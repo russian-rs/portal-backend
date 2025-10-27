@@ -1,0 +1,196 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.12.1-populate-program-project-map
+      author: Valerii Linden
+      changes:
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: IT }
+              - column: { name: program_code, value: IT }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: LAYOUT }
+              - column: { name: program_code, value: IT }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: FORMS }
+              - column: { name: program_code, value: IT }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: SCRAPERS }
+              - column: { name: program_code, value: IT }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: BOTS }
+              - column: { name: program_code, value: IT }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: APPS }
+              - column: { name: program_code, value: IT }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: LAWS }
+              - column: { name: program_code, value: LAW }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: HR }
+              - column: { name: program_code, value: LAW }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: DESIGN_3D }
+              - column: { name: program_code, value: DESIGN }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: DATA_COLLECTION }
+              - column: { name: program_code, value: INFORMATION }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: RESEARCH }
+              - column: { name: program_code, value: INFORMATION }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: POSTING }
+              - column: { name: program_code, value: INFORMATION }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: ARTICLES }
+              - column: { name: program_code, value: MEDIA }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: SMM }
+              - column: { name: program_code, value: MEDIA }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: DESIGN }
+              - column: { name: program_code, value: DESIGN }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: WEB_FIGMA }
+              - column: { name: program_code, value: MEDIA }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: SOCIAL_MEDIA_DESIGN }
+              - column: { name: program_code, value: MEDIA }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: MATERIAL_STYLE }
+              - column: { name: program_code, value: MEDIA }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: STICKERS }
+              - column: { name: program_code, value: MEDIA }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: GUIDE_ILLUSTRATIONS }
+              - column: { name: program_code, value: MEDIA }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: BOOK_MURALS }
+              - column: { name: program_code, value: MEDIA }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: VIDEO_EDITING }
+              - column: { name: program_code, value: MEDIA }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: PHOTO }
+              - column: { name: program_code, value: MEDIA }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: GUIDEBOOK }
+              - column: { name: program_code, value: MEDIA }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: TRAINING }
+              - column: { name: program_code, value: EDUCATION }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: COURSE_UPLOAD }
+              - column: { name: program_code, value: EDUCATION }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: PSYCHOLOGISTS }
+              - column: { name: program_code, value: EDUCATION }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: BOOK }
+              - column: { name: program_code, value: EDUCATION }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: LANGUAGE_COURSES }
+              - column: { name: program_code, value: EDUCATION }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: SPORT }
+              - column: { name: program_code, value: EDUCATION }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: MONITORING }
+              - column: { name: program_code, value: URBANISM }
+
+        - insert:
+            tableName: program_project
+            columns:
+              - column: { name: project_code, value: CLEAN_CITY }
+              - column: { name: program_code, value: URBANISM }
