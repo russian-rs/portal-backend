@@ -30,5 +30,8 @@ class Project(
         joinColumns = [JoinColumn(name = "project_code")],
         inverseJoinColumns = [JoinColumn(name = "statistic_group_code")]
     )
-    val statisticGroups: Set<StatisticGroup> = emptySet()
+    val statisticGroups: Set<StatisticGroup> = emptySet(),
+
+    @ManyToMany(mappedBy = "projects")
+    val programs: MutableSet<Program> = mutableSetOf()
 )
