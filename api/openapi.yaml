@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.22.1
+  version: 1.23.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -502,6 +502,36 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportPageResponse'
+  /reports/heat-map:
+    post:
+      operationId: getVolunteerHeatMap
+      description: Тепловая карта отчетов
+      tags:
+        - report-heat-map
+      parameters:
+        - name: searchQuery
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: pageRequest
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/PageRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportsHeatMapFilter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsHeatMapPageResponse'
 
   /application/create:
     post:
@@ -741,7 +771,6 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-
   /projects:
     get:
       operationId: getProjects
@@ -776,7 +805,6 @@ paths:
                   $ref: '#/components/schemas/CityDto'
         '500':
           $ref: '#/components/responses/ServerError'
-
   /cities/{code}:
     get:
       operationId: findCityByCode
@@ -800,7 +828,6 @@ paths:
           description: City not found
         '500':
           $ref: '#/components/responses/ServerError'
-
   /cities/search:
     get:
       operationId: findCityByName
@@ -847,7 +874,6 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
-
 components:
   responses:
     ServerError:
@@ -893,7 +919,7 @@ components:
           description: общее время, затраченное в часах всеми волонтерами в группе
     ProgramStatItem:
       type: object
-      required: [code, data]
+      required: [ code, data ]
       properties:
         code:
           type: string
@@ -903,7 +929,7 @@ components:
           $ref: '#/components/schemas/StatisticData'
     ProgramStatistics:
       type: object
-      required: [items, total]
+      required: [ items, total ]
       properties:
         items:
           type: array
@@ -1407,33 +1433,20 @@ components:
     UserSearchFilter:
       type: object
       nullable: false
-      required:
-        - onlyInactive
       properties:
+        onlyActive:
+          type: boolean
+          nullable: true
+          description: Показывать только активных пользователей
         onlyInactive:
           type: boolean
-          nullable: false
-          default: false
-          description: Показывать только неактивных пользователей
-        programCodes:
-          deprecated: true
-          type: array
-          description: Показывать только пользователей указанных программ
-          items:
-            type: string
-          uniqueItems: true
+          nullable: true
+          description: Показывать только неактивных пользователей (onlyActive приоритетней если указаны оба)
         program:
           type: string
           nullable: true
           description: Показывать только пользователей по указанной программе, пустая строка значит показать пользователей без программы
           example: "IT"
-        projectCodes:
-          deprecated: true
-          type: array
-          description: Показывать только пользователей указанных проектов
-          items:
-            type: string
-          uniqueItems: true
         project:
           type: string
           nullable: true
@@ -1496,3 +1509,87 @@ components:
           type: string
         nameSr:
           type: string
+
+    ReportsHeatMapPageResponse:
+      type: object
+      required:
+        - content
+        - page
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/VolunteerHeatMapItem'
+        page:
+          $ref: '#/components/schemas/PageResponse'
+    VolunteerHeatMapItem:
+      type: object
+      required:
+        - volunteerInfo
+        - weeks
+      properties:
+        volunteerInfo:
+          $ref: '#/components/schemas/UserInfoDto'
+        weeks:
+          type: array
+          description: Информация по каждой неделе
+          items:
+            $ref: '#/components/schemas/HeatMapItem'
+        totalWorked:
+          type: number
+          description: Кол-во засчитанных часов по отчетам по всем неделям
+          nullable: false
+        totalRequired:
+          type: number
+          description: Кол-во требуемых часов суммарно по всем неделям
+          nullable: false
+    HeatMapItem:
+      type: object
+      required:
+        - week
+        - weekStart
+        - weekEnd
+        - hoursWorked
+        - hoursRequired
+      properties:
+        week:
+          type: integer
+          description: Номер недели
+          nullable: false
+          example: 52
+        weekStart:
+          type: string
+          format: date
+          description: Дата начала недели
+          nullable: false
+        weekEnd:
+          type: string
+          format: date
+          description: Дата окончания недели
+          nullable: false
+        hoursWorked:
+          type: number
+          description: Кол-во засчитанных часов по отчетам в указанную неделю
+          nullable: false
+        hoursRequired:
+          type: number
+          description: Кол-во требуемых часов в указанную неделю
+          nullable: false
+    ReportsHeatMapFilter:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+          description: Дата, начиная с которой, вывести тепловую карту
+          example: "2025-01-01"
+        program:
+          type: string
+          nullable: true
+          description: Показывать только пользователей по указанной программе, пустая строка значит показать пользователей без программы
+          example: "IT"
+        project:
+          type: string
+          nullable: true
+          description: Показывать только пользователей по указанному проекту, пустая строка значит показать пользователей без проекта
+          example: "DESIGN_3D"
