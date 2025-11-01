@@ -6,6 +6,7 @@ import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.JoinTable
 import jakarta.persistence.ManyToMany
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 
 @Entity
@@ -24,6 +25,10 @@ class Project(
     @Column(name = "name_sr", nullable = false)
     val nameSr: String,
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "program_code", nullable = false)
+    val program: Program,
+
     @ManyToMany
     @JoinTable(
         name = "project_statistic_group",
@@ -31,7 +36,4 @@ class Project(
         inverseJoinColumns = [JoinColumn(name = "statistic_group_code")]
     )
     val statisticGroups: Set<StatisticGroup> = emptySet(),
-
-    @ManyToMany(mappedBy = "projects")
-    val programs: MutableSet<Program> = mutableSetOf()
 )

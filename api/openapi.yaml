@@ -740,22 +740,6 @@ paths:
                   $ref: '#/components/schemas/ProgramDto'
         '500':
           $ref: '#/components/responses/ServerError'
-  /programs/mapping:
-    get:
-      operationId: getProgramProjectMapping
-      tags: [ programs ]
-      summary: Mapping of program to project codes
-      responses:
-        '200':
-          description: List of mappings program to projects
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/ProgramMapDto'
-        '500':
-          $ref: '#/components/responses/ServerError'
 
   /projects:
     get:
@@ -774,40 +758,6 @@ paths:
                   $ref: '#/components/schemas/ProjectDto'
         '500':
           $ref: '#/components/responses/ServerError'
-  /projects/by-program/{code}:
-    get:
-      operationId: getProjectsByProgram
-      tags: [ projects ]
-      parameters:
-        - in: path
-          name: code
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/ProjectDto' }
-  /programs/by-project/{code}:
-    get:
-      operationId: getProgramsByProject
-      tags: [ programs ]
-      parameters:
-        - in: path
-          name: code
-          required: true
-          schema: { type: string }
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: array
-                items: { $ref: '#/components/schemas/ProgramDto' }
 
   /cities:
     get:
@@ -1529,6 +1479,10 @@ components:
           type: string
         nameSr:
           type: string
+        projectCodes:
+          type: array
+          description: List of project codes related to this program
+          items: { type: string }
     ProjectDto:
       type: object
       required:
@@ -1545,18 +1499,6 @@ components:
           type: string
         nameSr:
           type: string
-    ProgramMapDto:
-      type: object
-      additionalProperties: false
-      required: [ programCode, projectCodes ]
-      properties:
         programCode:
           type: string
-          description: Program code (e.g., IT, MEDIA)
-        projectCodes:
-          type: array
-          description: Projects allowed for the program
-          uniqueItems: true
-          items:
-            type: string
-            description: Project code (e.g., APPS, LAYOUT)
+          description: Owning program code
