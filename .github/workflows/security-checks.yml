@@ -1,0 +1,108 @@
+name: Security Checks
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+
+env:
+  GITLEAKS_VERSION: "8.28.0"
+
+jobs:
+  security-scan:
+    name: Pre-commit Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for better analysis
+
+      - name: Get changed files
+        id: changed-files
+        uses: tj-actions/changed-files@v41
+        with:
+          separator: "\n"
+
+      - name: Install optional tools
+        run: |
+          # Install gitleaks for comprehensive secret scanning
+          wget -q https://github.com/gitleaks/gitleaks/releases/download/v${{ env.GITLEAKS_VERSION }}/gitleaks_${{ env.GITLEAKS_VERSION }}_linux_x64.tar.gz
+          tar -xzf gitleaks_${{ env.GITLEAKS_VERSION }}_linux_x64.tar.gz
+          sudo mv gitleaks /usr/local/bin/
+          sudo chmod +x /usr/local/bin/gitleaks
+
+          # Install exiftool for EXIF metadata scanning
+          sudo apt-get update
+          sudo apt-get install -y libimage-exiftool-perl
+
+          echo "✅ Security tools installed"
+
+      - name: Run pre-commit security checks
+        env:
+          CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+          CHECK_MODE: ci
+          SKIP_OPTIONAL_TOOLS: false
+        run: |
+          echo "=========================================="
+          echo "Running Security Checks on Changed Files"
+          echo "=========================================="
+          echo ""
+
+          # Use shared security check script
+          chmod +x scripts/security-check.sh
+          ./scripts/security-check.sh
+
+      - name: Comment PR on failure
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ❌ Security Check Failed
+
+              The pre-commit security checks detected issues in this PR.
+
+              **Common Issues:**
+              - 🔑 Hardcoded secrets (API keys, passwords, tokens)
+              - 📁 Large files (>1MB) - consider Git LFS
+              - 🔒 Private keys or certificates
+              - 📄 Backup files (.bak, .old)
+              - 🌐 Hardcoded URLs or IP addresses
+
+              **How to Fix:**
+              1. Review the job logs above for specific errors
+              2. Remove sensitive data or use environment variables
+              3. Add large files to .gitignore or use Git LFS
+              4. Push your fixes
+
+              **For Local Development:**
+              Set up pre-commit hooks to catch issues before pushing:
+              \`\`\`bash
+              git config core.hooksPath .git-hooks
+              \`\`\`
+
+              See [README-SECURITY.md](../blob/main/README-SECURITY.md) for details.
+              `
+            })
+
+      - name: Success summary
+        if: success()
+        run: |
+          echo "✅ All security checks passed!"
+          echo ""
+          echo "The following checks were performed:"
+          echo "  ✓ Suspicious filenames"
+          echo "  ✓ Large files (>1MB)"
+          echo "  ✓ Backup files"
+          echo "  ✓ Certificates and keys"
+          echo "  ✓ Database dumps"
+          echo "  ✓ Secrets in file contents"
+          echo "  ✓ Gitleaks scan"
+          echo ""
+          echo "Your changes are safe to merge! 🎉"
