@@ -1,5 +1,5 @@
 # Use the official Gradle image with JDK 21 installed
-FROM gradle:8.11.1-jdk21-alpine AS build
+FROM gradle:9.0.0-jdk21-alpine AS build
 
 # Set work directory
 WORKDIR /home/gradle/src
