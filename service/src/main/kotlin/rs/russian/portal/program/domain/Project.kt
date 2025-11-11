@@ -2,6 +2,7 @@ package rs.russian.portal.program.domain
 
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
 import jakarta.persistence.JoinTable
@@ -25,7 +26,7 @@ class Project(
     @Column(name = "name_sr", nullable = false)
     val nameSr: String,
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "program_code", nullable = false)
     val program: Program,
 
