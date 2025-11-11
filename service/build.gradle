@@ -25,7 +25,10 @@ kotlin {
 
 dependencyCheck {
     failBuildOnCVSS = 7
-    suppressionFile = "dependency-check-suppressions.xml"
+    suppressionFile = file("dependency-check-suppressions.xml").absolutePath
+    nvd {
+        apiKey = System.getenv('NVD_API_KEY') ?: ''
+    }
 }
 
 dependencies {
