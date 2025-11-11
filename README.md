@@ -24,3 +24,22 @@ api лежит в `api/openapi.yaml` и генерится автоматиче�
 ### Тесты 
 - Для запуска использовать docker-compose-test.
 - Указывать профили "local", "no-auth", "test"
+
+## Security Checks
+
+Проверки безопасности запускаются автоматически в GitHub Actions при создании PR.
+
+**Локальная установка**:
+```bash
+git config core.hooksPath .git-hooks
+```
+
+**Ручной запуск**: `./scripts/security-check.sh`
+
+**Полное сканирование**: 
+Необходимо установить инструменты `gitleaks`, `exiftool`, затем выполнить:
+```bash
+export SKIP_OPTIONAL_TOOLS=false
+
+./scripts/security-check.sh`
+```
