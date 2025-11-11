@@ -7,7 +7,7 @@ import rs.russian.portal.program.domain.Program
 import rs.russian.portal.program.domain.Project
 
 
-@Mapper(componentModel = "spring")
+@Mapper
 abstract class ProgramMapper {
 
     @Mapping(target = "projectCodes", source = "projects")

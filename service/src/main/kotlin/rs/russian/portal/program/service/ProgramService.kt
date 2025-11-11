@@ -15,7 +15,7 @@ class ProgramService(
 ) {
 
     @Transactional(readOnly = true)
-    @Cacheable(cacheNames = [PROGRAM_DICT_CACHE_NAME], key = "'all'")
+    @Cacheable(cacheNames = [PROGRAM_DICT_CACHE_NAME])
     fun getPrograms(): List<ProgramDto> =
         programRepository.findAll().map(programMapper::toDto)
 }
