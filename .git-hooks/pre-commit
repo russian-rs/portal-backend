@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#
+# Pre-commit hook - calls shared security check script
+#
+
+# Skip optional tools (gitleaks, exiftool) in local hook
+# These should be installed manually if desired
+export SKIP_OPTIONAL_TOOLS=true
+export CHECK_MODE=hook
+
+# Call shared security check script
+exec "$(dirname "$0")/../scripts/security-check.sh" "$@"
