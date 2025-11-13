@@ -15,8 +15,7 @@ class ProjectService(
 ) {
 
     @Transactional(readOnly = true)
-    @Cacheable(cacheNames = [PROJECT_DICT_CACHE_NAME])
-    fun getProjects(): List<ProjectDto> {
-        return projectRepository.findAll().map { projectMapper.toDto(it) }
-    }
+    @Cacheable(cacheNames = [PROJECT_DICT_CACHE_NAME], key = "'all'")
+    fun getProjects(): List<ProjectDto> =
+        projectRepository.findAll().map(projectMapper::toDto)
 }
