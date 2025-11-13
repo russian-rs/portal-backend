@@ -3,6 +3,7 @@ package rs.russian.portal.program.domain
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
+import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
 
 @Entity
@@ -19,5 +20,8 @@ class Program(
     val nameEn: String,
 
     @Column(name = "name_sr", nullable = false)
-    val nameSr: String
+    val nameSr: String,
+
+    @OneToMany(mappedBy = "program")
+    val projects: Set<Project> = emptySet(),
 )
