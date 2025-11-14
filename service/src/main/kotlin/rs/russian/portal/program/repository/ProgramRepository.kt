@@ -7,8 +7,9 @@ import rs.russian.portal.program.domain.Program
 
 @Repository
 interface ProgramRepository : JpaRepository<Program, String> {
+
     fun findByCode(code: String): Program?
 
-    @EntityGraph(attributePaths = ["projects"])
+    @EntityGraph(Program.GRAPH_FULL)
     override fun findAll(): List<Program>
 }
