@@ -6,5 +6,6 @@ import rs.russian.portal.program.domain.Project
 
 @Repository
 interface ProjectRepository : JpaRepository<Project, String> {
+
     fun findByCode(code: String): Project?
 }

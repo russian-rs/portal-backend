@@ -1,13 +1,15 @@
 package rs.russian.portal.program.domain
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.Id
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
+import jakarta.persistence.*
 
 @Entity
 @Table(name = "program")
+@NamedEntityGraph(
+    name = Program.GRAPH_FULL,
+    attributeNodes = [
+        NamedAttributeNode("projects")
+    ]
+)
 class Program(
     @Id
     @Column(name = "code", nullable = false, unique = true)
@@ -24,4 +26,9 @@ class Program(
 
     @OneToMany(mappedBy = "program")
     val projects: Set<Project> = emptySet(),
-)
+) {
+
+    companion object {
+        const val GRAPH_FULL = "Program.Full"
+    }
+}
