@@ -1,0 +1,12 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.12.0-project-code-other
+      author: Valerii Linden
+      changes:
+        - insert:
+            tableName: program
+            columns:
+              - column: { name: code, value: OTHER }
+              - column: { name: name_ru, value: Другое }
+              - column: { name: name_en, value: Other }
+              - column: { name: name_sr, value: Drugo }
