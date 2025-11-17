@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.12.2-fix-null-program-code
+      author: Valerii Linden
+      preConditions:
+        - onFail: CONTINUE
+          columnExists:
+            tableName: project
+            columnName: program_code
+
+      changes:
+        - sql:
+            sql: |
+              UPDATE project
+              SET program_code = 'OTHER'
+              WHERE program_code IS NULL;
+
+        - addNotNullConstraint:
+            tableName: project
+            columnName: program_code
+            columnDataType: VARCHAR(50)

@@ -17,8 +17,15 @@ import java.time.LocalDateTime
     name = UserInfo.GRAPH_FULL,
     attributeNodes = [
         NamedAttributeNode("avatar"),
-        NamedAttributeNode("program"),
+        NamedAttributeNode("program", subgraph = Program.GRAPH_FULL),
         NamedAttributeNode("project")
+    ],
+    subgraphs = [
+        NamedSubgraph(
+            name = Program.GRAPH_FULL, attributeNodes = [
+                NamedAttributeNode("projects")
+            ]
+        )
     ]
 )
 class UserInfo(
@@ -52,9 +59,9 @@ class UserInfo(
 
     @OneToOne(fetch = LAZY, cascade = [ALL], orphanRemoval = true)
     @JoinColumn(name = "avatar_file_id")
-    var avatar: FileInfo? = null
+    var avatar: FileInfo? = null,
 
-) : JpaEntity<String>() {
+    ) : JpaEntity<String>() {
 
     override fun equalityProperties() = setOf(UserInfo::id)
 

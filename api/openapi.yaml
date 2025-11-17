@@ -771,6 +771,7 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+
   /projects:
     get:
       operationId: getProjects
@@ -1493,6 +1494,10 @@ components:
           type: string
         nameSr:
           type: string
+        projectCodes:
+          type: array
+          description: List of project codes related to this program
+          items: { type: string }
     ProjectDto:
       type: object
       required:
@@ -1509,6 +1514,9 @@ components:
           type: string
         nameSr:
           type: string
+        programCode:
+          type: string
+          description: Owning program code
 
     ReportsHeatMapPageResponse:
       type: object
