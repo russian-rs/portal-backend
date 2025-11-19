@@ -67,7 +67,7 @@ dependencies {
     implementation("software.amazon.awssdk:s3:2.30.31")
 
     // Common
-    implementation("commons-io:commons-io:2.18.0")
+    implementation("commons-io:commons-io:2.21.0")
 
     // Web
     implementation("com.squareup.okhttp3:okhttp:$OKHTTP_VERSION")
