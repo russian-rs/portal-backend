@@ -23,7 +23,7 @@ fun searchSpecification(query: String, filter: UserSearchFilter?): Specification
         val querySpec = like<Account>(Account_.FULL_NAME, query)
             .or(like(Account_.USERNAME, query))
             .or(like(Account_.EMAIL, query))
-            .or(like(Account_.INFO, UserInfo_.TELEGRAM, query))
+            .or(like(Account_.INFO, UserInfo_.TELEGRAM, query.replace("@", "")))
             .or(like(Account_.INFO, UserInfo_.PHONE, query))
         resultSpec = resultSpec.and(querySpec)
     }
@@ -31,12 +31,12 @@ fun searchSpecification(query: String, filter: UserSearchFilter?): Specification
     filter?.let {
         var filterSpec: Specification<Account> = empty()
 
-        it.onlyInactive?.let {
-            filterSpec = filterSpec.and(equal(Account_.ACTIVE, false))
+        it.onlyInactive?.let { onlyInactive ->
+            filterSpec = filterSpec.and(equal(Account_.ACTIVE, !onlyInactive))
         }
 
-        it.onlyActive?.let {
-            filterSpec = filterSpec.and(equal(Account_.ACTIVE, true))
+        it.onlyActive?.let { onlyActive ->
+            filterSpec = filterSpec.and(equal(Account_.ACTIVE, onlyActive))
         }
 
         it.program?.let { program ->
