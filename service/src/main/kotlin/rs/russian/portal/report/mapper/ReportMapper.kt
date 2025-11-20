@@ -26,6 +26,8 @@ abstract class ReportMapper {
     @Autowired
     private lateinit var noteMapper: NoteMapper
 
+    @Mapping(target = "program", source = "program.code")
+    @Mapping(target = "project", source = "project.code")
     @Mapping(target = "week", source = "report", qualifiedByName = ["reportWeek"])
     @Mapping(target = "user", source = "account.username")
     abstract fun map(report: Report): ReportDto

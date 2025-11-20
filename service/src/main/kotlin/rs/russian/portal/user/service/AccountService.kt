@@ -2,7 +2,6 @@ package rs.russian.portal.user.service
 
 import io.authentik.model.User
 import jakarta.persistence.EntityManager
-import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -34,7 +33,7 @@ class AccountService(
     private val contractMapper: ContractMapper,
     private val accountRepository: AccountRepository,
     private val authentikUserService: AuthentikService,
-    private val entityManager: EntityManager
+    private val entityManager: EntityManager,
 ) {
 
     @Transactional(readOnly = true)
@@ -192,6 +191,7 @@ class AccountService(
             ?: throw IllegalArgumentException("Project with code: $code not found!")
 
         userInfo.project = project
+        userInfo.program = project.program
         account.info = userInfo
         return account
     }
@@ -209,9 +209,5 @@ class AccountService(
         accounts.forEach { account -> entityManager.detach(account) }
         val accountsFull = accountRepository.findAllByIdIn(accounts.mapNotNull { it.id }, pageable.sort)
         return PageImpl(accountsFull, accounts.pageable, accounts.totalElements)
-    }
-
-    companion object {
-        private val log = LoggerFactory.getLogger(this::class.java)
     }
 }

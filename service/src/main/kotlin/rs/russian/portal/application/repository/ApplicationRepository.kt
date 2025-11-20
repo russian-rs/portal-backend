@@ -2,6 +2,7 @@ package rs.russian.portal.application.repository
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
@@ -31,5 +32,7 @@ interface ApplicationRepository : JpaRepository<Application, UUID> {
     ): Optional<Application>
 
     @EntityGraph(GRAPH_FULL)
+    fun findAllByIdIn(idList: Collection<UUID>, sort: Sort): List<Application>
+
     fun findAll(specification: Specification<Application>, pageable: Pageable): Page<Application>
 }

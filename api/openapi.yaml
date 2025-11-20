@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.23.0
+  version: 1.24.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -1191,20 +1191,34 @@ components:
         createTime:
           type: string
           format: date-time
+          description: Время создания
         user:
           type: string
+          description: Логин пользователя
         status:
           type: string
+          description: Статус отчета
         week:
           type: number
+          description: Номер отчетной недели
+        program:
+          type: string
+          description: Код программы
+          example: IT
+        project:
+          type: string
+          description: Код проекта
+          example: PORTAL
         tasks:
           type: array
           default: [ ]
+          description: Список задач в отчете
           items:
             $ref: '#/components/schemas/TaskDto'
         notes:
           type: array
           default: [ ]
+          description: Список заметок от модератора
           items:
             $ref: '#/components/schemas/NoteDto'
     TaskDto:
