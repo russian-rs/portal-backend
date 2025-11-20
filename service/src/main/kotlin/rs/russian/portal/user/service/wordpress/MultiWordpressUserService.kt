@@ -10,9 +10,10 @@ import rs.russian.portal.user.service.AccountSynchroniser
 @Service
 class MultiWordpressUserService(
     private val wordpressUserServices: Map<String, WordpressUserService>,
-    private val wordpressUserMapper: WordpressUserMapper
-): AccountSynchroniser {
-   override fun sync(accounts: List<Account>) {
+    private val wordpressUserMapper: WordpressUserMapper,
+) : AccountSynchroniser {
+
+    override fun sync(accounts: List<Account>) {
         wordpressUserServices.forEach { (_, service) ->
             try {
                 val existingRoles = service.getAvailableRoles().map { it.slug }
@@ -24,7 +25,11 @@ class MultiWordpressUserService(
         }
     }
 
-    private fun createOrUpdateWpUser(service: WordpressUserService, account: Account, existingRoles: List<String>): Boolean {
+    private fun createOrUpdateWpUser(
+        service: WordpressUserService,
+        account: Account,
+        existingRoles: List<String>,
+    ): Boolean {
         try {
             var wpUser = service.getUser(account.username)
             if (wpUser == null) { // new user
@@ -62,4 +67,4 @@ class MultiWordpressUserService(
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
     }
-} 
+}
