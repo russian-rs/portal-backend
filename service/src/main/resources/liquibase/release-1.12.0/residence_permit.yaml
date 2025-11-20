@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.12.0-residence-permit-create-table
+      author: AI
+      changes:
+        - createTable:
+            tableName: residence_permit
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: account_id
+                  type: INT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_residence_permit_account
+                    referencedTableName: account
+                    referencedColumnNames: id
+              - column: { name: nationality, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: purpose_of_stay, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: note, type: VARCHAR(255) }
+              - column: { name: issuing_authority, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: state_of_birth, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: valid_until, type: DATE, constraints: { nullable: false } }
+              - column: { name: issuing_date, type: DATE, constraints: { nullable: false } }
+              - column: { name: registration_number, type: VARCHAR(9), constraints: { nullable: false } }
+              - column: { name: identity_number, type: VARCHAR(13), constraints: { nullable: false } }
+              - column:
+                  name: front_side_file_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_residence_permit_front_file
+                    referencedTableName: file_info
+                    referencedColumnNames: id
+              - column:
+                  name: back_side_file_id
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_residence_permit_back_file
+                    referencedTableName: file_info
+                    referencedColumnNames: id
+              - column:
+                  name: version
+                  type: DATETIME
+                  constraints:
+                    nullable: false

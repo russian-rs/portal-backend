@@ -22,13 +22,16 @@ import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.domain.specification.searchSpecification
 import rs.russian.portal.user.mapper.ContractMapper
 import rs.russian.portal.user.mapper.UserMapper
+import rs.russian.portal.user.mapper.ResidencePermitMapper
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.authentik.AuthentikService
+import java.util.UUID
 
 @Service
 class AccountService(
     private val userMapper: UserMapper,
     private val programRepository: ProgramRepository,
+    private val residencePermitMapper: ResidencePermitMapper,
     private val projectRepository: ProjectRepository,
     private val fileService: FileService,
     private val contractMapper: ContractMapper,
@@ -68,7 +71,7 @@ class AccountService(
         val ssoUser = authentikUserService.createUser(request.username, request.fullName, request.email)
         var account = userMapper.map(ssoUser)
         account.info = UserInfo.default(account)
-        account.contracts = mutableListOf(userMapper.map(request.contract, account))
+        account.contracts = mutableSetOf(userMapper.map(request.contract, account))
         account = accountRepository.saveAndFlush(account)
         return account
     }
@@ -152,6 +155,15 @@ class AccountService(
     }
 
     @Transactional
+    fun updateResidencePermits(id: Int, permits: List<ResidencePermitDto>): Account {
+        val account = getAccount(id)
+        val newPermits = permits.map { residencePermitMapper.toEntity(it, account) }.toSet()
+        account.residencePermits.retainAll(newPermits)
+        account.residencePermits.addAll(newPermits)
+        return accountRepository.save(account)
+    }
+
+    @Transactional
     fun updateInfo(accountId: Int, newInfo: UserInfo) {
         val account = getAccount(accountId)
         newInfo.id = account.username
@@ -194,6 +206,13 @@ class AccountService(
         userInfo.project = project
         account.info = userInfo
         return account
+    }
+
+    @Transactional
+    fun deleteResidencePermit(accountId: Int, permitId: UUID): Account {
+        val account = getAccount(accountId)
+        account.residencePermits.removeIf { it.id == permitId }
+        return accountRepository.save(account)
     }
 
     /**

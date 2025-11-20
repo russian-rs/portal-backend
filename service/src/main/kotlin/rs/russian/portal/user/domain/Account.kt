@@ -18,6 +18,7 @@ import java.time.LocalDateTime
     attributeNodes = [
         NamedAttributeNode("info", subgraph = UserInfo.GRAPH_FULL),
         NamedAttributeNode("contracts"),
+        NamedAttributeNode("residencePermits", subgraph = "ResidencePermit.photos"),
     ],
     subgraphs = [
         NamedSubgraph(
@@ -25,6 +26,13 @@ import java.time.LocalDateTime
                 NamedAttributeNode("avatar"),
                 NamedAttributeNode("program"),
                 NamedAttributeNode("project")
+            ]
+        ),
+        NamedSubgraph(
+            name = "ResidencePermit.photos",
+            attributeNodes = [
+                NamedAttributeNode("frontSidePhoto"),
+                NamedAttributeNode("backSidePhoto")
             ]
         )
     ]
@@ -46,7 +54,10 @@ class Account(
     var groups: Set<UserGroup> = mutableSetOf(),
 
     @OneToMany(mappedBy = "account", cascade = [ALL], orphanRemoval = true)
-    var contracts: MutableList<Contract> = ArrayList(),
+    var contracts: MutableSet<Contract> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "account", cascade = [ALL], orphanRemoval = true)
+    var residencePermits: MutableSet<ResidencePermit> = mutableSetOf(),
 
     var active: Boolean = true,
 
