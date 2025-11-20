@@ -15,8 +15,8 @@ buildscript {
 
 ext {
     SPRING_VERSION = "3.3.6"
-    KOTLINX_VERSION = "1.8.1"
-    OKHTTP_VERSION = "5.0.0-alpha.14"
+    KOTLINX_VERSION = "1.10.2"
+    OKHTTP_VERSION = "5.3.0"
     JACKSON_KOTLIN_VERSION = "2.18.2"
     JAKARTA_VALIDATION_VERSION = "3.1.0"
 }
