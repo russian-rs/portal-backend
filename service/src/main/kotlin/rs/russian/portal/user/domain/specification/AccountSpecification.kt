@@ -32,11 +32,15 @@ fun searchSpecification(query: String, filter: UserSearchFilter?): Specification
         var filterSpec: Specification<Account> = empty()
 
         it.onlyInactive?.let { onlyInactive ->
-            filterSpec = filterSpec.and(equal(Account_.ACTIVE, !onlyInactive))
+            if (onlyInactive) {
+                filterSpec = filterSpec.and(equal(Account_.ACTIVE, false))
+            }
         }
 
         it.onlyActive?.let { onlyActive ->
-            filterSpec = filterSpec.and(equal(Account_.ACTIVE, onlyActive))
+            if (onlyActive) {
+                filterSpec = filterSpec.and(equal(Account_.ACTIVE, true))
+            }
         }
 
         it.program?.let { program ->
