@@ -13,9 +13,13 @@ app:
   authentik:
     base-url: https://REDACTED_HOST
     # Можно взять в Coolify в настройках окружения
-    api-key: ${AUTHENTIK_API_KEY}
+    api-key: ${AUTHENTIK_API_KEY:no-key}
   wordpress:
     instances:
+  helpdesk:
+    api-key: ${HELPDESK_API_KEY:no-key}
+    api-base-url: ${HELPDESK_API_BASE_URL:http://localhost/api/v1}
+    ticket-base-url: ${HELPDESK_TICKET_BASE_URL:http://localhost/ticket/zoom}
   schedulers:
     email-outbox: "-"
     user-sync: "-"
@@ -32,7 +36,7 @@ spring:
     username: ${DB_USER:admin}
     password: ${DB_PASS:123456}
   jpa:
-#    show-sql: true
+    #    show-sql: true
     properties:
       hibernate:
         format_sql: true

@@ -36,26 +36,32 @@ import javax.sql.DataSource
 @EnableSchedulerLock(defaultLockAtLeastFor = "PT1M", defaultLockAtMostFor = "PT59M")
 @EnableConfigurationProperties(
     value = [
-        AppProperties::class, S3Properties::class, AuthentikProperties::class, WordpressProperties::class, OutlineProperties::class]
+        AppProperties::class,
+        S3Properties::class,
+        AuthentikProperties::class,
+        WordpressProperties::class,
+        OutlineProperties::class,
+        HelpdeskProperties::class
+    ]
 )
-class AppConfig {
+open class AppConfig {
 
     @Bean
     @Primary
-    fun objectMapper(): ObjectMapper = ObjectMapper()
+    open fun objectMapper(): ObjectMapper = ObjectMapper()
         .registerKotlinModule()
         .registerModules(JavaTimeModule())
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     @Bean
-    fun csvMapper(): CsvMapper = CsvMapper().apply {
+    open fun csvMapper(): CsvMapper = CsvMapper().apply {
         registerKotlinModule()
         registerModules(JavaTimeModule())
         disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     }
 
     @Bean
-    fun shedlockProvider(datasource: DataSource): LockProvider = JdbcTemplateLockProvider(
+    open fun shedlockProvider(datasource: DataSource): LockProvider = JdbcTemplateLockProvider(
         JdbcTemplateLockProvider.Configuration.builder()
             .withJdbcTemplate(JdbcTemplate(datasource))
             .usingDbTime()
@@ -63,7 +69,7 @@ class AppConfig {
     )
 
     @Bean
-    fun s3Client(props: S3Properties): S3Client {
+    open fun s3Client(props: S3Properties): S3Client {
         val creds = AwsBasicCredentials.create(props.accessKey, props.secretKey)
         return S3Client.builder()
             .region(Region.of(props.region))
@@ -74,7 +80,7 @@ class AppConfig {
     }
 
     @Bean
-    fun s3Presigner(props: S3Properties, s3Client: S3Client): S3Presigner {
+    open fun s3Presigner(props: S3Properties, s3Client: S3Client): S3Presigner {
         val creds = AwsBasicCredentials.create(props.accessKey, props.secretKey)
         return S3Presigner.builder()
             .region(Region.of(props.region))
@@ -90,14 +96,14 @@ class AppConfig {
     }
 
     @Bean
-    fun cacheManager(): CaffeineCacheManager {
+    open fun cacheManager(): CaffeineCacheManager {
         val cacheManager = CaffeineCacheManager()
         CACHE_MAP.forEach { (name, cache) -> cacheManager.registerCustomCache(name, cache) }
         return cacheManager
     }
 
     @Bean("emailTemplateEngine")
-    fun emailTemplateEngine(): SpringTemplateEngine {
+    open fun emailTemplateEngine(): SpringTemplateEngine {
         val templateResolver = ClassLoaderTemplateResolver()
         templateResolver.prefix = "templates/email/"
         templateResolver.suffix = ".html"
@@ -110,7 +116,7 @@ class AppConfig {
 
     @Bean
     @Profile("local")
-    fun requestLoggingFilter(): CommonsRequestLoggingFilter {
+    open fun requestLoggingFilter(): CommonsRequestLoggingFilter {
         val filter = CommonsRequestLoggingFilter()
         filter.setIncludeQueryString(true)
         filter.setIncludePayload(false)

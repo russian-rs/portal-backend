@@ -5,7 +5,7 @@ import java.time.Duration
 
 @ConfigurationProperties(prefix = "app")
 data class AppProperties(
-    val frontendUri: String
+    val frontendUri: String,
 )
 
 @ConfigurationProperties(prefix = "app.s3")
@@ -16,29 +16,36 @@ data class S3Properties(
     val endpoint: String,
     val presignDuration: Duration,
     val bucket: String,
-    val bucketService: String
+    val bucketService: String,
 )
 
 @ConfigurationProperties(prefix = "app.authentik")
 data class AuthentikProperties(
     val baseUrl: String,
-    val apiKey: String
+    val apiKey: String,
 )
 
 @ConfigurationProperties(prefix = "app.wordpress")
 data class WordpressProperties(
-    val instances: List<WordpressInstance>
+    val instances: List<WordpressInstance>,
 )
 
 data class WordpressInstance(
     val name: String,
     val baseUrl: String,
     val username: String,
-    val password: String
+    val password: String,
 )
 
 @ConfigurationProperties(prefix = "app.outline")
 data class OutlineProperties(
     val apiKey: String,
-    val baseUrl: String
+    val baseUrl: String,
+)
+
+@ConfigurationProperties(prefix = "app.helpdesk")
+data class HelpdeskProperties(
+    val apiKey: String,
+    val apiBaseUrl: String,
+    val ticketBaseUrl: String,
 )

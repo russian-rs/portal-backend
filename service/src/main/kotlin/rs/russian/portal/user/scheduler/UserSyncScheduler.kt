@@ -11,7 +11,7 @@ import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.Account_
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.AccountService
-import rs.russian.portal.user.service.AccountSynchroniser
+import rs.russian.portal.user.service.AccountSynchronizer
 import rs.russian.portal.user.service.authentik.AuthentikService
 import java.time.Duration
 import java.time.LocalDateTime
@@ -22,7 +22,7 @@ private val log = LoggerFactory.getLogger(UserSyncScheduler::class.java)
 class UserSyncScheduler(
     private val accountService: AccountService,
     private val accountRepository: AccountRepository,
-    private val accountSynchronisers: List<AccountSynchroniser>,
+    private val accountSynchronizers: List<AccountSynchronizer>,
     private val authentikUserService: AuthentikService,
 ) {
 
@@ -41,14 +41,14 @@ class UserSyncScheduler(
                 accountService.createOrUpdateAccount(ssoUser)
             }
             .toList()
-        accountSynchronisers.forEach { it.sync(usersToSync) }
+        accountSynchronizers.forEach { it.sync(usersToSync) }
 
         val inactiveSpec = less<Account, LocalDateTime>(Account_.LAST_SYNCED, syncStart)
             .or(isNull(Account_.LAST_SYNCED))
         val inactiveUsers = accountRepository.findAll(inactiveSpec)
         inactiveUsers.forEach { user ->
             accountService.save(user.also { it.active = false })
-            accountSynchronisers.forEach { it.delete(user) }
+            accountSynchronizers.forEach { it.delete(user) }
         }
 
         log.info(

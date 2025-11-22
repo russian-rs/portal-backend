@@ -28,6 +28,7 @@ dependencies {
     implementation(project(":authentik-api"))
     implementation(project(":wordpress-api"))
     implementation(project(":outline-api"))
+    implementation(project(":helpdesk-api"))
 
     // Spring
     implementation("org.springframework.boot:spring-boot-starter")

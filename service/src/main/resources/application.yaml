@@ -43,6 +43,10 @@ app:
   outline:
     base-url: ${OUTLINE_BASE_URL}
     api-key: ${OUTLINE_API_KEY} # outline -> preferences -> api&apps -> new api key with scopes: "groups.* users.*"
+  helpdesk:
+    api-key: ${HELPDESK_API_KEY}
+    api-base-url: ${HELPDESK_API_BASE_URL}
+    ticket-base-url: ${HELPDESK_TICKET_BASE_URL}
   schedulers:
     email-outbox: "*/15 * * * * *"
     user-sync: "0 0 */1 * * *"

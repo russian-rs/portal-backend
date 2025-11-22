@@ -6,16 +6,14 @@ import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Service
 import rs.russian.portal.user.domain.Account
-import rs.russian.portal.user.service.AccountSynchroniser
+import rs.russian.portal.user.service.AccountSynchronizer
 import java.util.*
-
-private val log = LoggerFactory.getLogger(OutlineServiceImpl::class.java)
 
 @Service
 @Profile("!local")
-class OutlineServiceImpl(
+class OutlineAccountSynchronizer(
     private val outlineApiClient: OutlineApiClient,
-) : AccountSynchroniser {
+) : AccountSynchronizer {
 
     override fun sync(accounts: List<Account>) {
         try {
@@ -24,12 +22,12 @@ class OutlineServiceImpl(
                 it.username = it.username.lowercase()
             }
 
-            val ourGroups = accounts.flatMap { it.groups }.map { it.oauthGroup.lowercase() }.toSet()
+            val sourceGroups = accounts.flatMap { it.groups }.map { it.oauthGroup.lowercase() }.toSet()
 
             val existingOutlineGroups = outlineApiClient.groupsList()
             val outlineMemberships = outlineApiClient.groupMemberships(existingOutlineGroups)
 
-            val outlineGroups = syncGroupsToOutline(ourGroups, existingOutlineGroups)
+            val outlineGroups = syncGroupsToOutline(sourceGroups, existingOutlineGroups)
 
             val outlineUsers = outlineApiClient.activeUsersList()
             outlineUsers.forEach { user ->
@@ -39,10 +37,9 @@ class OutlineServiceImpl(
 
             syncUsersToOutlineGroups(accounts, outlineUsers, outlineGroups, outlineMemberships)
 
-            log.info("Outline was synced successfully (${accounts.size} accounts, ${ourGroups.size} groups)")
+            log.info("Outline was synced successfully (${accounts.size} accounts, ${sourceGroups.size} groups)")
         } catch (e: Exception) {
             log.error("Error during Outline sync", e)
-            // ignore
         }
     }
 
@@ -104,24 +101,27 @@ class OutlineServiceImpl(
 
         log.info(
             "Synced Outline users to groups: " +
-                "added: ${toAdd.values.sumOf { it.size }} users to ${toAdd.keys.size} groups, " +
-                "removed: ${toRemove.values.sumOf { it.size }} users from ${toRemove.filterValues { it.isNotEmpty() }.keys.size} groups"
+                    "added: ${toAdd.values.sumOf { it.size }} users to ${toAdd.keys.size} groups, " +
+                    "removed: ${toRemove.values.sumOf { it.size }} users from ${toRemove.filterValues { it.isNotEmpty() }.keys.size} groups"
         )
     }
 
     override fun delete(account: Account) {
+        var accountEmail = account.email.lowercase()
         try {
-            val outlineUser = outlineApiClient.userByEmail(account.email)
+            val outlineUser = outlineApiClient.userByEmail(accountEmail)
             if (outlineUser == null) {
-                //log.warn("Nothing to delete: No Outline user found for email: ${account.email}")
                 return
             }
             outlineApiClient.usersSuspend(outlineUser.id!!)
 
-            log.info("Successfully suspended Outline user with email: ${account.email}")
+            log.info("Successfully suspended Outline user $accountEmail")
         } catch (e: Exception) {
-            log.error("Error during Outline users suspend (delete)", e)
-            // ignore
+            log.error("Error suspending Outline user $accountEmail", e)
         }
+    }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(this::class.java)
     }
 }
