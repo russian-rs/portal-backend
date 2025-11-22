@@ -16,21 +16,7 @@ class HelpdeskAccountSynchronizer(
     override fun sync(accounts: List<Account>) {
         try {
             syncRoles(accounts)
-            accounts.forEach { account ->
-                val email = account.email.lowercase()
-                val helpdeskUserDto = UserDto(
-                    login = email,
-                    email = email,
-                    firstname = account.fullName,
-                    roles = account.groups.map { it.oauthGroup.lowercase() }.toMutableSet()
-                )
-                val helpdeskAccount = helpdeskApiClient.getUserByEmail(email)
-                if (helpdeskAccount != null) {
-                    helpdeskApiClient.updateUser(helpdeskAccount.id!!, helpdeskUserDto)
-                } else {
-                    helpdeskApiClient.createUser(helpdeskUserDto)
-                }
-            }
+            accounts.forEach { syncAccount(it) }
         } catch (e: Throwable) {
             log.error("Error during Helpdesk users sync", e)
         }
@@ -57,6 +43,27 @@ class HelpdeskAccountSynchronizer(
             if (!existingHelpdeskRoles.contains(sourceRole)) {
                 helpdeskApiClient.createRole(RoleDto(name = sourceRole, active = true))
             }
+        }
+    }
+
+    private fun syncAccount(account: Account) {
+        val email = account.email.lowercase()
+        try {
+            val helpdeskUserDto = UserDto(
+                login = email,
+                email = email,
+                firstname = account.fullName.split(" ").first(),
+                lastname = account.fullName.split(" ").last(),
+                roles = account.groups.map { it.oauthGroup.lowercase() }.toMutableSet()
+            )
+            val helpdeskAccount = helpdeskApiClient.getUserByEmail(email)
+            if (helpdeskAccount != null) {
+                helpdeskApiClient.updateUser(helpdeskAccount.id!!, helpdeskUserDto)
+            } else {
+                helpdeskApiClient.createUser(helpdeskUserDto)
+            }
+        } catch (e: Throwable) {
+            log.error("Failed to sync account to HelpDesk $email", e)
         }
     }
 
