@@ -49,12 +49,16 @@ class HelpdeskAccountSynchronizer(
     private fun syncAccount(account: Account) {
         val email = account.email.lowercase()
         try {
+            val roles = account.groups
+                .map { it.oauthGroup.lowercase() }
+                .toMutableSet()
+                .also { it.add(DEFAULT_ROLE) }
             val helpdeskUserDto = UserDto(
                 login = email,
                 email = email,
                 firstname = account.fullName.split(" ").first(),
                 lastname = account.fullName.split(" ").last(),
-                roles = account.groups.map { it.oauthGroup.lowercase() }.toMutableSet()
+                roles = roles
             )
             val helpdeskAccount = helpdeskApiClient.getUserByEmail(email)
             if (helpdeskAccount != null) {
@@ -68,6 +72,7 @@ class HelpdeskAccountSynchronizer(
     }
 
     companion object {
+        private val DEFAULT_ROLE = "default"
         private val log = LoggerFactory.getLogger(this::class.java)
     }
 
