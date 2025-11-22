@@ -23,7 +23,7 @@ import rs.russian.portal.user.service.AccountService
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig(
+open class SecurityConfig(
     private val accountService: AccountService,
     private val appProperties: AppProperties,
 ) {
@@ -47,7 +47,7 @@ class SecurityConfig(
 
     @Bean
     @Profile("!no-auth")
-    fun securityFilterChain(
+    open fun securityFilterChain(
         httpSecurity: HttpSecurity,
     ): SecurityFilterChain = httpSecurity
         .cors {
@@ -104,7 +104,7 @@ class SecurityConfig(
 
     @Bean
     @Profile("no-auth")
-    fun securityFilterChainNoAuth(
+    open fun securityFilterChainNoAuth(
         httpSecurity: HttpSecurity,
         defaultUserFilter: DefaultUserFilter,
     ): SecurityFilterChain = httpSecurity
