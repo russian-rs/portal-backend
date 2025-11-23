@@ -16,15 +16,15 @@ import rs.russian.portal.user.domain.enums.UserGroup
 import java.math.BigDecimal
 import java.util.*
 
-val log = LoggerFactory.getLogger(OutlineServiceImplTest::class.java)
+val log = LoggerFactory.getLogger(OutlineAccountSynchronizerTest::class.java)
 
-class OutlineServiceImplTest {
+class OutlineAccountSynchronizerTest {
     private val maxFetchLimit = BigDecimal(100) // sync with OutlineApiClient
 
     private val groupsOutlineApi = mockk<GroupsOutlineApi>()
     private val usersOutlineApi = mockk<UsersOutlineApi>()
     private val outlineApiClient: OutlineApiClient = OutlineApiClient(groupsOutlineApi, usersOutlineApi)
-    private var outlineService: OutlineServiceImpl = OutlineServiceImpl(outlineApiClient)
+    private var outlineService: OutlineAccountSynchronizer = OutlineAccountSynchronizer(outlineApiClient)
 
     /**
      * ### Given

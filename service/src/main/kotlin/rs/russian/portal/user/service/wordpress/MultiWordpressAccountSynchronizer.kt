@@ -5,13 +5,13 @@ import org.springframework.stereotype.Service
 import org.wordpress.model.WpUser
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.mapper.WordpressUserMapper
-import rs.russian.portal.user.service.AccountSynchroniser
+import rs.russian.portal.user.service.AccountSynchronizer
 
 @Service
-class MultiWordpressUserService(
+class MultiWordpressAccountSynchronizer(
     private val wordpressUserServices: Map<String, WordpressUserService>,
     private val wordpressUserMapper: WordpressUserMapper,
-) : AccountSynchroniser {
+) : AccountSynchronizer {
 
     override fun sync(accounts: List<Account>) {
         wordpressUserServices.forEach { (_, service) ->

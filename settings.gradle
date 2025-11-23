@@ -26,4 +26,7 @@ project(":wordpress-api").projectDir = file("api/wordpress-api")
 include(":outline-api")
 project(":outline-api").projectDir = file("api/outline-api")
 
+include(":helpdesk-api")
+project(":helpdesk-api").projectDir = file("api/helpdesk-api")
+
 include(":service")

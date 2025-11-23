@@ -17,7 +17,7 @@ import org.springframework.session.web.http.DefaultCookieSerializer
     maxInactiveIntervalInSeconds = 172800, // 2 * 24 * 60 * 60 = 48 hours
     redisNamespace = "portal-backend-sessions"
 )
-class RedisSessionConfig : BeanClassLoaderAware {
+open class RedisSessionConfig : BeanClassLoaderAware {
 
     private lateinit var loader: ClassLoader
 
@@ -26,7 +26,7 @@ class RedisSessionConfig : BeanClassLoaderAware {
     }
 
     @Bean
-    fun springSessionDefaultRedisSerializer(): RedisSerializer<Any> {
+    open fun springSessionDefaultRedisSerializer(): RedisSerializer<Any> {
         return GenericJackson2JsonRedisSerializer(ObjectMapper().also {
             it.addMixIn(Long::class.java, LongMixin::class.java)
             it.registerModules(SecurityJackson2Modules.getModules(this.loader))
@@ -38,7 +38,7 @@ class RedisSessionConfig : BeanClassLoaderAware {
     }
 
     @Bean
-    fun cookieSerializer(): CookieSerializer {
+    open fun cookieSerializer(): CookieSerializer {
         val cookieSerializer = DefaultCookieSerializer()
         cookieSerializer.setCookieMaxAge(2 * 24 * 60 * 60) // 48 hours in seconds
         cookieSerializer.setUseSecureCookie(true)
