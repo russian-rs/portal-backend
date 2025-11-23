@@ -48,7 +48,7 @@ class OutlineAccountSynchronizerTest {
     fun `sync existing groups with members`() {
         // Given: our groups in DB for accounts
         val userGroup1 = UserGroup.DEVELOPER
-        val userGroup2 = UserGroup.INSIDE_VOLUNTEER
+        val userGroup2 = UserGroup.VOLUNTEER
 
         // Given: accounts from our db
         val accountGroup1 = Instancio.of(Account::class.java)
@@ -180,7 +180,7 @@ class OutlineAccountSynchronizerTest {
     fun `sync accounts and create new group`() {
         // Given: our groups in DB for accounts
         val userGroup1Existed = UserGroup.DEVELOPER
-        val userGroup2ToCreate = UserGroup.INSIDE_VOLUNTEER // to create in outline
+        val userGroup2ToCreate = UserGroup.VOLUNTEER // to create in outline
 
         // Given: accounts from our db
         val accountGroup12 = Instancio.of(Account::class.java)
@@ -265,7 +265,7 @@ class OutlineAccountSynchronizerTest {
     fun `sync accounts and delete from group`() {
         // Given: our groups in DB for accounts
         val userGroup1Existed = UserGroup.DEVELOPER
-        val userGroup2ToRemoveFrom = UserGroup.INSIDE_VOLUNTEER
+        val userGroup2ToRemoveFrom = UserGroup.VOLUNTEER
 
         // Given: accounts from our db
         val accountGroup12 = Instancio.of(Account::class.java)

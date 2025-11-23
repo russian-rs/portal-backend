@@ -4,18 +4,14 @@ enum class UserGroup(val oauthGroup: String) {
 
     ADMIN("administrator"),
     ADMIN_VOLUNTEER("admin_of_volunteer"),
-    ADMIN_SSO("administrator_sso"),
-    ADMIN_WP("admin_wp"),
+    DEVELOPER_WP("developer_wp"),
     DEVELOPER("developer"),
-    GUIDES("um_guidesman"),
-    INSIDE_VOLUNTEER("um_inside_volounteer"),
-    MAIN_VOLUNTEER("um_main_volounteer"),
-    LAWYERS("um_lawyers"),
-    MEDIA("um_media"),
-    TEACHER("stm_lms_instructor"),
-    SEO_MANAGER("wpseo_editor"),
+    VOLUNTEER("volounteer"),
+    VOLUNTEER_CC("volounteer_cc"),
+    LAWYERS("lawyers"),
+    MEDIA("media"),
+    TEACHER("teacher"),
     INTERVIEWER("interviewer"),
-    MEMBER("um_member_of_diaspora"),
     ;
 
     companion object {

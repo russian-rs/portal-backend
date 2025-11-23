@@ -7,7 +7,6 @@ import rs.russian.generated.model.*
 import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.Authorized
-import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_SSO
 import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.service.AccountService
@@ -67,18 +66,18 @@ class UserController(
         return ResponseEntity.ok(userMapper.map(accountService.setProject(id, code).info))
     }
 
-    @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])
+    @Authorized(allowed = [ADMIN_VOLUNTEER])
     override fun createUser(userCreateRequest: UserCreateRequest): ResponseEntity<UserInfoDto> {
         val account = accountService.create(userCreateRequest)
         return ResponseEntity.ok(userMapper.map(account.info))
     }
 
-    @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])
+    @Authorized(allowed = [ADMIN_VOLUNTEER])
     override fun activateAccount(id: Int): ResponseEntity<UserInfoDto> {
         return ResponseEntity.ok(userMapper.map(accountService.switchActiveState(id, true).info))
     }
 
-    @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])
+    @Authorized(allowed = [ADMIN_VOLUNTEER])
     override fun deactivateAccount(id: Int): ResponseEntity<UserInfoDto> {
         return ResponseEntity.ok(userMapper.map(accountService.switchActiveState(id, false).info))
     }
@@ -92,7 +91,7 @@ class UserController(
         val targetAccount = accountService.getAccountByLogin(login)
         val currentAccount = accountService.getCurrentAccount()
 
-        if (!(currentAccount.groups.contains(ADMIN_SSO) || currentAccount.groups.contains(ADMIN_VOLUNTEER))) {
+        if (!(currentAccount.groups.contains(ADMIN_VOLUNTEER))) {
             if (currentAccount.username != login) {
                 throw NotAuthorizedException()
             }
