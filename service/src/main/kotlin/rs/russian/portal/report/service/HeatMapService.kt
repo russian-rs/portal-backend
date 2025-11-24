@@ -8,6 +8,8 @@ import rs.russian.portal.report.repository.ReportHeatMapRepository
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.service.AccountService
+import java.math.BigDecimal.ZERO
+import java.math.BigDecimal.valueOf
 import java.time.LocalDate
 import java.time.LocalDate.now
 
@@ -45,13 +47,15 @@ class HeatMapService(
         val result = ArrayList<VolunteerHeatMapItem>()
         accounts.forEach { account ->
             val weeks = heatMap[account.username] ?: mutableListOf()
+            val totalRequired = weeks.sumOf { it.hoursRequired }
             result.add(
                 VolunteerHeatMapItem(
                     volunteerInfo = userMapper.map(account.info),
                     weeks = weeks,
                     totalWorked = weeks.sumOf { it.hoursWorked },
-                    totalRequired = weeks.sumOf { it.hoursRequired }
-                ))
+                    totalRequired = if (totalRequired == ZERO) ZERO else totalRequired.minus(valueOf(10)),
+                )
+            )
         }
         return ReportsHeatMapPageResponse(
             content = result.sortedByDescending { r -> r.totalRequired!!.minus(r.totalWorked!!) }.toMutableList(),
