@@ -85,7 +85,7 @@ dependencies {
     kapt('org.mapstruct:mapstruct-processor:1.6.3')
 
     // CSV
-    implementation('com.opencsv:opencsv:5.9')
+    implementation('com.opencsv:opencsv:5.12.0')
     implementation('com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.17.2')
 
     // Logging
