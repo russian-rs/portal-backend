@@ -17,5 +17,5 @@ interface ContractMapper {
 
     fun map(contract: Contract): ContractDto
 
-    fun map(contracts: List<Contract>): MutableList<ContractDto>
+    fun map(contracts: Set<Contract>): MutableSet<ContractDto>
 }

@@ -67,7 +67,7 @@ class AccountService(
         val ssoUser = authentikUserService.createUser(request.username, request.fullName, request.email)
         var account = userMapper.map(ssoUser)
         account.info = UserInfo.default(account)
-        account.contracts = mutableListOf(userMapper.map(request.contract, account))
+        account.contracts = mutableSetOf(userMapper.map(request.contract, account))
         account = accountRepository.saveAndFlush(account)
         return account
     }
@@ -143,7 +143,7 @@ class AccountService(
     }
 
     @Transactional
-    fun updateContracts(id: Int, contractList: List<ContractDto>): Account {
+    fun updateContracts(id: Int, contractList: Set<ContractDto>): Account {
         val account = getAccount(id)
         account.contracts.clear()
         account.contracts.addAll(contractList.map { contractMapper.map(it, account) })
