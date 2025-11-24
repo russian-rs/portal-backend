@@ -52,7 +52,7 @@ class Account(
     var groups: Set<UserGroup> = mutableSetOf(),
 
     @OneToMany(mappedBy = "account", cascade = [ALL], orphanRemoval = true)
-    var contracts: MutableList<Contract> = ArrayList(),
+    var contracts: MutableSet<Contract> = HashSet(),
 
     var active: Boolean = true,
 

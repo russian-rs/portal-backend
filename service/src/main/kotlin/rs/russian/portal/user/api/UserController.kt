@@ -17,7 +17,7 @@ import rs.russian.portal.user.service.SessionService
 class UserController(
     private val accountService: AccountService,
     private val sessionService: SessionService,
-    private val userMapper: UserMapper
+    private val userMapper: UserMapper,
 ) : UserApi {
 
     override fun getCurrentAccount(): ResponseEntity<UserInfoDto> {
@@ -43,7 +43,7 @@ class UserController(
     override fun searchUsers(
         searchQuery: String,
         pageRequest: PageRequest,
-        userSearchFilter: UserSearchFilter?
+        userSearchFilter: UserSearchFilter?,
     ): ResponseEntity<UserPageResponse> {
         val page = accountService.search(searchQuery, pageRequest, userSearchFilter)
         return ResponseEntity.ok(
@@ -85,7 +85,7 @@ class UserController(
 
     @Authorized(allowed = [ADMIN_VOLUNTEER])
     override fun updateContracts(id: Int, contractDto: List<ContractDto>): ResponseEntity<UserInfoDto> {
-        return ResponseEntity.ok(userMapper.map(accountService.updateContracts(id, contractDto).info))
+        return ResponseEntity.ok(userMapper.map(accountService.updateContracts(id, HashSet(contractDto)).info))
     }
 
     override fun updateInfo(login: String, userInfoUpdateRequest: UserInfoUpdateRequest): ResponseEntity<UserInfoDto> {
