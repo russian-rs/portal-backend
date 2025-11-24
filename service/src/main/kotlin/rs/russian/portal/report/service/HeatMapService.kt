@@ -54,7 +54,7 @@ class HeatMapService(
                 ))
         }
         return ReportsHeatMapPageResponse(
-            content = result,
+            content = result.sortedByDescending { r -> r.totalRequired!!.minus(r.totalWorked!!) }.toMutableList(),
             page = convert(accounts),
         )
     }
