@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.0.3
 info:
   title: Helpdesk API (Zammad)
   version: 1.0.0
@@ -11,8 +11,13 @@ security:
   - BearerAuth: [ ]
 tags:
   - name: roles
+    description: Роли
   - name: users
+    description: Пользователи
   - name: tickets
+    description: Обращения (тикеты)
+  - name: groups
+    description: Группы поддержки (назначения)
 paths:
   /roles:
     get:
@@ -141,6 +146,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TicketDto'
+  /groups:
+    get:
+      operationId: getGroups
+      tags:
+        - groups
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupDto'
 
 components:
   schemas:
@@ -196,7 +215,9 @@ components:
       properties:
         type:
           type: string
-          default: "email"
+          enum:
+            - web
+            - email
         internal:
           type: boolean
           default: false
@@ -211,3 +232,33 @@ components:
           default: "text/html"
         body:
           type: string
+        sender:
+          type: string
+          enum:
+            - Customer
+            - Agent
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentDto'
+    AttachmentDto:
+      type: object
+      properties:
+        filename:
+          type: string
+          example: "portal.txt"
+        data:
+          type: string
+          description: file content base64 encoded
+        mime-type:
+          type: string
+          example: "text/plain"
+    GroupDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        active:
+          type: boolean
