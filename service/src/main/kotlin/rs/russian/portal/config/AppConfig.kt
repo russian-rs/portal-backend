@@ -1,3 +1,5 @@
+@file:Suppress("UsePropertyAccessSyntax")
+
 package rs.russian.portal.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -44,24 +46,24 @@ import javax.sql.DataSource
         HelpdeskProperties::class
     ]
 )
-open class AppConfig {
+class AppConfig {
 
     @Bean
     @Primary
-    open fun objectMapper(): ObjectMapper = ObjectMapper()
+    fun objectMapper(): ObjectMapper = ObjectMapper()
         .registerKotlinModule()
         .registerModules(JavaTimeModule())
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     @Bean
-    open fun csvMapper(): CsvMapper = CsvMapper().apply {
+    fun csvMapper(): CsvMapper = CsvMapper().apply {
         registerKotlinModule()
         registerModules(JavaTimeModule())
         disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
     }
 
     @Bean
-    open fun shedlockProvider(datasource: DataSource): LockProvider = JdbcTemplateLockProvider(
+    fun shedlockProvider(datasource: DataSource): LockProvider = JdbcTemplateLockProvider(
         JdbcTemplateLockProvider.Configuration.builder()
             .withJdbcTemplate(JdbcTemplate(datasource))
             .usingDbTime()
@@ -69,7 +71,7 @@ open class AppConfig {
     )
 
     @Bean
-    open fun s3Client(props: S3Properties): S3Client {
+    fun s3Client(props: S3Properties): S3Client {
         val creds = AwsBasicCredentials.create(props.accessKey, props.secretKey)
         return S3Client.builder()
             .region(Region.of(props.region))
@@ -80,7 +82,7 @@ open class AppConfig {
     }
 
     @Bean
-    open fun s3Presigner(props: S3Properties, s3Client: S3Client): S3Presigner {
+    fun s3Presigner(props: S3Properties, s3Client: S3Client): S3Presigner {
         val creds = AwsBasicCredentials.create(props.accessKey, props.secretKey)
         return S3Presigner.builder()
             .region(Region.of(props.region))
@@ -96,14 +98,15 @@ open class AppConfig {
     }
 
     @Bean
-    open fun cacheManager(): CaffeineCacheManager {
+    fun cacheManager(): CaffeineCacheManager {
         val cacheManager = CaffeineCacheManager()
         CACHE_MAP.forEach { (name, cache) -> cacheManager.registerCustomCache(name, cache) }
         return cacheManager
     }
 
+    @Primary
     @Bean("emailTemplateEngine")
-    open fun emailTemplateEngine(): SpringTemplateEngine {
+    fun emailTemplateEngine(): SpringTemplateEngine {
         val templateResolver = ClassLoaderTemplateResolver()
         templateResolver.prefix = "templates/email/"
         templateResolver.suffix = ".html"
@@ -114,9 +117,21 @@ open class AppConfig {
         return templateEngine
     }
 
+    @Bean("ticketTemplateEngine")
+    fun ticketTemplateEngine(): SpringTemplateEngine {
+        val templateResolver = ClassLoaderTemplateResolver()
+        templateResolver.prefix = "templates/ticket/"
+        templateResolver.suffix = ".html"
+        templateResolver.setTemplateMode("HTML")
+        templateResolver.characterEncoding = "UTF-8"
+        val templateEngine = SpringTemplateEngine()
+        templateEngine.setTemplateResolver(templateResolver)
+        return templateEngine
+    }
+
     @Bean
     @Profile("local")
-    open fun requestLoggingFilter(): CommonsRequestLoggingFilter {
+    fun requestLoggingFilter(): CommonsRequestLoggingFilter {
         val filter = CommonsRequestLoggingFilter()
         filter.setIncludeQueryString(true)
         filter.setIncludePayload(false)

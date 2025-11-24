@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.24.0
+  version: 1.25.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -11,10 +11,6 @@ servers:
     description: Test Environment
   - url: https://portal.russian.rs/api
     description: Prod Environment
-
-tags:
-  - name: user
-    'x-displayName': User
 
 paths:
   /user/account:
@@ -875,6 +871,43 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /ticket:
+    post:
+      operationId: createTicket
+      description: Создание тикета (обращения)
+      tags:
+        - tickets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketCreateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketCreateResponse'
+  /ticket/groups:
+    get:
+      operationId: getTicketGroups
+      description: Получить доступные группы поддержки
+      tags:
+        - tickets
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                default: [ ]
+                items:
+                  type: string
+                  default: Название группы поддержки для создания тикета
+
 components:
   responses:
     ServerError:
@@ -1615,3 +1648,47 @@ components:
           nullable: true
           description: Показывать только пользователей по указанному проекту, пустая строка значит показать пользователей без проекта
           example: "DESIGN_3D"
+    TicketCreateRequest:
+      type: object
+      required:
+        - fromUser
+        - toUser
+        - group
+        - title
+        - body
+      properties:
+        fromUser:
+          type: string
+          description: Логин пользователя, который создал тикет (или null если тикет от системы)
+          nullable: true
+        toUser:
+          type: string
+          description: Логин пользователя, на которого заведен тикет (например куратор завел на волонтера)
+          nullable: true
+        group:
+          type: string
+          description: Имя группы, на которую будет назначен тикет
+          nullable: false
+        title:
+          type: string
+          description: Загловок (название) обращения
+          nullable: false
+        body:
+          type: string
+          description: Текст обращения
+          nullable: false
+        attachments:
+          type: array
+          description: Прилагаемые файлы
+          items:
+            type: string
+            description: Идентификатор файла
+    TicketCreateResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор созданного тикета
+        ticketLink:
+          type: string
+          description: Ссылка на тикет в системе HelpDesk
