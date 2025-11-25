@@ -28,7 +28,7 @@ class HeatMapService(
         val weeks = reportHeatMapRepository.findVolunteerHeatmap(
             usernames = setOf(account.username),
             startDate = LocalDate.of(year, 1, 1),
-            endDate = LocalDate.of(year, 12, 31)
+            endDate = if (now().year == year) now() else LocalDate.of(year, 12, 31)
         )
         return createHeatMapItem(account, heatMapMapper.map(weeks))
     }
