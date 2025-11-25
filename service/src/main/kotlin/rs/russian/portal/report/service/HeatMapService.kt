@@ -6,6 +6,7 @@ import rs.russian.generated.model.*
 import rs.russian.portal.report.mapper.HeatMapMapper
 import rs.russian.portal.report.repository.ReportHeatMapRepository
 import rs.russian.portal.shared.jpa.convert
+import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.service.AccountService
 import java.math.BigDecimal.ZERO
@@ -20,6 +21,17 @@ class HeatMapService(
     private val heatMapMapper: HeatMapMapper,
     private val reportHeatMapRepository: ReportHeatMapRepository,
 ) {
+
+    @Transactional(readOnly = true)
+    fun getCurrentUserHeatMap(year: Int): VolunteerHeatMapItem {
+        val account = userService.getCurrentAccount()
+        val weeks = reportHeatMapRepository.findVolunteerHeatmap(
+            usernames = setOf(account.username),
+            startDate = LocalDate.of(year, 1, 1),
+            endDate = LocalDate.of(year, 12, 31)
+        )
+        return createHeatMapItem(account, heatMapMapper.map(weeks))
+    }
 
     @Transactional(readOnly = true)
     fun getHeatMap(
@@ -45,21 +57,21 @@ class HeatMapService(
             heatMap.merge(row.username, mutableListOf(weekItem)) { old, new -> (old + new).toMutableList() }
         }
         val result = ArrayList<VolunteerHeatMapItem>()
-        accounts.forEach { account ->
-            val weeks = heatMap[account.username] ?: mutableListOf()
-            val totalRequired = weeks.sumOf { it.hoursRequired }
-            result.add(
-                VolunteerHeatMapItem(
-                    volunteerInfo = userMapper.map(account.info),
-                    weeks = weeks,
-                    totalWorked = weeks.sumOf { it.hoursWorked },
-                    totalRequired = if (totalRequired == ZERO) ZERO else totalRequired.minus(valueOf(10)),
-                )
-            )
-        }
+        accounts.forEach { account -> result.add(createHeatMapItem(account, heatMap[account.username])) }
         return ReportsHeatMapPageResponse(
             content = result.sortedByDescending { r -> r.totalRequired!!.minus(r.totalWorked!!) }.toMutableList(),
             page = convert(accounts),
+        )
+    }
+
+    private fun createHeatMapItem(account: Account, weekItems: List<HeatMapItem>?): VolunteerHeatMapItem {
+        val weeks = weekItems ?: emptyList()
+        val totalRequired = weeks.sumOf { it.hoursRequired }
+        return VolunteerHeatMapItem(
+            volunteerInfo = userMapper.map(account.info),
+            weeks = weeks.toMutableList(),
+            totalWorked = weeks.sumOf { it.hoursWorked },
+            totalRequired = if (totalRequired == ZERO) ZERO else totalRequired.minus(valueOf(10)),
         )
     }
 
