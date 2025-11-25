@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.25.0
+  version: 1.26.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -499,6 +499,25 @@ paths:
               schema:
                 $ref: '#/components/schemas/ReportPageResponse'
   /reports/heat-map:
+    get:
+      operationId: getCurrentUserHeatMap
+      description: Тепловая карта отчетов текущего пользователя
+      tags:
+        - report-heat-map
+      parameters:
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 2025
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VolunteerHeatMapItem'
     post:
       operationId: getVolunteerHeatMap
       description: Тепловая карта отчетов

@@ -6,6 +6,7 @@ import rs.russian.generated.api.ReportHeatMapApi
 import rs.russian.generated.model.PageRequest
 import rs.russian.generated.model.ReportsHeatMapFilter
 import rs.russian.generated.model.ReportsHeatMapPageResponse
+import rs.russian.generated.model.VolunteerHeatMapItem
 import rs.russian.portal.report.service.HeatMapService
 import rs.russian.portal.shared.security.Authorized
 import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
@@ -14,6 +15,10 @@ import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
 class HeatMapController(
     private val heatMapService: HeatMapService,
 ) : ReportHeatMapApi {
+    
+    override fun getCurrentUserHeatMap(year: Int): ResponseEntity<VolunteerHeatMapItem> {
+        return ResponseEntity.ok(heatMapService.getCurrentUserHeatMap(year))
+    }
 
     @Authorized(allowed = [ADMIN_VOLUNTEER])
     override fun getVolunteerHeatMap(

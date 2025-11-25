@@ -8,4 +8,6 @@ import rs.russian.portal.report.repository.projections.VolunteerWeekProjection
 interface HeatMapMapper {
 
     fun map(projection: VolunteerWeekProjection): HeatMapItem
+
+    fun map(projections: List<VolunteerWeekProjection>): List<HeatMapItem>
 }
