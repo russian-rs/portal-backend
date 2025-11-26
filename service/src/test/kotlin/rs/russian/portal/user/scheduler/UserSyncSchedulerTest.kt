@@ -12,15 +12,15 @@ import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.AccountService
 import rs.russian.portal.user.service.authentik.AuthentikService
-import rs.russian.portal.user.service.wordpress.MultiWordpressUserService
+import rs.russian.portal.user.service.wordpress.MultiWordpressAccountSynchronizer
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 class UserSyncSchedulerTest {
 
     private lateinit var accountService: AccountService
     private lateinit var accountRepository: AccountRepository
-    private lateinit var multiWordpressUserService: MultiWordpressUserService
+    private lateinit var multiWordpressAccountSynchroniser: MultiWordpressAccountSynchronizer
     private lateinit var authentikUserService: AuthentikService
     private lateinit var userSyncScheduler: UserSyncScheduler
 
@@ -28,13 +28,13 @@ class UserSyncSchedulerTest {
     fun setUp() {
         accountService = mockk(relaxed = true)
         accountRepository = mockk(relaxed = true)
-        multiWordpressUserService = mockk(relaxed = true)
+        multiWordpressAccountSynchroniser = mockk(relaxed = true)
         authentikUserService = mockk(relaxed = true)
 
         userSyncScheduler = UserSyncScheduler(
             accountService,
             accountRepository,
-            listOf(multiWordpressUserService),
+            listOf(multiWordpressAccountSynchroniser),
             authentikUserService
         )
     }
@@ -61,7 +61,7 @@ class UserSyncSchedulerTest {
         verify { accountService.createOrUpdateAccount(user1) }
         verify { accountService.createOrUpdateAccount(user2) }
         verify(exactly = 0) { accountService.createOrUpdateAccount(serviceAccount) }
-        verify { multiWordpressUserService.sync(listOf(account1, account2)) }
+        verify { multiWordpressAccountSynchroniser.sync(listOf(account1, account2)) }
         verify { accountRepository.findAll(any<Specification<Account>>()) }
     }
 
@@ -82,10 +82,10 @@ class UserSyncSchedulerTest {
         // Assert
         verify { authentikUserService.getAllUsers() }
         verify { accountService.createOrUpdateAccount(user1) }
-        verify { multiWordpressUserService.sync(listOf(account1)) }
+        verify { multiWordpressAccountSynchroniser.sync(listOf(account1)) }
 
         verify { accountService.save(match { it.id == 3 && !it.active }) }
-        verify { multiWordpressUserService.delete(inactiveAccount) }
+        verify { multiWordpressAccountSynchroniser.delete(inactiveAccount) }
     }
 
     private fun createUser(id: Int, username: String, type: UserTypeEnum) = User(

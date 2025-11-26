@@ -20,10 +20,10 @@ import java.util.concurrent.ConcurrentHashMap
 private val log = LoggerFactory.getLogger(WpApiConfig::class.java)
 
 @Configuration
-class WpApiConfig(
+open class WpApiConfig(
     private val wpProps: WordpressProperties,
     private val tokenWordpressApis: Map<String, TokenWordpressApi>,
-    private val env: Environment
+    private val env: Environment,
 ) {
     private val tokens: MutableMap<String, String?> =
         if (env.activeProfiles.any { "local".equals(it, ignoreCase = true) }) {
@@ -60,7 +60,7 @@ class WpApiConfig(
 
     @Bean
     @Profile("!local")
-    fun wordpressUserServices(): Map<String, WordpressUserService> = wpUserServices
+    open fun wordpressUserServices(): Map<String, WordpressUserService> = wpUserServices
 
     private fun createWordpressApiClient(instance: WordpressInstance): OkHttpClient {
         val authInterceptor = Interceptor { chain ->

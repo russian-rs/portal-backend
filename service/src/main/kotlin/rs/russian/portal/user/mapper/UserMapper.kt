@@ -23,20 +23,23 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Mapper(
-    imports = [ArrayList::class, LocalDateTime::class, UUID::class],
-    uses = [FileInfoMapper::class, ProgramMapper::class, ProjectMapper::class]
+    imports = [HashSet::class, ArrayList::class, LocalDateTime::class, UUID::class],
+    uses = [FileInfoMapper::class, ProgramMapper::class, ProjectMapper::class, ContractMapper::class]
 )
 abstract class UserMapper {
 
     @Autowired
     private lateinit var fileInfoMapper: FileInfoMapper
 
+    @Autowired
+    private lateinit var contractMapper: ContractMapper
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "info", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "active", constant = "true")
     @Mapping(target = "username", source = "nickName")
-    @Mapping(target = "contracts", expression = "java(new ArrayList<>())")
+    @Mapping(target = "contracts", expression = "java(new HashSet<>())")
     @Mapping(target = "lastSynced", expression = "java(LocalDateTime.now())")
     @Mapping(target = "fullName", source = "oidcUserInfo", qualifiedByName = ["nameOidc"])
     @Mapping(target = "groups", source = "oidcUserInfo", qualifiedByName = ["mapGroups"])
@@ -45,7 +48,7 @@ abstract class UserMapper {
     @Mapping(target = "id", source = "pk")
     @Mapping(target = "info", ignore = true)
     @Mapping(target = "version", ignore = true)
-    @Mapping(target = "contracts", expression = "java(new ArrayList<>())")
+    @Mapping(target = "contracts", expression = "java(new HashSet<>())")
     @Mapping(target = "fullName", source = "ssoUser", qualifiedByName = ["nameSso"])
     @Mapping(target = "lastSynced", expression = "java(LocalDateTime.now())")
     @Mapping(target = "groups", source = "groupsObj", qualifiedByName = ["mapGroupsSso"])

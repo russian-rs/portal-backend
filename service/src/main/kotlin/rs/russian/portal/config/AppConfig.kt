@@ -1,3 +1,5 @@
+@file:Suppress("UsePropertyAccessSyntax")
+
 package rs.russian.portal.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -36,7 +38,13 @@ import javax.sql.DataSource
 @EnableSchedulerLock(defaultLockAtLeastFor = "PT1M", defaultLockAtMostFor = "PT59M")
 @EnableConfigurationProperties(
     value = [
-        AppProperties::class, S3Properties::class, AuthentikProperties::class, WordpressProperties::class, OutlineProperties::class]
+        AppProperties::class,
+        S3Properties::class,
+        AuthentikProperties::class,
+        WordpressProperties::class,
+        OutlineProperties::class,
+        HelpdeskProperties::class
+    ]
 )
 class AppConfig {
 
@@ -96,10 +104,23 @@ class AppConfig {
         return cacheManager
     }
 
+    @Primary
     @Bean("emailTemplateEngine")
     fun emailTemplateEngine(): SpringTemplateEngine {
         val templateResolver = ClassLoaderTemplateResolver()
         templateResolver.prefix = "templates/email/"
+        templateResolver.suffix = ".html"
+        templateResolver.setTemplateMode("HTML")
+        templateResolver.characterEncoding = "UTF-8"
+        val templateEngine = SpringTemplateEngine()
+        templateEngine.setTemplateResolver(templateResolver)
+        return templateEngine
+    }
+
+    @Bean("ticketTemplateEngine")
+    fun ticketTemplateEngine(): SpringTemplateEngine {
+        val templateResolver = ClassLoaderTemplateResolver()
+        templateResolver.prefix = "templates/ticket/"
         templateResolver.suffix = ".html"
         templateResolver.setTemplateMode("HTML")
         templateResolver.characterEncoding = "UTF-8"

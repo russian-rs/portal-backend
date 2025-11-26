@@ -11,7 +11,7 @@ COPY . /home/gradle/src
 RUN gradle clean build -x test --no-daemon
 
 # For the runtime stage use the official OpenJDK 21 image from Docker Hub
-FROM alpine/java:21.0.4-jdk
+FROM alpine/java:22.0.2-jdk
 
 # Expose port 8080 for your application
 EXPOSE 8081
