@@ -1,0 +1,264 @@
+openapi: 3.0.3
+info:
+  title: Helpdesk API (Zammad)
+  version: 1.0.0
+  contact:
+    email: help@russian.rs
+servers:
+  - url: https://help.russian.rs/api/v1
+    description: Production
+security:
+  - BearerAuth: [ ]
+tags:
+  - name: roles
+    description: Роли
+  - name: users
+    description: Пользователи
+  - name: tickets
+    description: Обращения (тикеты)
+  - name: groups
+    description: Группы поддержки (назначения)
+paths:
+  /roles:
+    get:
+      operationId: getRoles
+      tags:
+        - roles
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RoleDto'
+    post:
+      operationId: createRole
+      tags:
+        - roles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleDto'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoleDto'
+  /users:
+    post:
+      operationId: createUser
+      tags:
+        - users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+  /users/{id}:
+    put:
+      operationId: updateUser
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            nullable: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserDto'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+    delete:
+      operationId: deleteUser
+      tags:
+        - users
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            nullable: false
+      responses:
+        '200':
+          description: Success
+  /users/search:
+    get:
+      operationId: searchUser
+      tags:
+        - users
+      parameters:
+        - name: query
+          in: query
+          required: true
+          schema:
+            type: string
+            nullable: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserDto'
+  /tickets:
+    post:
+      operationId: createTicket
+      tags:
+        - tickets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketDto'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketDto'
+  /groups:
+    get:
+      operationId: getGroups
+      tags:
+        - groups
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupDto'
+
+components:
+  schemas:
+    RoleDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+          example: "administrator"
+        active:
+          type: boolean
+    UserDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        login:
+          type: string
+        firstname:
+          type: string
+        lastname:
+          type: string
+        email:
+          type: string
+        roles:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+    TicketDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        number:
+          type: string
+          example: "1316"
+        title:
+          type: string
+          example: "Нет отчетов"
+        group:
+          type: string
+          example: "Куратор"
+        customer:
+          type: string
+          example: "john@example.xyz"
+        article:
+          $ref: '#/components/schemas/ArticleDto'
+    ArticleDto:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - web
+            - email
+        internal:
+          type: boolean
+          default: false
+        to:
+          type: string
+          example: "John Doe <john@example.xyz>"
+        subject:
+          type: string
+          example: "Нет отчетов"
+        content_type:
+          type: string
+          default: "text/html"
+        body:
+          type: string
+        sender:
+          type: string
+          enum:
+            - Customer
+            - Agent
+        attachments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AttachmentDto'
+    AttachmentDto:
+      type: object
+      properties:
+        filename:
+          type: string
+          example: "portal.txt"
+        data:
+          type: string
+          description: file content base64 encoded
+        mime-type:
+          type: string
+          example: "text/plain"
+    GroupDto:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        active:
+          type: boolean

@@ -1,6 +1,10 @@
 package rs.russian.portal.application.service
 
+import jakarta.persistence.EntityManager
 import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.ApplicationDto
@@ -27,6 +31,7 @@ import java.util.*
 @Service
 class ApplicationService(
     private val noteService: NoteService,
+    private val entityManager: EntityManager,
     private val accountService: AccountService,
     private val applicationMapper: ApplicationMapper,
     private val applicationRepository: ApplicationRepository,
@@ -72,7 +77,7 @@ class ApplicationService(
     @Transactional(readOnly = true)
     fun getAll(searchQuery: String?, pageRequest: PageRequest, filter: ApplicationsFilter?): Page<Application> {
         val specification = searchSpecification(searchQuery, filter)
-        return applicationRepository.findAll(specification, convert(pageRequest))
+        return getAllFull(specification, convert(pageRequest))
     }
 
     @Transactional
@@ -104,5 +109,20 @@ class ApplicationService(
         )
         application.notes.add(note)
         return note
+    }
+
+    /**
+     * Получить список заявок с использованием EntityGraph
+     * Решает проблему, при которой невозможно одновременная работа Pageable и EntityGraph:
+     * HHH90003004: firstResult/maxResults specified with collection fetch; applying in memory
+     * entityManager.detach(...) - необходим потому что findAll загружает "легковесные" объекты и
+     * сохраняет их в контекст, а findAllByIdIn уже загрузит полные объекты, однако если не очистить
+     * контекст, то они не будут перезаписаны в контексте, что повлечет дополнительные SQL запросы
+     */
+    private fun getAllFull(specification: Specification<Application>, pageable: Pageable): Page<Application> {
+        val applications = applicationRepository.findAll(specification, pageable)
+        applications.forEach { account -> entityManager.detach(account) }
+        val applicationsFull = applicationRepository.findAllByIdIn(applications.mapNotNull { it.id }, pageable.sort)
+        return PageImpl(applicationsFull, applications.pageable, applications.totalElements)
     }
 }

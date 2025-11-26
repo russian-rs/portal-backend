@@ -10,11 +10,11 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Profile
 
 @Configuration
-class AuthentikApiConfig {
+open class AuthentikApiConfig {
 
     @Bean
     @Profile("!no-auth")
-    fun coreAuthentikApi(authentikProperties: AuthentikProperties): CoreAuthentikApi {
+    open fun coreAuthentikApi(authentikProperties: AuthentikProperties): CoreAuthentikApi {
         return CoreAuthentikApi(
             client = authentikApiClient(
                 authentikProperties.baseUrl,

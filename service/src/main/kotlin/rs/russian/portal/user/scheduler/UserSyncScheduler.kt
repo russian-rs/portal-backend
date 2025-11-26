@@ -11,7 +11,7 @@ import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.Account_
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.AccountService
-import rs.russian.portal.user.service.AccountSynchroniser
+import rs.russian.portal.user.service.AccountSynchronizer
 import rs.russian.portal.user.service.authentik.AuthentikService
 import java.time.Duration
 import java.time.LocalDateTime
@@ -22,8 +22,8 @@ private val log = LoggerFactory.getLogger(UserSyncScheduler::class.java)
 class UserSyncScheduler(
     private val accountService: AccountService,
     private val accountRepository: AccountRepository,
-    private val accountSynchronisers: List<AccountSynchroniser>,
-    private val authentikUserService: AuthentikService
+    private val accountSynchronizers: List<AccountSynchronizer>,
+    private val authentikUserService: AuthentikService,
 ) {
 
     @Scheduled(cron = "\${app.schedulers.user-sync}")
@@ -32,6 +32,7 @@ class UserSyncScheduler(
         val syncStart = LocalDateTime.now()
         val authentikUsers = authentikUserService.getAllUsers()
         val usersToSync = authentikUsers
+            .asSequence()
             .filter { it.type != UserTypeEnum.service_account }
             .filter { it.type != UserTypeEnum.internal_service_account }
             .filter { !it.email.isNullOrBlank() }
@@ -39,18 +40,21 @@ class UserSyncScheduler(
             .map { ssoUser ->
                 accountService.createOrUpdateAccount(ssoUser)
             }
-        accountSynchronisers.forEach { it.sync(usersToSync) }
+            .toList()
+        accountSynchronizers.forEach { it.sync(usersToSync) }
 
         val inactiveSpec = less<Account, LocalDateTime>(Account_.LAST_SYNCED, syncStart)
             .or(isNull(Account_.LAST_SYNCED))
         val inactiveUsers = accountRepository.findAll(inactiveSpec)
         inactiveUsers.forEach { user ->
             accountService.save(user.also { it.active = false })
-            accountSynchronisers.forEach { it.delete(user) }
+            accountSynchronizers.forEach { it.delete(user) }
         }
 
-        log.info("User sync completed in ${Duration.between(syncStart, LocalDateTime.now()).toMillis()}ms: " +
-                "${usersToSync.size} users attempted to sync, ${inactiveUsers.size} users attempted to deactivate")
+        log.info(
+            "User sync completed in ${Duration.between(syncStart, LocalDateTime.now()).toMillis()}ms: " +
+                    "${usersToSync.size} users attempted to sync, ${inactiveUsers.size} users attempted to deactivate"
+        )
     }
 
 }

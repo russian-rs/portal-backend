@@ -1,0 +1,95 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.12.1-project-program-link
+      author: Valerii Linden
+      preConditions:
+        - onFail: MARK_RAN
+          not:
+            columnExists:
+              tableName: project
+              columnName: program_code
+
+      changes:
+        - addColumn:
+            tableName: project
+            columns:
+              - column:
+                  name: program_code
+                  type: VARCHAR(50)
+
+        - createIndex:
+            tableName: project
+            indexName: idx_project_program_code
+            columns:
+              - column:
+                  name: program_code
+
+        - sql:
+            splitStatements: false
+            sql: |
+              UPDATE project SET program_code = CASE code
+                WHEN 'IT'                     THEN 'IT'
+                WHEN 'LAYOUT'                 THEN 'IT'
+                WHEN 'FORMS'                  THEN 'IT'
+                WHEN 'SCRAPERS'               THEN 'IT'
+                WHEN 'BOTS'                   THEN 'IT'
+                WHEN 'APPS'                   THEN 'IT'
+
+                WHEN 'LAWS'                   THEN 'LAW'
+                WHEN 'HR'                     THEN 'LAW'
+
+                WHEN 'DESIGN_3D'              THEN 'DESIGN'
+                WHEN 'DESIGN'                 THEN 'DESIGN'
+
+                WHEN 'DATA_COLLECTION'        THEN 'INFORMATION'
+                WHEN 'RESEARCH'               THEN 'INFORMATION'
+                WHEN 'POSTING'                THEN 'INFORMATION'
+
+                WHEN 'ARTICLES'               THEN 'MEDIA'
+                WHEN 'SMM'                    THEN 'MEDIA'
+                WHEN 'WEB_FIGMA'              THEN 'MEDIA'
+                WHEN 'SOCIAL_MEDIA_DESIGN'    THEN 'MEDIA'
+                WHEN 'MATERIAL_STYLE'         THEN 'MEDIA'
+                WHEN 'STICKERS'               THEN 'MEDIA'
+                WHEN 'GUIDE_ILLUSTRATIONS'    THEN 'MEDIA'
+                WHEN 'BOOK_MURALS'            THEN 'MEDIA'
+                WHEN 'VIDEO_EDITING'          THEN 'MEDIA'
+                WHEN 'PHOTO'                  THEN 'MEDIA'
+                WHEN 'GUIDEBOOK'              THEN 'MEDIA'
+
+                WHEN 'TRAINING'               THEN 'EDUCATION'
+                WHEN 'COURSE_UPLOAD'          THEN 'EDUCATION'
+                WHEN 'PSYCHOLOGISTS'          THEN 'EDUCATION'
+                WHEN 'BOOK'                   THEN 'EDUCATION'
+                WHEN 'LANGUAGE_COURSES'       THEN 'EDUCATION'
+                WHEN 'SPORT'                  THEN 'EDUCATION'
+
+                WHEN 'MONITORING'             THEN 'URBANISM'
+                WHEN 'CLEAN_CITY'             THEN 'URBANISM'
+                ELSE 'OTHER'
+              END;
+
+        - addForeignKeyConstraint:
+            baseTableName: project
+            baseColumnNames: program_code
+            referencedTableName: program
+            referencedColumnNames: code
+            constraintName: fk_project_program
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+
+        - addNotNullConstraint:
+            tableName: project
+            columnName: program_code
+            columnDataType: VARCHAR(50)
+
+      rollback:
+        - dropForeignKeyConstraint:
+            baseTableName: project
+            constraintName: fk_project_program
+        - dropIndex:
+            tableName: project
+            indexName: idx_project_program_code
+        - dropColumn:
+            tableName: project
+            columnName: program_code
