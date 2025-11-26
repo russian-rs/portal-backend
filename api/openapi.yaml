@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.22.1
+  version: 1.26.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -11,10 +11,6 @@ servers:
     description: Test Environment
   - url: https://portal.russian.rs/api
     description: Prod Environment
-
-tags:
-  - name: user
-    'x-displayName': User
 
 paths:
   /user/account:
@@ -544,6 +540,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ReportPageResponse'
+  /reports/heat-map:
+    get:
+      operationId: getCurrentUserHeatMap
+      description: Тепловая карта отчетов текущего пользователя
+      tags:
+        - report-heat-map
+      parameters:
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 2025
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VolunteerHeatMapItem'
+    post:
+      operationId: getVolunteerHeatMap
+      description: Тепловая карта отчетов
+      tags:
+        - report-heat-map
+      parameters:
+        - name: searchQuery
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: pageRequest
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/PageRequest'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReportsHeatMapFilter'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReportsHeatMapPageResponse'
 
   /application/create:
     post:
@@ -818,7 +863,6 @@ paths:
                   $ref: '#/components/schemas/CityDto'
         '500':
           $ref: '#/components/responses/ServerError'
-
   /cities/{code}:
     get:
       operationId: findCityByCode
@@ -842,7 +886,6 @@ paths:
           description: City not found
         '500':
           $ref: '#/components/responses/ServerError'
-
   /cities/search:
     get:
       operationId: findCityByName
@@ -889,6 +932,42 @@ paths:
         '500':
           $ref: '#/components/responses/ServerError'
 
+  /ticket:
+    post:
+      operationId: createTicket
+      description: Создание тикета (обращения)
+      tags:
+        - tickets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TicketCreateRequest'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TicketCreateResponse'
+  /ticket/groups:
+    get:
+      operationId: getTicketGroups
+      description: Получить доступные группы поддержки
+      tags:
+        - tickets
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                default: [ ]
+                items:
+                  type: string
+                  default: Название группы поддержки для создания тикета
 
 components:
   responses:
@@ -935,7 +1014,7 @@ components:
           description: общее время, затраченное в часах всеми волонтерами в группе
     ProgramStatItem:
       type: object
-      required: [code, data]
+      required: [ code, data ]
       properties:
         code:
           type: string
@@ -945,7 +1024,7 @@ components:
           $ref: '#/components/schemas/StatisticData'
     ProgramStatistics:
       type: object
-      required: [items, total]
+      required: [ items, total ]
       properties:
         items:
           type: array
@@ -1211,20 +1290,34 @@ components:
         createTime:
           type: string
           format: date-time
+          description: Время создания
         user:
           type: string
+          description: Логин пользователя
         status:
           type: string
+          description: Статус отчета
         week:
           type: number
+          description: Номер отчетной недели
+        program:
+          type: string
+          description: Код программы
+          example: IT
+        project:
+          type: string
+          description: Код проекта
+          example: PORTAL
         tasks:
           type: array
           default: [ ]
+          description: Список задач в отчете
           items:
             $ref: '#/components/schemas/TaskDto'
         notes:
           type: array
           default: [ ]
+          description: Список заметок от модератора
           items:
             $ref: '#/components/schemas/NoteDto'
     TaskDto:
@@ -1506,33 +1599,20 @@ components:
     UserSearchFilter:
       type: object
       nullable: false
-      required:
-        - onlyInactive
       properties:
+        onlyActive:
+          type: boolean
+          nullable: true
+          description: Показывать только активных пользователей
         onlyInactive:
           type: boolean
-          nullable: false
-          default: false
-          description: Показывать только неактивных пользователей
-        programCodes:
-          deprecated: true
-          type: array
-          description: Показывать только пользователей указанных программ
-          items:
-            type: string
-          uniqueItems: true
+          nullable: true
+          description: Показывать только неактивных пользователей (onlyActive приоритетней если указаны оба)
         program:
           type: string
           nullable: true
           description: Показывать только пользователей по указанной программе, пустая строка значит показать пользователей без программы
           example: "IT"
-        projectCodes:
-          deprecated: true
-          type: array
-          description: Показывать только пользователей указанных проектов
-          items:
-            type: string
-          uniqueItems: true
         project:
           type: string
           nullable: true
@@ -1579,6 +1659,10 @@ components:
           type: string
         nameSr:
           type: string
+        projectCodes:
+          type: array
+          description: List of project codes related to this program
+          items: { type: string }
     ProjectDto:
       type: object
       required:
@@ -1595,3 +1679,134 @@ components:
           type: string
         nameSr:
           type: string
+        programCode:
+          type: string
+          description: Owning program code
+
+    ReportsHeatMapPageResponse:
+      type: object
+      required:
+        - content
+        - page
+      properties:
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/VolunteerHeatMapItem'
+        page:
+          $ref: '#/components/schemas/PageResponse'
+    VolunteerHeatMapItem:
+      type: object
+      required:
+        - volunteerInfo
+        - weeks
+      properties:
+        volunteerInfo:
+          $ref: '#/components/schemas/UserInfoDto'
+        weeks:
+          type: array
+          description: Информация по каждой неделе
+          items:
+            $ref: '#/components/schemas/HeatMapItem'
+        totalWorked:
+          type: number
+          description: Кол-во засчитанных часов по отчетам по всем неделям
+          nullable: false
+        totalRequired:
+          type: number
+          description: Кол-во требуемых часов суммарно по всем неделям
+          nullable: false
+    HeatMapItem:
+      type: object
+      required:
+        - week
+        - weekStart
+        - weekEnd
+        - hoursWorked
+        - hoursRequired
+      properties:
+        week:
+          type: integer
+          description: Номер недели
+          nullable: false
+          example: 52
+        weekStart:
+          type: string
+          format: date
+          description: Дата начала недели
+          nullable: false
+        weekEnd:
+          type: string
+          format: date
+          description: Дата окончания недели
+          nullable: false
+        hoursWorked:
+          type: number
+          description: Кол-во засчитанных часов по отчетам в указанную неделю
+          nullable: false
+        hoursRequired:
+          type: number
+          description: Кол-во требуемых часов в указанную неделю
+          nullable: false
+    ReportsHeatMapFilter:
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+          description: Дата, начиная с которой, вывести тепловую карту
+          example: "2025-01-01"
+        program:
+          type: string
+          nullable: true
+          description: Показывать только пользователей по указанной программе, пустая строка значит показать пользователей без программы
+          example: "IT"
+        project:
+          type: string
+          nullable: true
+          description: Показывать только пользователей по указанному проекту, пустая строка значит показать пользователей без проекта
+          example: "DESIGN_3D"
+    TicketCreateRequest:
+      type: object
+      required:
+        - fromUser
+        - toUser
+        - group
+        - title
+        - body
+      properties:
+        fromUser:
+          type: string
+          description: Логин пользователя, который создал тикет (или null если тикет от системы)
+          nullable: true
+        toUser:
+          type: string
+          description: Логин пользователя, на которого заведен тикет (например куратор завел на волонтера)
+          nullable: true
+        group:
+          type: string
+          description: Имя группы, на которую будет назначен тикет
+          nullable: false
+        title:
+          type: string
+          description: Загловок (название) обращения
+          nullable: false
+        body:
+          type: string
+          description: Текст обращения
+          nullable: false
+        attachments:
+          type: array
+          description: Прилагаемые файлы
+          items:
+            type: string
+            description: Идентификатор файла
+    TicketCreateResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Идентификатор созданного тикета
+        ticketLink:
+          type: string
+          description: Ссылка на тикет в системе HelpDesk

@@ -24,7 +24,7 @@ class ApplicationEventListener(
     private val contractMapper: ContractMapper,
     private val templateEngine: TemplateEngine,
     private val applicationMapper: ApplicationMapper,
-    private val applicationService: ApplicationService
+    private val applicationService: ApplicationService,
 ) {
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -52,7 +52,7 @@ class ApplicationEventListener(
                     val account = accountService.create(application.email, application.name)
                     accountService.updateContracts(
                         account.id!!,
-                        listOf(
+                        setOf(
                             ContractDto(
                                 id = UUID.randomUUID(),
                                 startDate = application.contractFrom!!,
@@ -67,7 +67,7 @@ class ApplicationEventListener(
             if (application.type == ApplicationType.PROLONGATION) {
                 val account = accountService.findAccountByEmail(application.email)!!
                 accountService.switchActiveState(account.id!!, true)
-                val contracts = contractMapper.map(account.contracts.toList()).toMutableList()
+                val contracts = contractMapper.map(account.contracts)
                 contracts.add(
                     ContractDto(
                         id = UUID.randomUUID(),

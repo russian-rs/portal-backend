@@ -24,12 +24,15 @@ import java.util.*
 
 @Mapper(
     imports = [HashSet::class, LocalDateTime::class, UUID::class],
-    uses = [FileInfoMapper::class, ProgramMapper::class, ProjectMapper::class]
+    uses = [FileInfoMapper::class, ProgramMapper::class, ProjectMapper::class, ContractMapper::class]
 )
 abstract class UserMapper {
 
     @Autowired
     private lateinit var fileInfoMapper: FileInfoMapper
+
+    @Autowired
+    private lateinit var contractMapper: ContractMapper
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "info", ignore = true)

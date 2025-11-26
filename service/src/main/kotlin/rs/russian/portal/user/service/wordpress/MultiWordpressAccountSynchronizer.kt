@@ -5,14 +5,15 @@ import org.springframework.stereotype.Service
 import org.wordpress.model.WpUser
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.mapper.WordpressUserMapper
-import rs.russian.portal.user.service.AccountSynchroniser
+import rs.russian.portal.user.service.AccountSynchronizer
 
 @Service
-class MultiWordpressUserService(
+class MultiWordpressAccountSynchronizer(
     private val wordpressUserServices: Map<String, WordpressUserService>,
-    private val wordpressUserMapper: WordpressUserMapper
-): AccountSynchroniser {
-   override fun sync(accounts: List<Account>) {
+    private val wordpressUserMapper: WordpressUserMapper,
+) : AccountSynchronizer {
+
+    override fun sync(accounts: List<Account>) {
         wordpressUserServices.forEach { (_, service) ->
             try {
                 val existingRoles = service.getAvailableRoles().map { it.slug }
@@ -24,7 +25,11 @@ class MultiWordpressUserService(
         }
     }
 
-    private fun createOrUpdateWpUser(service: WordpressUserService, account: Account, existingRoles: List<String>): Boolean {
+    private fun createOrUpdateWpUser(
+        service: WordpressUserService,
+        account: Account,
+        existingRoles: List<String>,
+    ): Boolean {
         try {
             var wpUser = service.getUser(account.username)
             if (wpUser == null) { // new user
@@ -62,4 +67,4 @@ class MultiWordpressUserService(
     companion object {
         private val log = LoggerFactory.getLogger(this::class.java)
     }
-} 
+}

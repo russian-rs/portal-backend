@@ -5,6 +5,7 @@ import jakarta.persistence.CascadeType.ALL
 import jakarta.persistence.FetchType.LAZY
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
+import rs.russian.portal.program.domain.Program
 import rs.russian.portal.shared.jpa.JpaEntity
 import rs.russian.portal.shared.jpa.converter.UserGroupSetConverter
 import rs.russian.portal.user.domain.enums.UserGroup
@@ -22,11 +23,16 @@ import java.time.LocalDateTime
     ],
     subgraphs = [
         NamedSubgraph(
-            name = UserInfo.GRAPH_FULL, attributeNodes = [
+            name = UserInfo.GRAPH_FULL,
+            attributeNodes = [
                 NamedAttributeNode("avatar"),
-                NamedAttributeNode("program"),
+                NamedAttributeNode("program", subgraph = Program.GRAPH_FULL),
                 NamedAttributeNode("project")
             ]
+        ),
+        NamedSubgraph(
+            name = Program.GRAPH_FULL,
+            attributeNodes = [NamedAttributeNode("projects")]
         ),
         NamedSubgraph(
             name = "ResidencePermit.photos",
