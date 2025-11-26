@@ -21,25 +21,41 @@
 api лежит в `api/openapi.yaml` и генерится автоматически при билде или при запуске gradle таски `api/openapi.yaml`  
 Этот файл можно перетащить в postman и он сгенерит удобно api для тестирования, останется только прописать baseUrl = `http://localhost:8081/` в переменные постмана
 
-### Тесты 
+### Тесты
 - Для запуска использовать docker-compose-test.
 - Указывать профили "local", "no-auth", "test"
 
-## Security Checks
+### Безопасность
 
-Проверки безопасности запускаются автоматически в GitHub Actions при создании PR.
+Все проверки безопасности запускаются автоматически в GitHub Actions при push/PR.
 
-**Локальная установка**:
+#### 1. Pre-commit проверки
+**Автоматическая установка**:
 ```bash
 git config core.hooksPath .git-hooks
 ```
 
-**Ручной запуск**: `./scripts/security-check.sh`
+**Ручной запуск**:
+```bash
+./scripts/security-check.sh
+```
 
-**Полное сканирование**: 
-Необходимо установить инструменты `gitleaks`, `exiftool`, затем выполнить:
+**Полное сканирование** (требует установки `gitleaks`, `exiftool`):
 ```bash
 export SKIP_OPTIONAL_TOOLS=false
-
-./scripts/security-check.sh`
+./scripts/security-check.sh
 ```
+
+**Что проверяется**: секреты, большие файлы, сертификаты, backup файлы, gitleaks
+
+#### 2. OWASP Dependency Check
+**Локальный запуск**:
+```bash
+./gradlew dependencyCheckAnalyze
+```
+Отчет: `service/build/reports/dependency-check-report.html`
+
+**NVD API ключ** (опционально, ускоряет проверку):
+1. Получить: https://nvd.nist.gov/developers/request-an-api-key
+2. Локально: `export NVD_API_KEY=your-key`
+3. GitHub: Settings → Secrets → Repository secrets → `NVD_API_KEY`

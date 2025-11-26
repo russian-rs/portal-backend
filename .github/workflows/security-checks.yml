@@ -106,3 +106,35 @@ jobs:
           echo "  ✓ Gitleaks scan"
           echo ""
           echo "Your changes are safe to merge! 🎉"
+
+  dependency-check:
+    name: OWASP Dependency Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Cache OWASP DB
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/dependency-check-data
+          key: owasp-db-${{ hashFiles('**/build.gradle') }}
+
+      - name: Run Dependency Check
+        env:
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+          GRADLE_OPTS: '-Dorg.gradle.jvmargs="-Xmx2g -XX:MaxMetaspaceSize=512m"'
+        run: ./gradlew dependencyCheckAnalyze --no-daemon
+
+      - name: Upload Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-check-report
+          path: service/build/reports/dependency-check-report.html
