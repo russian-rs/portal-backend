@@ -9,6 +9,7 @@ plugins {
     id("org.jetbrains.kotlin.plugin.allopen")
     id("org.hibernate.orm") version "6.6.23.Final"
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("org.owasp.dependencycheck")
 }
 
 group = "rs.russian"
@@ -20,6 +21,14 @@ repositories {
 
 kotlin {
     jvmToolchain(21)
+}
+
+dependencyCheck {
+    failBuildOnCVSS = 7
+    suppressionFile = file("dependency-check-suppressions.xml").absolutePath
+    nvd {
+        apiKey = System.getenv('NVD_API_KEY') ?: ''
+    }
 }
 
 dependencies {
@@ -45,7 +54,6 @@ dependencies {
     // Data
     implementation("org.postgresql:postgresql")
     implementation("org.liquibase:liquibase-core")
-    implementation("net.lbruun.springboot:preliquibase-spring-boot-starter:1.6.0")
     implementation('io.hypersistence:hypersistence-utils-hibernate-63:3.8.3')
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.0.2")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.0.2")
@@ -61,7 +69,7 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.8")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
-    implementation("io.github.serpro69:kotlin-faker:2.0.0-rc.10")
+    implementation("io.github.serpro69:kotlin-faker:2.0.0-rc.11")
     testImplementation("org.instancio:instancio-core:5.4.1")
 
     // S3
@@ -89,7 +97,7 @@ dependencies {
     implementation('com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.20.1')
 
     // Logging
-    implementation("ch.qos.logback:logback-classic:1.5.6")
+    implementation('ch.qos.logback:logback-classic:1.5.13')
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
     implementation("com.squareup.okhttp3:logging-interceptor:$OKHTTP_VERSION")
 
