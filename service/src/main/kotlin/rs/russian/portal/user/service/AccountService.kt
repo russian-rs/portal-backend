@@ -17,6 +17,7 @@ import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.domain.Account
+import rs.russian.portal.user.domain.ResidencePermit
 import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.domain.specification.searchSpecification
 import rs.russian.portal.user.mapper.ContractMapper
@@ -156,9 +157,20 @@ class AccountService(
     @Transactional
     fun updateResidencePermits(id: Int, permits: List<ResidencePermitDto>): Account {
         val account = getAccount(id)
-        val newPermits = permits.map { residencePermitMapper.toEntity(it, account) }.toSet()
-        account.residencePermits.retainAll(newPermits)
-        account.residencePermits.addAll(newPermits)
+        val existingPermitsMap: Map<String, ResidencePermit> = account.residencePermits
+            .filter { it.id != null }
+            .associateBy { it.id.toString() }
+        val updatedPermits = permits.map { dto ->
+            val existingEntity = existingPermitsMap[dto.id.toString()]
+            if (existingEntity != null) {
+                residencePermitMapper.update(dto, existingEntity)
+                existingEntity
+            } else {
+                residencePermitMapper.toEntity(dto, account)
+            }
+        }.toMutableSet()
+        account.residencePermits.clear()
+        account.residencePermits.addAll(updatedPermits)
         return accountRepository.save(account)
     }
 

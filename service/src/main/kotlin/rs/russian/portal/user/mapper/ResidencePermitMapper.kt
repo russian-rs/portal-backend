@@ -2,6 +2,7 @@ package rs.russian.portal.user.mapper
 
 import org.mapstruct.Mapper
 import org.mapstruct.Mapping
+import org.mapstruct.MappingTarget
 import org.springframework.beans.factory.annotation.Autowired
 import rs.russian.generated.model.ResidencePermitDto
 import rs.russian.portal.file.mapper.FileInfoMapper
@@ -25,6 +26,13 @@ abstract class ResidencePermitMapper {
     @Mapping(target = "frontSidePhoto", expression = "java(fileService.getFile(dto.getFrontSidePhoto().getId()))")
     @Mapping(target = "backSidePhoto", expression = "java(fileService.getFile(dto.getBackSidePhoto().getId()))")
     abstract fun toEntity(dto: ResidencePermitDto, account: Account): ResidencePermit
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "account", ignore = true)
+    @Mapping(target = "frontSidePhoto", expression = "java(fileService.getFile(dto.getFrontSidePhoto().getId()))")
+    @Mapping(target = "backSidePhoto", expression = "java(fileService.getFile(dto.getBackSidePhoto().getId()))")
+    abstract fun update(dto: ResidencePermitDto, @MappingTarget entity: ResidencePermit)
 
     abstract fun toDto(entity: ResidencePermit): ResidencePermitDto
 }
