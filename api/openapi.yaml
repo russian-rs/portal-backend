@@ -1083,10 +1083,16 @@ components:
       properties:
         email:
           type: string
+          format: email
+          maxLength: 100
         username:
           type: string
+          minLength: 2
+          maxLength: 100
         fullName:
           type: string
+          minLength: 2
+          maxLength: 100
         contract:
           $ref: '#/components/schemas/ContractDto'
     UserInfoDto:
@@ -1356,26 +1362,36 @@ components:
           format: uuid
         status:
           type: string
+          maxLength: 50
         type:
           type: string
+          maxLength: 50
         created:
           type: string
           format: date-time
         email:
           type: string
+          format: email
+          maxLength: 100
         name:
           type: string
+          minLength: 1
+          maxLength: 100
         patronymic:
           type: string
+          maxLength: 100
         birthDate:
           type: string
           format: date
         passport:
           type: string
+          maxLength: 100
         citizenship:
           type: string
+          maxLength: 100
         telegram:
           type: string
+          maxLength: 100
         inSerbia:
           type: boolean
         enterDate:
@@ -1383,34 +1399,46 @@ components:
           format: date
         city:
           type: string
+          maxLength: 100
         postalCode:
           type: string
+          maxLength: 20
         address:
           type: string
+          maxLength: 200
         phone:
           type: string
+          maxLength: 30
         residenceRequired:
           type: boolean
         occupation:
           type: string
+          maxLength: 100
         gender:
           $ref: '#/components/schemas/GenderEnumDto'
         hasExperience:
           type: boolean
         experience:
           type: string
+          maxLength: 1000
         languages:
           type: string
+          maxLength: 200
         skills:
           type: string
+          maxLength: 1000
         goal:
           type: string
+          maxLength: 2000
         bio:
           type: string
+          maxLength: 1000
         refuseReason:
           type: string
+          maxLength: 2000
         comment:
           type: string
+          maxLength: 2000
         contract:
           $ref: '#/components/schemas/ContractDto'
         notes:
@@ -1484,8 +1512,11 @@ components:
         createdBy:
           type: string
           description: Логин пользователя, который создал заметку
+          maxLength: 100
         text:
           type: string
+          minLength: 1
+          maxLength: 5000
     ChangeReportStatusRequest:
       type: object
       nullable: false

@@ -2,6 +2,7 @@ package rs.russian.portal.application.api
 
 import com.digitalsanctuary.cf.turnstile.service.TurnstileValidationService
 import jakarta.servlet.http.HttpServletRequest
+import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 import rs.russian.generated.api.ApplicationApi
@@ -27,7 +28,7 @@ class ApplicationController(
 
     override fun createApplication(
         captchaToken: String,
-        applicationDto: ApplicationDto,
+        @Valid applicationDto: ApplicationDto,
     ): ResponseEntity<ApplicationStatusDto> {
         val captchaValid = captchaService.validateTurnstileResponse(
             captchaToken,

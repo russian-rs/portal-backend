@@ -41,7 +41,8 @@ openApiGenerate {
             "serializableModel"    : "true",
             "skipDefaultInterface" : "true",
             "documentationProvider": "none",
-            "modelMutable"         : "true"
+            "modelMutable"         : "true",
+            "useBeanValidation"    : "true"
     ]
 }
 
