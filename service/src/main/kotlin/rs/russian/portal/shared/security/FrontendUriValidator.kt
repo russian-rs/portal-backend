@@ -1,0 +1,47 @@
+package rs.russian.portal.shared.security
+
+import org.slf4j.LoggerFactory
+import java.net.URI
+
+/**
+ * Validates frontend URI to prevent open redirect vulnerabilities.
+ * Only allows localhost (development) and *.russian.rs (production).
+ */
+object FrontendUriValidator {
+
+    private val log = LoggerFactory.getLogger(FrontendUriValidator::class.java)
+    private const val TRUSTED_DOMAIN = "russian.rs"
+
+    /**
+     * Validates and normalizes a frontend URI.
+     */
+    fun validate(url: String): String {
+        try {
+            val uri = URI(url)
+            val host = uri.host ?: throw IllegalArgumentException("Frontend URI must have a host: $url")
+
+            // Allow localhost for development
+            if (host == "localhost" || host == "127.0.0.1") {
+                log.info("Frontend URI configured for development: {}", url)
+                return url
+            }
+
+            // Allow trusted domain and subdomains
+            if (host == TRUSTED_DOMAIN || host.endsWith(".$TRUSTED_DOMAIN")) {
+                if (uri.scheme != "https") {
+                    val httpsUri = URI("https", uri.userInfo, uri.host, uri.port, uri.path, uri.query, uri.fragment).toString()
+                    log.warn("Frontend URI upgraded to HTTPS: {} -> {}", url, httpsUri)
+                    return httpsUri
+                }
+                log.info("Frontend URI configured: {}", url)
+                return url
+            }
+
+            throw IllegalArgumentException("Frontend URI must be localhost or *.$TRUSTED_DOMAIN, got: $host")
+        } catch (e: IllegalArgumentException) {
+            throw e
+        } catch (e: Exception) {
+            throw IllegalArgumentException("Invalid frontend URI '$url': ${e.message}", e)
+        }
+    }
+}
