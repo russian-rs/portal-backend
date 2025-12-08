@@ -56,8 +56,8 @@ dependencies {
     implementation("org.postgresql:postgresql")
     implementation("org.liquibase:liquibase-core")
     implementation('io.hypersistence:hypersistence-utils-hibernate-63:3.8.3')
-    implementation("net.javacrumbs.shedlock:shedlock-spring:6.0.2")
-    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.0.2")
+    implementation("net.javacrumbs.shedlock:shedlock-spring:7.2.1")
+    implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:7.2.1")
     compileOnly("org.hibernate:hibernate-jpamodelgen:6.6.3.Final")
 
     // Kotlin
