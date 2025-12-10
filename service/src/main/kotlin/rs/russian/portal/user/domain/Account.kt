@@ -19,7 +19,7 @@ import java.time.LocalDateTime
     attributeNodes = [
         NamedAttributeNode("info", subgraph = UserInfo.GRAPH_FULL),
         NamedAttributeNode("contracts"),
-        NamedAttributeNode("residencePermits", subgraph = "ResidencePermit.photos"),
+        NamedAttributeNode("residencePermits", subgraph = Account.GRAPH_RESIDENCE_PERMIT_PHOTOS),
     ],
     subgraphs = [
         NamedSubgraph(
@@ -35,7 +35,7 @@ import java.time.LocalDateTime
             attributeNodes = [NamedAttributeNode("projects")]
         ),
         NamedSubgraph(
-            name = "ResidencePermit.photos",
+            name = Account.GRAPH_RESIDENCE_PERMIT_PHOTOS,
             attributeNodes = [
                 NamedAttributeNode("frontSidePhoto"),
                 NamedAttributeNode("backSidePhoto")
@@ -76,5 +76,6 @@ class Account(
     companion object {
         const val GRAPH_FULL = "Account.Full"
         const val GRAPH_USERNAME = "Account.Username"
+        const val GRAPH_RESIDENCE_PERMIT_PHOTOS = "ResidencePermit.photos"
     }
 }

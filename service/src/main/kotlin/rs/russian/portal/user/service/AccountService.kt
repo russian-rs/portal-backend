@@ -13,6 +13,7 @@ import rs.russian.generated.model.*
 import rs.russian.portal.file.service.FileService
 import rs.russian.portal.program.repository.ProgramRepository
 import rs.russian.portal.program.repository.ProjectRepository
+import rs.russian.portal.shared.exception.InvalidRequestException
 import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.currentUserLogin
@@ -157,6 +158,14 @@ class AccountService(
     @Transactional
     fun updateResidencePermits(id: Int, permits: List<ResidencePermitDto>): Account {
         val account = getAccount(id)
+
+        // Validate dates
+        permits.forEach { permit ->
+            if (permit.validUntil <= permit.issuingDate) {
+                throw InvalidRequestException("Valid until date must be after issuing date")
+            }
+        }
+
         val existingPermitsMap: Map<String, ResidencePermit> = account.residencePermits
             .filter { it.id != null }
             .associateBy { it.id.toString() }

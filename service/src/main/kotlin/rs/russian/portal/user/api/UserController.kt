@@ -12,6 +12,8 @@ import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.service.AccountService
 import rs.russian.portal.user.service.SessionService
+import rs.russian.portal.shared.security.currentUserRoles
+import rs.russian.portal.user.domain.enums.UserGroup
 import java.util.UUID
 
 @RestController
@@ -28,7 +30,17 @@ class UserController(
 
     override fun getInfo(login: String): ResponseEntity<UserInfoDto> {
         val account = accountService.getAccountByLogin(login)
-        return ResponseEntity.ok(userMapper.map(account.info))
+        val dto = userMapper.map(account.info)
+        
+        // Filter residence permits: allowed only for self or ADMIN_VOLUNTEER
+        val currentUser = accountService.getCurrentAccount()
+        val isAdmin = currentUser.groups.contains(ADMIN_VOLUNTEER)
+
+        if (currentUser.id != account.id && !isAdmin) {
+            dto.residencePermits = mutableListOf()
+        }
+        
+        return ResponseEntity.ok(dto)
     }
 
     override fun logout(all: Boolean): ResponseEntity<Unit> {
@@ -71,7 +83,17 @@ class UserController(
     @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])
     override fun createUser(userCreateRequest: UserCreateRequest): ResponseEntity<UserInfoDto> {
         val account = accountService.create(userCreateRequest)
-        return ResponseEntity.ok(userMapper.map(account.info))
+        val dto = userMapper.map(account.info)
+
+        // Filter residence permits: allowed only for self or ADMIN_VOLUNTEER
+        val currentUser = accountService.getCurrentAccount()
+        val isAdmin = currentUser.groups.contains(ADMIN_VOLUNTEER)
+
+        if (currentUser.id != account.id && !isAdmin) {
+            dto.residencePermits = mutableListOf()
+        }
+
+        return ResponseEntity.ok(dto)
     }
 
     @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])

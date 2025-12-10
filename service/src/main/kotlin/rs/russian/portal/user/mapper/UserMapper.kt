@@ -24,7 +24,7 @@ import java.util.*
 
 @Mapper(
     imports = [HashSet::class, LocalDateTime::class, UUID::class],
-    uses = [FileInfoMapper::class, ProgramMapper::class, ProjectMapper::class, ContractMapper::class]
+    uses = [FileInfoMapper::class, ProgramMapper::class, ProjectMapper::class, ContractMapper::class, ResidencePermitMapper::class]
 )
 abstract class UserMapper {
 

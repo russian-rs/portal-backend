@@ -27,8 +27,8 @@ databaseChangeLog:
               - column: { name: state_of_birth, type: VARCHAR(255), constraints: { nullable: false } }
               - column: { name: valid_until, type: DATE, constraints: { nullable: false } }
               - column: { name: issuing_date, type: DATE, constraints: { nullable: false } }
-              - column: { name: registration_number, type: VARCHAR(9), constraints: { nullable: false } }
-              - column: { name: identity_number, type: VARCHAR(13), constraints: { nullable: false } }
+              - column: { name: registration_number, type: VARCHAR(255), constraints: { nullable: false } }
+              - column: { name: identity_number, type: VARCHAR(255), constraints: { nullable: false } }
               - column:
                   name: front_side_file_id
                   type: VARCHAR(255)
