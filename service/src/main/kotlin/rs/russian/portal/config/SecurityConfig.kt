@@ -12,20 +12,41 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import rs.russian.portal.user.service.AccountService
 
 @Configuration
 @EnableWebSecurity
-open class SecurityConfig(
+class SecurityConfig(
     private val accountService: AccountService,
     private val appProperties: AppProperties,
 ) {
 
     @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration().apply {
+            allowedOrigins = listOf(appProperties.frontendUri)
+            allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+            allowedHeaders = listOf("*")
+            exposedHeaders = listOf(LOCATION)
+            allowCredentials = true
+            maxAge = 3600L
+        }
+        return UrlBasedCorsConfigurationSource().apply {
+            registerCorsConfiguration("/**", configuration)
+        }
+    }
+
+    @Bean
     @Profile("!no-auth")
-    open fun securityFilterChain(
+    fun securityFilterChain(
         httpSecurity: HttpSecurity,
     ): SecurityFilterChain = httpSecurity
+        .cors {
+            it.configurationSource(corsConfigurationSource())
+        }
         .csrf {
             it.disable()
         }
@@ -60,10 +81,13 @@ open class SecurityConfig(
 
     @Bean
     @Profile("no-auth")
-    open fun securityFilterChainNoAuth(
+    fun securityFilterChainNoAuth(
         httpSecurity: HttpSecurity,
         defaultUserFilter: DefaultUserFilter,
     ): SecurityFilterChain = httpSecurity
+        .cors {
+            it.configurationSource(corsConfigurationSource())
+        }
         .csrf {
             it.disable()
         }
