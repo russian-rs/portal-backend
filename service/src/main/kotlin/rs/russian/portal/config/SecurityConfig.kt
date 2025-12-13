@@ -12,6 +12,8 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
 import rs.russian.portal.user.service.AccountService
 
 @Configuration
@@ -27,7 +29,11 @@ open class SecurityConfig(
         httpSecurity: HttpSecurity,
     ): SecurityFilterChain = httpSecurity
         .csrf {
-            it.disable()
+            // Cookie-based CSRF tokens for SPA frontend
+            it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            it.csrfTokenRequestHandler(CsrfTokenRequestAttributeHandler())
+            // Disable CSRF for public endpoints (they have captcha protection)
+            it.ignoringRequestMatchers(*CSRF_DISABLED_ENDPOINTS)
         }
         .authorizeHttpRequests {
             it
@@ -85,7 +91,14 @@ open class SecurityConfig(
             "/turnstile",
             "/cities",
             "/cities/search",
-            "/cities/{code}"
+            "/cities/{code}",
+            "/csrf",
+        )
+
+        // Endpoints that don't need CSRF (public endpoints protected by captcha)
+        private val CSRF_DISABLED_ENDPOINTS = arrayOf(
+            "/application/create",
+            "/actuator/health",
         )
     }
 
