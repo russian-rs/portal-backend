@@ -1,12 +1,17 @@
 package rs.russian.portal.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
+import rs.russian.portal.shared.security.FrontendUriValidator
 import java.time.Duration
 
 @ConfigurationProperties(prefix = "app")
 data class AppProperties(
     val frontendUri: String,
-)
+) {
+    init {
+        FrontendUriValidator.validate(frontendUri)
+    }
+}
 
 @ConfigurationProperties(prefix = "app.s3")
 data class S3Properties(
