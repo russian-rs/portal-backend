@@ -15,6 +15,8 @@ import org.springframework.security.web.SecurityFilterChain
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
 import rs.russian.portal.user.service.AccountService
 
 @Configuration
@@ -48,7 +50,11 @@ class SecurityConfig(
             it.configurationSource(corsConfigurationSource())
         }
         .csrf {
-            it.disable()
+            // Cookie-based CSRF tokens for SPA frontend
+            it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            it.csrfTokenRequestHandler(CsrfTokenRequestAttributeHandler())
+            // Disable CSRF for public endpoints (they have captcha protection)
+            it.ignoringRequestMatchers(*CSRF_DISABLED_ENDPOINTS)
         }
         .authorizeHttpRequests {
             it
@@ -109,7 +115,14 @@ class SecurityConfig(
             "/turnstile",
             "/cities",
             "/cities/search",
-            "/cities/{code}"
+            "/cities/{code}",
+            "/csrf",
+        )
+
+        // Endpoints that don't need CSRF (public endpoints protected by captcha)
+        private val CSRF_DISABLED_ENDPOINTS = arrayOf(
+            "/application/create",
+            "/actuator/health",
         )
     }
 
