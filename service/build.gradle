@@ -86,7 +86,7 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
     // Security
-    implementation('com.auth0:java-jwt:4.4.0')
+    implementation('com.auth0:java-jwt:4.5.0')
     implementation('com.digitalsanctuary:ds-spring-cf-turnstile:1.1.5')
 
     // Mapstruct
