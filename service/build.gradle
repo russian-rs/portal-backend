@@ -67,7 +67,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
 
     // Testing
-    testImplementation("io.mockk:mockk:1.13.8")
+    testImplementation("io.mockk:mockk:1.14.7")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
     implementation("io.github.serpro69:kotlin-faker:2.0.0-rc.11")
@@ -107,7 +107,7 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("io.mockk:mockk:1.14.0")
+    testImplementation("io.mockk:mockk:1.14.7")
     testImplementation("org.testcontainers:postgresql:1.19.6")
     testImplementation("org.testcontainers:junit-jupiter:1.19.6")
     testImplementation("com.redis:testcontainers-redis:2.2.2")
