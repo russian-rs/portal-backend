@@ -83,6 +83,11 @@ class SecurityConfig(
         .sessionManagement {
             it.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
         }
+        .headers {
+            it.contentSecurityPolicy { csp ->
+                csp.policyDirectives(buildCspPolicy())
+            }
+        }
         .build()
 
     @Bean
@@ -105,6 +110,13 @@ class SecurityConfig(
         }
         .addFilterBefore(defaultUserFilter, OAuth2LoginAuthenticationFilter::class.java)
         .build()
+
+    private fun buildCspPolicy(): String = listOf(
+        "default-src 'self'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "img-src 'self' data: blob:",
+    ).joinToString("; ")
 
     companion object {
         val WHITELIST = arrayOf(
