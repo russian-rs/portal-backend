@@ -178,6 +178,11 @@ class AccountService(
             ?: throw IllegalArgumentException("Program with code: $code not found!")
 
         userInfo.program = program
+
+        if (userInfo.project !in userInfo.program?.projects.orEmpty()) {
+            userInfo.project = null
+        }
+
         account.info = userInfo
         return account
     }
