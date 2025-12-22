@@ -179,8 +179,10 @@ class AccountService(
 
         userInfo.program = program
 
-        if (userInfo.project !in userInfo.program?.projects.orEmpty()) {
-            userInfo.project = null
+        userInfo.project?.let { project ->
+            if (project !in userInfo.program?.projects.orEmpty()) {
+                userInfo.project = null
+            }
         }
 
         account.info = userInfo
