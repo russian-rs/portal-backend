@@ -180,7 +180,7 @@ class AccountService(
         userInfo.program = program
 
         userInfo.project?.let { project ->
-            if (project !in userInfo.program?.projects.orEmpty()) {
+            if (project.program.code != program.code) {
                 userInfo.project = null
             }
         }
