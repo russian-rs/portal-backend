@@ -16,7 +16,10 @@ class CsrfController {
 
     @GetMapping
     fun getCsrfToken(csrfToken: CsrfToken): ResponseEntity<Void> {
-        // Just accessing the token forces it to be generated and set in the cookie
+        // With Spring Security 6, tokens are loaded lazily (deferred).
+        // We must explicitly call getToken() to force the token to be generated
+        // and the XSRF-TOKEN cookie to be set.
+        csrfToken.token
         return ResponseEntity.ok().build()
     }
 }
