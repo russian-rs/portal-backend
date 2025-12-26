@@ -16,7 +16,7 @@ import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository
-import org.springframework.security.web.csrf.XorCsrfTokenRequestAttributeHandler
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
 import rs.russian.portal.user.service.AccountService
 
 @Configuration
@@ -50,9 +50,10 @@ class SecurityConfig(
             it.configurationSource(corsConfigurationSource())
         }
         .csrf {
-            // Cookie-based CSRF tokens for SPA frontend with BREACH protection
+            // Cookie-based CSRF tokens for SPA frontend
             it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-            it.csrfTokenRequestHandler(XorCsrfTokenRequestAttributeHandler())
+            // Plain handler for SPA (no XOR encoding needed for header-based tokens)
+            it.csrfTokenRequestHandler(CsrfTokenRequestAttributeHandler())
             // Disable CSRF for public endpoints (they have captcha protection)
             it.ignoringRequestMatchers(*CSRF_DISABLED_ENDPOINTS)
         }
