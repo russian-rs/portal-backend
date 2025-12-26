@@ -178,6 +178,13 @@ class AccountService(
             ?: throw IllegalArgumentException("Program with code: $code not found!")
 
         userInfo.program = program
+
+        userInfo.project?.let { project ->
+            if (project.program.code != program.code) {
+                userInfo.project = null
+            }
+        }
+
         account.info = userInfo
         return account
     }
