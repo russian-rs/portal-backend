@@ -927,6 +927,17 @@ paths:
                   type: string
                   default: Название группы поддержки для создания тикета
 
+  /csrf:
+    get:
+      operationId: getCsrfToken
+      summary: Get CSRF token
+      description: Triggers CSRF token cookie to be set for SPA frontend
+      tags:
+        - security
+      responses:
+        '200':
+          description: CSRF token cookie set successfully
+
 components:
   responses:
     ServerError:
