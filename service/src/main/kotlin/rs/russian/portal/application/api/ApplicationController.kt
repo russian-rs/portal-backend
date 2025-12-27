@@ -29,13 +29,13 @@ class ApplicationController(
         captchaToken: String,
         applicationDto: ApplicationDto,
     ): ResponseEntity<ApplicationStatusDto> {
-//        val captchaValid = captchaService.validateTurnstileResponse(
-//            captchaToken,
-//            captchaService.getClientIpAddress(httpServletRequest)
-//        )
-//        if (!captchaValid) {
-//            throw CaptchaInvalidException()
-//        }
+        val captchaValid = captchaService.validateTurnstileResponse(
+            captchaToken,
+            captchaService.getClientIpAddress(httpServletRequest)
+        )
+        if (!captchaValid) {
+            throw CaptchaInvalidException()
+        }
         val application = applicationService.create(applicationDto)
         return ResponseEntity.ok(applicationMapper.mapStatus(application))
     }
