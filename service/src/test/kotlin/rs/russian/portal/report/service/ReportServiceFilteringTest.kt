@@ -124,9 +124,11 @@ class ReportServiceFilteringTest : AbstractIntegrationTest() {
     @Test
     fun `getReports should combine program and project filters correctly`() {
         // Given: Create reports with different program/project combinations
+        // Note: Projects belong to specific programs (LAYOUT/FORMS belong to IT, ARTICLES belongs to MEDIA)
+        // setProject() also sets the program to the project's parent program
         createReportWithProgramAndProject("IT", "LAYOUT", "IT+Layout")
         createReportWithProgramAndProject("IT", "FORMS", "IT+Forms")
-        createReportWithProgramAndProject("MEDIA", "LAYOUT", "Media+Layout")
+        createReportWithProgramAndProject("MEDIA", "ARTICLES", "Media+Articles")
         createReportWithoutProgramProject("No Program/Project")
 
         // When: Filter by both IT program and LAYOUT project
