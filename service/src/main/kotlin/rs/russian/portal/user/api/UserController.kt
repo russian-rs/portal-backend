@@ -12,8 +12,6 @@ import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.service.AccountService
 import rs.russian.portal.user.service.SessionService
-import rs.russian.portal.shared.security.currentUserRoles
-import rs.russian.portal.user.domain.enums.UserGroup
 import java.util.UUID
 
 @RestController
@@ -31,15 +29,11 @@ class UserController(
     override fun getInfo(login: String): ResponseEntity<UserInfoDto> {
         val account = accountService.getAccountByLogin(login)
         val dto = userMapper.map(account.info)
-        
-        // Filter residence permits: allowed only for self or ADMIN_VOLUNTEER
-        val currentUser = accountService.getCurrentAccount()
-        val isAdmin = currentUser.groups.contains(ADMIN_VOLUNTEER)
-
-        if (currentUser.id != account.id && !isAdmin) {
+        val currentAccount = accountService.getCurrentAccount()
+        if (currentAccount.id != account.id && !currentAccount.groups.contains(ADMIN_VOLUNTEER)) {
+            // Filter residence permits: allowed only for self or ADMIN_VOLUNTEER
             dto.residencePermits = mutableListOf()
         }
-        
         return ResponseEntity.ok(dto)
     }
 
@@ -83,17 +77,7 @@ class UserController(
     @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])
     override fun createUser(userCreateRequest: UserCreateRequest): ResponseEntity<UserInfoDto> {
         val account = accountService.create(userCreateRequest)
-        val dto = userMapper.map(account.info)
-
-        // Filter residence permits: allowed only for self or ADMIN_VOLUNTEER
-        val currentUser = accountService.getCurrentAccount()
-        val isAdmin = currentUser.groups.contains(ADMIN_VOLUNTEER)
-
-        if (currentUser.id != account.id && !isAdmin) {
-            dto.residencePermits = mutableListOf()
-        }
-
-        return ResponseEntity.ok(dto)
+        return ResponseEntity.ok(userMapper.map(account.info))
     }
 
     @Authorized(allowed = [ADMIN_SSO, ADMIN_VOLUNTEER])
