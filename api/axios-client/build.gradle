@@ -7,12 +7,10 @@ group = "rs.russian.api"
 
 def openApiPath = "$projectDir/../openapi.yaml"
 def npmName = "@russian-rs/portal-api-axios"
-def npmVersion = resolveApiVersion(openApiPath)
+def baseVersion = resolveApiVersion(openApiPath)
+def gitHash = project.hasProperty('gitHash') ? project.gitHash : 'local'
+def npmVersion = "${baseVersion}-${gitHash}"
 def npmRepository = "https://npm.pkg.github.com"
-
-if (project.hasProperty('snapshot')) {
-    npmVersion = "${resolveApiVersion(openApiPath)}-snapshot-${snapshot}"
-}
 
 openApiGenerate {
     generatorName = "typescript-axios"
