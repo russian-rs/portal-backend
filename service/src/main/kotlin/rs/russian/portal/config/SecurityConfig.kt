@@ -12,22 +12,50 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
 import rs.russian.portal.user.service.AccountService
 
 @Configuration
 @EnableWebSecurity
-open class SecurityConfig(
+class SecurityConfig(
     private val accountService: AccountService,
     private val appProperties: AppProperties,
 ) {
 
     @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration().apply {
+            allowedOrigins = listOf(appProperties.frontendUri)
+            allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+            allowedHeaders = listOf("*")
+            exposedHeaders = listOf(LOCATION)
+            allowCredentials = true
+            maxAge = 3600L
+        }
+        return UrlBasedCorsConfigurationSource().apply {
+            registerCorsConfiguration("/**", configuration)
+        }
+    }
+
+    @Bean
     @Profile("!no-auth")
-    open fun securityFilterChain(
+    fun securityFilterChain(
         httpSecurity: HttpSecurity,
     ): SecurityFilterChain = httpSecurity
+        .cors {
+            it.configurationSource(corsConfigurationSource())
+        }
         .csrf {
-            it.disable()
+            // Cookie-based CSRF tokens for SPA frontend
+            it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+            // Plain handler for SPA (no XOR encoding needed for header-based tokens)
+            it.csrfTokenRequestHandler(CsrfTokenRequestAttributeHandler())
+            // Disable CSRF for public endpoints (they have captcha protection)
+            it.ignoringRequestMatchers(*CSRF_DISABLED_ENDPOINTS)
         }
         .authorizeHttpRequests {
             it
@@ -56,14 +84,22 @@ open class SecurityConfig(
         .sessionManagement {
             it.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
         }
+        .headers {
+            it.contentSecurityPolicy { csp ->
+                csp.policyDirectives(buildCspPolicy())
+            }
+        }
         .build()
 
     @Bean
     @Profile("no-auth")
-    open fun securityFilterChainNoAuth(
+    fun securityFilterChainNoAuth(
         httpSecurity: HttpSecurity,
         defaultUserFilter: DefaultUserFilter,
     ): SecurityFilterChain = httpSecurity
+        .cors {
+            it.configurationSource(corsConfigurationSource())
+        }
         .csrf {
             it.disable()
         }
@@ -76,6 +112,13 @@ open class SecurityConfig(
         .addFilterBefore(defaultUserFilter, OAuth2LoginAuthenticationFilter::class.java)
         .build()
 
+    private fun buildCspPolicy(): String = listOf(
+        "default-src 'self'",
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+        "font-src 'self' https://fonts.gstatic.com",
+        "img-src 'self' data: blob:",
+    ).joinToString("; ")
+
     companion object {
         val WHITELIST = arrayOf(
             "/actuator/health",
@@ -85,7 +128,15 @@ open class SecurityConfig(
             "/turnstile",
             "/cities",
             "/cities/search",
-            "/cities/{code}"
+            "/cities/{code}",
+            "/csrf",
+        )
+
+        // Endpoints that don't need CSRF (public endpoints protected by captcha or non-sensitive)
+        private val CSRF_DISABLED_ENDPOINTS = arrayOf(
+            "/application/create",
+            "/actuator/health",
+            "/turnstile",
         )
     }
 
