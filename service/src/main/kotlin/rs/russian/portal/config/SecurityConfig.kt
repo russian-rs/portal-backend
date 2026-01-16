@@ -29,7 +29,7 @@ class SecurityConfig(
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration().apply {
-            allowedOrigins = listOf(appProperties.frontendUri)
+            allowedOrigins = appProperties.allowedOrigins
             allowedMethods = listOf("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             allowedHeaders = listOf("*")
             exposedHeaders = listOf(LOCATION)
@@ -112,12 +112,16 @@ class SecurityConfig(
         .addFilterBefore(defaultUserFilter, OAuth2LoginAuthenticationFilter::class.java)
         .build()
 
-    private fun buildCspPolicy(): String = listOf(
-        "default-src 'self'",
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-        "font-src 'self' https://fonts.gstatic.com",
-        "img-src 'self' data: blob:",
-    ).joinToString("; ")
+    private fun buildCspPolicy(): String {
+        val allowedOrigins = appProperties.allowedOrigins.joinToString(" ")
+        return listOf(
+            "default-src 'self'",
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+            "font-src 'self' https://fonts.gstatic.com",
+            "img-src 'self' data: blob:",
+            "connect-src 'self' $allowedOrigins",
+        ).joinToString("; ")
+    }
 
     companion object {
         val WHITELIST = arrayOf(
