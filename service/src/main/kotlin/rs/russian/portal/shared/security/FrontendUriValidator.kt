@@ -14,17 +14,17 @@ object FrontendUriValidator {
 
     /**
      * Validates and normalizes a frontend URI. Throws on invalid URI.
+     * Supports patterns like http://localhost:* for CORS configuration.
      */
     fun validate(url: String): String {
         try {
-            val uri = URI(url)
-            val host = uri.host ?: throw IllegalArgumentException("Frontend URI must have a host: $url")
-
-            // Allow localhost for development
-            if (isLocalhost(host)) {
+            if (isLocalhost(url)) {
                 log.info("Frontend URI configured for development: {}", url)
                 return url
             }
+
+            val uri = URI(url)
+            val host = uri.host ?: throw IllegalArgumentException("Frontend URI must have a host: $url")
 
             // Allow trusted domain and subdomains
             if (host == TRUSTED_DOMAIN || host.endsWith(".$TRUSTED_DOMAIN")) {
@@ -54,13 +54,14 @@ object FrontendUriValidator {
         }
 
     /**
-     * Checks if host or URL is localhost.
+     * Checks if host or URL is localhost (supports patterns like http://localhost:*).
      */
     fun isLocalhost(hostOrUrl: String): Boolean {
-        val host = if (hostOrUrl.contains("://")) {
-            runCatching { URI(hostOrUrl).host }.getOrNull()
+        val normalized = hostOrUrl.replace(":*", ":0") // normalize pattern for URI parsing
+        val host = if (normalized.contains("://")) {
+            runCatching { URI(normalized).host }.getOrNull()
         } else {
-            hostOrUrl
+            normalized.substringBefore(":")
         }
         return host == "localhost" || host == "127.0.0.1"
     }
