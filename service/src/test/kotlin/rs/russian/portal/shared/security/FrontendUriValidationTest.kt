@@ -15,7 +15,9 @@ class FrontendUriValidationTest {
     @ParameterizedTest
     @ValueSource(strings = [
         "http://localhost:3000",
+        "http://localhost:*",
         "http://127.0.0.1:3000",
+        "http://127.0.0.1:*",
         "https://russian.rs",
         "https://portal.russian.rs",
         "https://REDACTED_HOST",
@@ -23,6 +25,30 @@ class FrontendUriValidationTest {
     ])
     fun `should accept valid URLs`(url: String) {
         assertEquals(url, FrontendUriValidator.validate(url))
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = [
+        "http://localhost:3000",
+        "http://localhost:*",
+        "http://localhost:5173",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:*",
+        "localhost",
+        "127.0.0.1",
+    ])
+    fun `isLocalhost should return true for localhost`(hostOrUrl: String) {
+        assertTrue(FrontendUriValidator.isLocalhost(hostOrUrl))
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = [
+        "https://russian.rs",
+        "https://evil.com",
+        "google.com",
+    ])
+    fun `isLocalhost should return false for non-localhost`(hostOrUrl: String) {
+        assertFalse(FrontendUriValidator.isLocalhost(hostOrUrl))
     }
 
     @Test
