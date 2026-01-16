@@ -54,8 +54,14 @@ object FrontendUriValidator {
         }
 
     /**
-     * Checks if URL's host is localhost.
+     * Checks if host or URL is localhost.
      */
-    fun isLocalhost(url: String): Boolean =
-        runCatching { URI(url).host }.getOrNull()?.let { it == "localhost" || it == "127.0.0.1" } ?: false
+    fun isLocalhost(hostOrUrl: String): Boolean {
+        val host = if (hostOrUrl.contains("://")) {
+            runCatching { URI(hostOrUrl).host }.getOrNull()
+        } else {
+            hostOrUrl
+        }
+        return host == "localhost" || host == "127.0.0.1"
+    }
 }
