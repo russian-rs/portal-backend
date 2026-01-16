@@ -13,7 +13,7 @@ object FrontendUriValidator {
     private const val TRUSTED_DOMAIN = "russian.rs"
 
     /**
-     * Validates and normalizes a frontend URI.
+     * Validates and normalizes a frontend URI. Throws on invalid URI.
      */
     fun validate(url: String): String {
         try {
@@ -21,7 +21,7 @@ object FrontendUriValidator {
             val host = uri.host ?: throw IllegalArgumentException("Frontend URI must have a host: $url")
 
             // Allow localhost for development
-            if (host == "localhost" || host == "127.0.0.1") {
+            if (isLocalhost(host)) {
                 log.info("Frontend URI configured for development: {}", url)
                 return url
             }
@@ -44,4 +44,18 @@ object FrontendUriValidator {
             throw IllegalArgumentException("Invalid frontend URI '$url': ${e.message}", e)
         }
     }
+
+    /**
+     * Validates without throwing. Returns null if invalid or blank.
+     */
+    fun validateOrNull(url: String): String? =
+        url.trim().takeIf { it.isNotBlank() }?.let {
+            runCatching { validate(it) }.getOrNull()
+        }
+
+    /**
+     * Checks if URL's host is localhost.
+     */
+    fun isLocalhost(url: String): Boolean =
+        runCatching { URI(url).host }.getOrNull()?.let { it == "localhost" || it == "127.0.0.1" } ?: false
 }
