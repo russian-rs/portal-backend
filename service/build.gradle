@@ -79,6 +79,9 @@ dependencies {
     // Common
     implementation("commons-io:commons-io:2.21.0")
 
+    // File type detection (MIME validation)
+    implementation("org.apache.tika:tika-core:3.2.3")
+
     // Web
     implementation("com.squareup.okhttp3:okhttp:$OKHTTP_VERSION")
 
