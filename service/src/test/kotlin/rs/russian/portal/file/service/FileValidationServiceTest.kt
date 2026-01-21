@@ -249,6 +249,141 @@ class FileValidationServiceTest {
         assertEquals("my_document_file.pdf", result)
     }
 
+    @Test
+    fun `should accept JPEG extension file`() {
+        // JPEG magic bytes
+        val jpegContent = byteArrayOf(0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte(), 0xE0.toByte()) +
+            ByteArray(100) { 0 }
+        val resource = createResource(jpegContent, "image.jpeg")
+
+        assertDoesNotThrow {
+            fileValidationService.validateFile(resource, FileExt.JPEG)
+        }
+    }
+
+    @Test
+    fun `should accept valid WEBP file`() {
+        // WEBP magic bytes: RIFF....WEBP
+        val webpContent = "RIFF".toByteArray() + ByteArray(4) { 0 } + "WEBP".toByteArray() + ByteArray(100) { 0 }
+        val resource = createResource(webpContent, "image.webp")
+
+        assertDoesNotThrow {
+            fileValidationService.validateFile(resource, FileExt.WEBP)
+        }
+    }
+
+    @Test
+    fun `should reject file with null filename`() {
+        val content = "test".toByteArray()
+        val resource = object : ByteArrayResource(content) {
+            override fun getFilename(): String? = null
+        }
+
+        val exception = assertThrows<UnsupportedFileFormat> {
+            fileValidationService.validateFile(resource, FileExt.TXT)
+        }
+
+        assertEquals("Filename is required", exception.message)
+    }
+
+    @Test
+    fun `should reject file with filename exceeding max length`() {
+        val content = "test content".toByteArray()
+        val longFilename = "a".repeat(256) + ".txt"
+        val resource = createResource(content, longFilename)
+
+        val exception = assertThrows<UnsupportedFileFormat> {
+            fileValidationService.validateFile(resource, FileExt.TXT)
+        }
+
+        assertEquals("Filename too long (max 255 characters)", exception.message)
+    }
+
+    @Test
+    fun `should reject file with sh extension in name`() {
+        val content = "test content".toByteArray()
+        val resource = createResource(content, "script.sh.pdf")
+
+        val exception = assertThrows<UnsupportedFileFormat> {
+            fileValidationService.validateFile(resource, FileExt.PDF)
+        }
+
+        assertEquals("Suspicious filename detected", exception.message)
+    }
+
+    @Test
+    fun `should reject file with bat extension in name`() {
+        val content = "test content".toByteArray()
+        val resource = createResource(content, "script.bat.txt")
+
+        val exception = assertThrows<UnsupportedFileFormat> {
+            fileValidationService.validateFile(resource, FileExt.TXT)
+        }
+
+        assertEquals("Suspicious filename detected", exception.message)
+    }
+
+    @Test
+    fun `should reject file with js extension in name`() {
+        val content = "test content".toByteArray()
+        val resource = createResource(content, "malicious.js.png")
+
+        val exception = assertThrows<UnsupportedFileFormat> {
+            fileValidationService.validateFile(resource, FileExt.PNG)
+        }
+
+        assertEquals("Suspicious filename detected", exception.message)
+    }
+
+    @Test
+    fun `should reject file with forward slash in name`() {
+        val content = "test content".toByteArray()
+        val resource = createResource(content, "some/path/file.txt")
+
+        val exception = assertThrows<UnsupportedFileFormat> {
+            fileValidationService.validateFile(resource, FileExt.TXT)
+        }
+
+        assertEquals("Invalid filename: path traversal detected", exception.message)
+    }
+
+    @Test
+    fun `should reject JPEG disguised as PNG`() {
+        // JPEG magic bytes
+        val jpegContent = byteArrayOf(0xFF.toByte(), 0xD8.toByte(), 0xFF.toByte(), 0xE0.toByte()) +
+            ByteArray(100) { 0 }
+        val resource = createResource(jpegContent, "fake.png")
+
+        val exception = assertThrows<UnsupportedFileFormat> {
+            fileValidationService.validateFile(resource, FileExt.PNG)
+        }
+
+        assertTrue(exception.message?.contains("does not match") == true)
+    }
+
+    @Test
+    fun `should reject text file disguised as PNG`() {
+        val textContent = "This is plain text, not an image".toByteArray()
+        val resource = createResource(textContent, "fake.png")
+
+        val exception = assertThrows<UnsupportedFileFormat> {
+            fileValidationService.validateFile(resource, FileExt.PNG)
+        }
+
+        assertTrue(exception.message?.contains("does not match") == true)
+    }
+
+    @Test
+    fun `should accept text file with different text mime subtype`() {
+        // HTML content is detected as text/html but should be accepted for TXT extension
+        val htmlContent = "<!DOCTYPE html><html><head></head><body></body></html>".toByteArray()
+        val resource = createResource(htmlContent, "document.txt")
+
+        assertDoesNotThrow {
+            fileValidationService.validateFile(resource, FileExt.TXT)
+        }
+    }
+
     private fun createResource(content: ByteArray, filename: String): ByteArrayResource {
         return object : ByteArrayResource(content) {
             override fun getFilename(): String = filename
