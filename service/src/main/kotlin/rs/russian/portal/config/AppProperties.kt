@@ -1,12 +1,45 @@
 package rs.russian.portal.config
 
+import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.ConfigurationProperties
+import rs.russian.portal.shared.security.FrontendUriValidator
 import java.time.Duration
+
+private val logger = LoggerFactory.getLogger(AppProperties::class.java)
 
 @ConfigurationProperties(prefix = "app")
 data class AppProperties(
     val frontendUri: String,
-)
+    val corsAllowedOrigins: List<String> = emptyList(),
+) {
+    /**
+     * Validated CORS origins: frontendUri + additional configured origins.
+     * Only trusted origins (*.russian.rs, localhost) are included.
+     */
+    val allowedOrigins: List<String> = validateCorsOrigins(frontendUri, corsAllowedOrigins)
+
+    init {
+        FrontendUriValidator.validate(frontendUri)
+    }
+}
+
+private fun validateCorsOrigins(frontendUri: String, corsAllowedOrigins: List<String>): List<String> {
+    val allOrigins = listOf(frontendUri) + corsAllowedOrigins
+    val (valid, invalid) = allOrigins.partition { FrontendUriValidator.validateOrNull(it) != null }
+
+    if (invalid.any { it.isNotBlank() }) {
+        logger.warn("Blocked untrusted CORS origins: {}", invalid.filter { it.isNotBlank() })
+    }
+
+    val validated = valid.mapNotNull { FrontendUriValidator.validateOrNull(it) }.distinct()
+    val localhostOrigins = validated.filter { FrontendUriValidator.isLocalhost(it) }
+
+    if (localhostOrigins.isNotEmpty()) {
+        logger.warn("CORS allows localhost origins - ensure this is not production: {}", localhostOrigins)
+    }
+
+    return validated
+}
 
 @ConfigurationProperties(prefix = "app.s3")
 data class S3Properties(

@@ -1,11 +1,13 @@
 package rs.russian.portal.shared.exception
 
 import jakarta.persistence.EntityNotFoundException
+import jakarta.validation.ConstraintViolationException
 import org.apache.catalina.connector.ClientAbortException
 import org.slf4j.LoggerFactory
 import org.springframework.beans.TypeMismatchException
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.ServletWebRequest
@@ -52,6 +54,28 @@ class GlobalExceptionHandler {
         ex: TypeMismatchException,
         request: WebRequest
     ): ResponseEntity<ErrorResponse> {
+        return ResponseEntity(ErrorResponse(BAD_REQUEST.reasonPhrase), BAD_REQUEST)
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException::class)
+    fun handleMethodArgumentNotValidException(
+        ex: MethodArgumentNotValidException,
+        request: WebRequest
+    ): ResponseEntity<ErrorResponse> {
+        val errors = ex.bindingResult.fieldErrors
+            .joinToString("; ") { "${it.field}: ${it.defaultMessage}" }
+        log.warn("Validation failed on URL: {} - Errors: {}", getRequestUrl(request), errors)
+        return ResponseEntity(ErrorResponse(BAD_REQUEST.reasonPhrase), BAD_REQUEST)
+    }
+
+    @ExceptionHandler(ConstraintViolationException::class)
+    fun handleConstraintViolationException(
+        ex: ConstraintViolationException,
+        request: WebRequest
+    ): ResponseEntity<ErrorResponse> {
+        val errors = ex.constraintViolations
+            .joinToString("; ") { "${it.propertyPath}: ${it.message}" }
+        log.warn("Constraint violation on URL: {} - Errors: {}", getRequestUrl(request), errors)
         return ResponseEntity(ErrorResponse(BAD_REQUEST.reasonPhrase), BAD_REQUEST)
     }
 

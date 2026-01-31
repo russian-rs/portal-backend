@@ -98,7 +98,8 @@ class UserSyncSchedulerTest {
         groupsObj = null,
         avatar = "null",
         uid = username,
-        uuid = UUID.randomUUID()
+        uuid = UUID.randomUUID(),
+        isActive = true,
     )
 
     private fun createAccount(id: Int, username: String) = Account(
