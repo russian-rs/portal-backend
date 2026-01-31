@@ -46,7 +46,9 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(UnsupportedFileFormat::class)
     fun handleUnsupportedFileFormat(ex: UnsupportedFileFormat, request: WebRequest): ResponseEntity<ErrorResponse> {
-        return ResponseEntity(ErrorResponse(UNSUPPORTED_MEDIA_TYPE.reasonPhrase), UNSUPPORTED_MEDIA_TYPE)
+        val message = ex.message ?: UNSUPPORTED_MEDIA_TYPE.reasonPhrase
+        log.warn("Unsupported file format on URL: {} - Error: {}", getRequestUrl(request), message)
+        return ResponseEntity(ErrorResponse(message), UNSUPPORTED_MEDIA_TYPE)
     }
 
     @ExceptionHandler(TypeMismatchException::class)
