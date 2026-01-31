@@ -16,7 +16,8 @@ import java.util.*
 class FileService(
     private val s3Service: S3Service,
     private val fileInfoMapper: FileInfoMapper,
-    private val fileInfoRepository: FileInfoRepository
+    private val fileInfoRepository: FileInfoRepository,
+    private val fileValidationService: FileValidationService,
 ) {
 
     @Transactional(readOnly = true)
@@ -35,11 +36,20 @@ class FileService(
     @Transactional
     fun createFile(file: Resource, author: Account): FileInfoDto {
         val id = UUID.randomUUID().toString()
+        val originalFilename = file.filename ?: id
+        val extension = FileExt.of(getFileSuffix(originalFilename))
+
+        // Validate file content matches claimed extension
+        fileValidationService.validateFile(file, extension)
+
+        // Sanitize filename
+        val sanitizedFilename = fileValidationService.sanitizeFilename(originalFilename)
+
         val fileInfo = fileInfoRepository.saveAndFlush(
             FileInfo(
                 id = id,
-                name = file.filename ?: id,
-                suffix = FileExt.of(getFileSuffix(file.filename)),
+                name = sanitizedFilename,
+                suffix = extension,
                 size = file.contentLength(),
                 author = author
             )
