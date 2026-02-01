@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.27.0
+  version: 1.28.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -189,10 +189,10 @@ paths:
     delete:
       operationId: deleteResidencePermit
       description: Удалить ВНЖ волонтера (только для администраторов)
-      tags: [user]
+      tags: [ user ]
       parameters:
-        - {in: path, name: id, required: true, schema: {type: integer}}
-        - {in: path, name: permitId, required: true, schema: {type: string, format: uuid}}
+        - { in: path, name: id, required: true, schema: { type: integer } }
+        - { in: path, name: permitId, required: true, schema: { type: string, format: uuid } }
       responses:
         '200':
           description: Success
