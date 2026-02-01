@@ -9,9 +9,6 @@ import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.service.AccountService
-import java.math.BigDecimal.ZERO
-import java.math.BigDecimal.valueOf
-import java.time.LocalDate
 import java.time.LocalDate.now
 
 @Service
@@ -29,18 +26,15 @@ class HeatMapService(
         val previousYear = currentYear - 1
         val currentYearData = reportHeatMapRepository.findVolunteerHeatmap(
             usernames = setOf(account.username),
-            startDate = LocalDate.of(currentYear, 1, 1),
-            endDate = now()
+            year = now().year
         )
         val previousYearData = reportHeatMapRepository.findVolunteerHeatmap(
             usernames = setOf(account.username),
-            startDate = LocalDate.of(previousYear, 1, 1),
-            endDate = LocalDate.of(previousYear, 12, 31)
+            year = now().year - 1
         )
-
         return mapOf(
-            currentYear.toString() to createHeatMapItem(account, heatMapMapper.map(currentYearData)),
-            previousYear.toString() to createHeatMapItem(account, heatMapMapper.map(previousYearData))
+            previousYear.toString() to createHeatMapItem(account, heatMapMapper.map(previousYearData)),
+            currentYear.toString() to createHeatMapItem(account, heatMapMapper.map(currentYearData))
         )
     }
 
@@ -55,11 +49,9 @@ class HeatMapService(
             pageRequest,
             UserSearchFilter(program = filter.program, project = filter.project, onlyActive = true)
         )
-        val year = filter.year ?: now().year
         val data = reportHeatMapRepository.findVolunteerHeatmap(
             usernames = accounts.map { it.username }.toSet(),
-            startDate = LocalDate.of(year, 1, 1),
-            endDate = if (now().year == year) now() else LocalDate.of(year, 12, 31)
+            year = filter.year ?: now().year
         )
         val heatMap = HashMap<String, MutableList<HeatMapItem>>()
         data.forEach { row ->
@@ -76,12 +68,11 @@ class HeatMapService(
 
     private fun createHeatMapItem(account: Account, weekItems: List<HeatMapItem>?): VolunteerHeatMapItem {
         val weeks = weekItems ?: emptyList()
-        val totalRequired = weeks.sumOf { it.hoursRequired }
         return VolunteerHeatMapItem(
             volunteerInfo = userMapper.map(account.info),
             weeks = weeks.toMutableList(),
             totalWorked = weeks.sumOf { it.hoursWorked },
-            totalRequired = if (totalRequired == ZERO) ZERO else totalRequired.minus(valueOf(10)),
+            totalRequired = weeks.sumOf { it.hoursRequired }
         )
     }
 }
