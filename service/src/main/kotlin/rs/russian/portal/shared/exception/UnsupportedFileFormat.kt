@@ -1,3 +1,3 @@
 package rs.russian.portal.shared.exception
 
-class UnsupportedFileFormat : RuntimeException()
+class UnsupportedFileFormat(message: String? = null) : RuntimeException(message)
