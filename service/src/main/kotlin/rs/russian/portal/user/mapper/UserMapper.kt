@@ -23,8 +23,8 @@ import java.time.LocalDateTime
 import java.util.*
 
 @Mapper(
-    imports = [HashSet::class, ArrayList::class, LocalDateTime::class, UUID::class],
-    uses = [FileInfoMapper::class, ProgramMapper::class, ProjectMapper::class, ContractMapper::class]
+    imports = [HashSet::class, LocalDateTime::class, UUID::class],
+    uses = [FileInfoMapper::class, ProgramMapper::class, ProjectMapper::class, ContractMapper::class, ResidencePermitMapper::class]
 )
 abstract class UserMapper {
 
@@ -40,6 +40,7 @@ abstract class UserMapper {
     @Mapping(target = "active", constant = "true")
     @Mapping(target = "username", source = "nickName")
     @Mapping(target = "contracts", expression = "java(new HashSet<>())")
+    @Mapping(target = "residencePermits", expression = "java(new HashSet<>())")
     @Mapping(target = "lastSynced", expression = "java(LocalDateTime.now())")
     @Mapping(target = "fullName", source = "oidcUserInfo", qualifiedByName = ["nameOidc"])
     @Mapping(target = "groups", source = "oidcUserInfo", qualifiedByName = ["mapGroups"])
@@ -49,6 +50,7 @@ abstract class UserMapper {
     @Mapping(target = "info", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "contracts", expression = "java(new HashSet<>())")
+    @Mapping(target = "residencePermits", expression = "java(new HashSet<>())")
     @Mapping(target = "fullName", source = "ssoUser", qualifiedByName = ["nameSso"])
     @Mapping(target = "lastSynced", expression = "java(LocalDateTime.now())")
     @Mapping(target = "groups", source = "groupsObj", qualifiedByName = ["mapGroupsSso"])
@@ -58,6 +60,7 @@ abstract class UserMapper {
     @Mapping(target = "info", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "contracts", ignore = true)
+    @Mapping(target = "residencePermits", ignore = true)
     @Mapping(target = "active", constant = "true")
     @Mapping(target = "username", source = "nickName")
     @Mapping(target = "lastSynced", expression = "java(LocalDateTime.now())")
@@ -69,6 +72,7 @@ abstract class UserMapper {
     @Mapping(target = "info", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "contracts", ignore = true)
+    @Mapping(target = "residencePermits", ignore = true)
     @Mapping(target = "lastSynced", expression = "java(LocalDateTime.now())")
     @Mapping(target = "fullName", source = "ssoUser", qualifiedByName = ["nameSso"])
     @Mapping(target = "groups", source = "groupsObj", qualifiedByName = ["mapGroupsSso"])
@@ -81,6 +85,7 @@ abstract class UserMapper {
     @Mapping(target = "groups", source = "account.groups")
     @Mapping(target = "active", source = "account.active")
     @Mapping(target = "contracts", source = "account.contracts")
+    @Mapping(target = "residencePermits", source = "account.residencePermits")
     abstract fun map(userInfo: UserInfo?): UserInfoDto
 
     @Mapping(target = "account", source = "account")
