@@ -10,14 +10,20 @@ import rs.russian.generated.model.VolunteerHeatMapItem
 import rs.russian.portal.report.service.HeatMapService
 import rs.russian.portal.shared.security.Authorized
 import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
+import java.time.LocalDate
 
 @RestController
 class HeatMapController(
     private val heatMapService: HeatMapService,
 ) : ReportHeatMapApi {
     
-    override fun getCurrentUserHeatMap(year: Int): ResponseEntity<VolunteerHeatMapItem> {
-        return ResponseEntity.ok(heatMapService.getCurrentUserHeatMap(year))
+    @Deprecated("use getCurrentUserHeatMap()")
+    override fun getCurrentUserHeatMapDeprecated(): ResponseEntity<VolunteerHeatMapItem> {
+        return ResponseEntity.ok(heatMapService.getCurrentUserHeatMap()[LocalDate.now().year.toString()])
+    }
+
+    override fun getCurrentUserHeatMap(): ResponseEntity<Map<String, VolunteerHeatMapItem>> {
+        return ResponseEntity.ok(heatMapService.getCurrentUserHeatMap())
     }
 
     @Authorized(allowed = [ADMIN_VOLUNTEER])
