@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.28.0
+  version: 1.29.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -19,14 +19,14 @@ paths:
       tags:
         - user
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoDto'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/UserInfoDto"
+        "500":
+          $ref: "#/components/responses/ServerError"
     post:
       operationId: createUser
       tags:
@@ -36,14 +36,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserCreateRequest'
+              $ref: "#/components/schemas/UserCreateRequest"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoDto'
+                $ref: "#/components/schemas/UserInfoDto"
   /user/account/{id}/program/{code}:
     patch:
       operationId: setProgram
@@ -62,12 +62,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoDto'
+                $ref: "#/components/schemas/UserInfoDto"
   /user/account/{id}/project/{code}:
     patch:
       operationId: setProject
@@ -86,12 +86,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoDto'
+                $ref: "#/components/schemas/UserInfoDto"
   /user/account/{id}/deactivate:
     post:
       operationId: deactivateAccount
@@ -105,12 +105,12 @@ paths:
             type: integer
             nullable: false
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoDto'
+                $ref: "#/components/schemas/UserInfoDto"
   /user/account/{id}/activate:
     post:
       operationId: activateAccount
@@ -124,12 +124,12 @@ paths:
             type: integer
             nullable: false
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoDto'
+                $ref: "#/components/schemas/UserInfoDto"
   /user/account/{id}/contracts:
     post:
       operationId: updateContracts
@@ -150,14 +150,14 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/ContractDto'
+                $ref: "#/components/schemas/ContractDto"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoDto'
+                $ref: "#/components/schemas/UserInfoDto"
   /user/account/{id}/residence-permits:
     put:
       operationId: updateResidencePermits
@@ -177,14 +177,14 @@ paths:
             schema:
               type: array
               items:
-                $ref: '#/components/schemas/ResidencePermitDto'
+                $ref: "#/components/schemas/ResidencePermitDto"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoDto'
+                $ref: "#/components/schemas/UserInfoDto"
   /user/account/{id}/residence-permits/{permitId}:
     delete:
       operationId: deleteResidencePermit
@@ -194,12 +194,12 @@ paths:
         - { in: path, name: id, required: true, schema: { type: integer } }
         - { in: path, name: permitId, required: true, schema: { type: string, format: uuid } }
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoDto'
+                $ref: "#/components/schemas/UserInfoDto"
   /user/info/{login}:
     get:
       operationId: getInfo
@@ -214,14 +214,14 @@ paths:
             type: string
             minLength: 3
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoDto'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/UserInfoDto"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
     patch:
       operationId: updateInfo
@@ -240,16 +240,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserInfoUpdateRequest'
+              $ref: "#/components/schemas/UserInfoUpdateRequest"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoDto'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/UserInfoDto"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /user/search:
     post:
@@ -266,20 +266,20 @@ paths:
           in: query
           required: true
           schema:
-            $ref: '#/components/schemas/PageRequest'
+            $ref: "#/components/schemas/PageRequest"
       requestBody:
         required: false
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserSearchFilter'
+              $ref: "#/components/schemas/UserSearchFilter"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserPageResponse'
+                $ref: "#/components/schemas/UserPageResponse"
   /user/logout:
     post:
       operationId: logout
@@ -294,10 +294,10 @@ paths:
           description: Logout from all devices
           required: false
       responses:
-        '200':
+        "200":
           description: Successfully logged out
-        '500':
-          $ref: '#/components/responses/ServerError'
+        "500":
+          $ref: "#/components/responses/ServerError"
   /user/avatar:
     post:
       operationId: setAvatar
@@ -310,12 +310,12 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserInfoDto'
+                $ref: "#/components/schemas/UserInfoDto"
   /user/resolve:
     post:
       operationId: resolveUsers
@@ -335,7 +335,7 @@ paths:
                 nullable: false
                 description: username
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -343,7 +343,7 @@ paths:
                 type: array
                 default: [ ]
                 items:
-                  $ref: '#/components/schemas/UserInfoDto'
+                  $ref: "#/components/schemas/UserInfoDto"
 
   /files/upload:
     post:
@@ -364,12 +364,12 @@ paths:
                   format: binary
                   nullable: false
       responses:
-        '200':
+        "200":
           description: Successfully uploaded
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FileInfoDto'
+                $ref: "#/components/schemas/FileInfoDto"
   /files/{id}:
     get:
       operationId: getFileInfo
@@ -383,18 +383,18 @@ paths:
             type: string
             nullable: false
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FileInfoDto'
-        '400':
+                $ref: "#/components/schemas/FileInfoDto"
+        "400":
           description: Not Found
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorResponse'
+                $ref: "#/components/schemas/ErrorResponse"
 
   /report:
     post:
@@ -406,16 +406,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReportDto'
+              $ref: "#/components/schemas/ReportDto"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportDto'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/ReportDto"
+        "500":
+          $ref: "#/components/responses/ServerError"
     put:
       operationId: updateReport
       tags:
@@ -425,14 +425,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReportDto'
+              $ref: "#/components/schemas/ReportDto"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportDto'
+                $ref: "#/components/schemas/ReportDto"
   /report/{id}:
     get:
       operationId: getReport
@@ -446,14 +446,14 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportDto'
-        '404':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/ReportDto"
+        "404":
+          $ref: "#/components/responses/ServerError"
     delete:
       operationId: deleteReport
       tags:
@@ -466,10 +466,10 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Success
-        '404':
-          $ref: '#/components/responses/ServerError'
+        "404":
+          $ref: "#/components/responses/ServerError"
   /report/{id}/note:
     post:
       operationId: addNote
@@ -487,14 +487,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoteDto'
+              $ref: "#/components/schemas/NoteDto"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NoteDto'
+                $ref: "#/components/schemas/NoteDto"
   /report/{id}/status:
     post:
       operationId: changeStatus
@@ -512,9 +512,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChangeReportStatusRequest'
+              $ref: "#/components/schemas/ChangeReportStatusRequest"
       responses:
-        '200':
+        "200":
           description: Success
   /reports:
     post:
@@ -526,43 +526,36 @@ paths:
           in: query
           required: true
           schema:
-            $ref: '#/components/schemas/PageRequest'
+            $ref: "#/components/schemas/PageRequest"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReportFilter'
+              $ref: "#/components/schemas/ReportFilter"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportPageResponse'
+                $ref: "#/components/schemas/ReportPageResponse"
   /reports/heat-map:
     get:
-      operationId: getCurrentUserHeatMap
-      description: Тепловая карта отчетов текущего пользователя
+      operationId: getCurrentUserHeatMapDeprecated
+      description: (deprecated) Тепловая карта отчетов текущего пользователя
       tags:
         - report-heat-map
-      parameters:
-        - name: year
-          in: query
-          required: true
-          schema:
-            type: integer
-            example: 2025
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/VolunteerHeatMapItem'
+                $ref: "#/components/schemas/VolunteerHeatMapItem"
     post:
       operationId: getVolunteerHeatMap
-      description: Тепловая карта отчетов
+      description: Тепловая карта отчетов для администраторов
       tags:
         - report-heat-map
       parameters:
@@ -575,21 +568,36 @@ paths:
           in: query
           required: true
           schema:
-            $ref: '#/components/schemas/PageRequest'
+            $ref: "#/components/schemas/PageRequest"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ReportsHeatMapFilter'
+              $ref: "#/components/schemas/ReportsHeatMapFilter"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReportsHeatMapPageResponse'
-
+                $ref: "#/components/schemas/ReportsHeatMapPageResponse"
+  /reports/heat-map/currentUser:
+    get:
+      operationId: getCurrentUserHeatMap
+      description: Тепловая карта отчетов текущего пользователя
+      tags:
+        - report-heat-map
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                description: Тепловые карты пользователя за текущий и прошлый год
+                additionalProperties:
+                  $ref: "#/components/schemas/VolunteerHeatMapItem"
   /application/create:
     post:
       operationId: createApplication
@@ -608,14 +616,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApplicationDto'
+              $ref: "#/components/schemas/ApplicationDto"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationStatusDto'
+                $ref: "#/components/schemas/ApplicationStatusDto"
   /application/{id}:
     get:
       operationId: getApplication
@@ -629,12 +637,12 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationDto'
+                $ref: "#/components/schemas/ApplicationDto"
   /application/{id}/note:
     post:
       operationId: addNoteToApplication
@@ -653,14 +661,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoteDto'
+              $ref: "#/components/schemas/NoteDto"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NoteDto'
+                $ref: "#/components/schemas/NoteDto"
   /application/update:
     put:
       operationId: updateApplication
@@ -671,14 +679,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ApplicationDto'
+              $ref: "#/components/schemas/ApplicationDto"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationDto'
+                $ref: "#/components/schemas/ApplicationDto"
   /applications:
     post:
       operationId: getApplications
@@ -689,7 +697,7 @@ paths:
           in: query
           required: true
           schema:
-            $ref: '#/components/schemas/PageRequest'
+            $ref: "#/components/schemas/PageRequest"
         - name: searchQuery
           in: query
           required: false
@@ -700,14 +708,14 @@ paths:
         content:
           "*/*":
             schema:
-              $ref: '#/components/schemas/ApplicationsFilter'
+              $ref: "#/components/schemas/ApplicationsFilter"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationPageResponse'
+                $ref: "#/components/schemas/ApplicationPageResponse"
   /application/status/{id}:
     get:
       operationId: getApplicationStatus
@@ -722,12 +730,12 @@ paths:
             format: uuid
             nullable: false
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationStatusDto'
+                $ref: "#/components/schemas/ApplicationStatusDto"
   /application/searchByEmail:
     get:
       operationId: searchApplicationByEmail
@@ -741,12 +749,12 @@ paths:
             type: string
             nullable: false
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ApplicationStatusDto'
+                $ref: "#/components/schemas/ApplicationStatusDto"
 
   /mail/send:
     post:
@@ -791,7 +799,7 @@ paths:
             schema:
               type: string
       responses:
-        '200':
+        "200":
           description: Success
 
   /note/{id}:
@@ -807,7 +815,7 @@ paths:
             type: string
             format: uuid
       responses:
-        '200':
+        "200":
           description: Success
 
   /programs:
@@ -817,16 +825,16 @@ paths:
         - programs
       summary: Получить список всех доступных программ
       responses:
-        '200':
+        "200":
           description: Список программ
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProgramDto'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                  $ref: "#/components/schemas/ProgramDto"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
 
   /projects:
@@ -836,16 +844,16 @@ paths:
         - projects
       summary: Получить список всех доступных проектов
       responses:
-        '200':
+        "200":
           description: Список проектов
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProjectDto'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                  $ref: "#/components/schemas/ProjectDto"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /cities:
     get:
@@ -853,16 +861,16 @@ paths:
       tags:
         - cities
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CityDto'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                  $ref: "#/components/schemas/CityDto"
+        "500":
+          $ref: "#/components/responses/ServerError"
   /cities/{code}:
     get:
       operationId: findCityByCode
@@ -874,18 +882,18 @@ paths:
           required: true
           schema:
             type: string
-          description: City code (e.g., 'belgrade', 'novi-sad')
+          description: City code (e.g., "belgrade", "novi-sad")
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CityDto'
-        '404':
+                $ref: "#/components/schemas/CityDto"
+        "404":
           description: City not found
-        '500':
-          $ref: '#/components/responses/ServerError'
+        "500":
+          $ref: "#/components/responses/ServerError"
   /cities/search:
     get:
       operationId: findCityByName
@@ -897,18 +905,18 @@ paths:
           required: true
           schema:
             type: string
-          description: City name to search (supports both Latin and Cyrillic, e.g., 'Beograd', 'Белград')
+          description: City name to search (supports both Latin and Cyrillic, e.g., "Beograd", "Белград")
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/CityDto'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                  $ref: "#/components/schemas/CityDto"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /statistics/{year}:
     get:
@@ -923,14 +931,14 @@ paths:
           schema:
             type: integer
       responses:
-        '200':
+        "200":
           description: Статистика для мин. труд по группам за год
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Statistics'
-        '500':
-          $ref: '#/components/responses/ServerError'
+                $ref: "#/components/schemas/Statistics"
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /ticket:
     post:
@@ -943,14 +951,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TicketCreateRequest'
+              $ref: "#/components/schemas/TicketCreateRequest"
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TicketCreateResponse'
+                $ref: "#/components/schemas/TicketCreateResponse"
   /ticket/groups:
     get:
       operationId: getTicketGroups
@@ -958,7 +966,7 @@ paths:
       tags:
         - tickets
       responses:
-        '200':
+        "200":
           description: Success
           content:
             application/json:
@@ -977,7 +985,7 @@ paths:
       tags:
         - security
       responses:
-        '200':
+        "200":
           description: CSRF token cookie set successfully
 
 components:
@@ -987,7 +995,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/ErrorResponse'
+            $ref: "#/components/schemas/ErrorResponse"
   schemas:
     VolunteerStatistics:
       description: Информация о волонтерах
@@ -1032,7 +1040,7 @@ components:
           nullable: true
           description: Код статистической программы; null = «прочее»
         data:
-          $ref: '#/components/schemas/StatisticData'
+          $ref: "#/components/schemas/StatisticData"
     ProgramStatistics:
       type: object
       required: [ items, total ]
@@ -1040,9 +1048,9 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/ProgramStatItem'
+            $ref: "#/components/schemas/ProgramStatItem"
         total:
-          $ref: '#/components/schemas/StatisticData'
+          $ref: "#/components/schemas/StatisticData"
       description: Универсальная сводка по программам
     FinalUsersStatistics:
       description: Данные о конечных пользователях волонтерской деятельности
@@ -1065,11 +1073,11 @@ components:
           type: integer
           description: Отчетный год
         programStatistics:
-          $ref: '#/components/schemas/ProgramStatistics'
+          $ref: "#/components/schemas/ProgramStatistics"
         volunteerStatistics:
-          $ref: '#/components/schemas/VolunteerStatistics'
+          $ref: "#/components/schemas/VolunteerStatistics"
         finalUsersStatistics:
-          $ref: '#/components/schemas/FinalUsersStatistics'
+          $ref: "#/components/schemas/FinalUsersStatistics"
     PageRequest:
       type: object
       description: Paging object
@@ -1147,7 +1155,7 @@ components:
           minLength: 2
           maxLength: 100
         contract:
-          $ref: '#/components/schemas/ContractDto'
+          $ref: "#/components/schemas/ContractDto"
     UserInfoDto:
       type: object
       description: Дополнительная информация о пользователе
@@ -1185,11 +1193,11 @@ components:
         phone:
           type: string
         program:
-          $ref: '#/components/schemas/ProgramDto'
+          $ref: "#/components/schemas/ProgramDto"
         project:
-          $ref: '#/components/schemas/ProjectDto'
+          $ref: "#/components/schemas/ProjectDto"
         avatar:
-          $ref: '#/components/schemas/FileInfoDto'
+          $ref: "#/components/schemas/FileInfoDto"
         groups:
           type: array
           uniqueItems: true
@@ -1199,17 +1207,17 @@ components:
           type: boolean
           nullable: false
         gender:
-          $ref: '#/components/schemas/GenderEnumDto'
+          $ref: "#/components/schemas/GenderEnumDto"
         contracts:
           type: array
           default: [ ]
           items:
-            $ref: '#/components/schemas/ContractDto'
+            $ref: "#/components/schemas/ContractDto"
         residencePermits:
           type: array
           default: [ ]
           items:
-            $ref: '#/components/schemas/ResidencePermitDto'
+            $ref: "#/components/schemas/ResidencePermitDto"
     UserInfoUpdateRequest:
       type: object
       description: обновить информацию о пользователе
@@ -1228,7 +1236,7 @@ components:
         phone:
           type: string
         gender:
-          $ref: '#/components/schemas/GenderEnumDto'
+          $ref: "#/components/schemas/GenderEnumDto"
       additionalProperties: false
     UserPageResponse:
       type: object
@@ -1238,13 +1246,13 @@ components:
         - content
       properties:
         page:
-          $ref: '#/components/schemas/PageResponse'
+          $ref: "#/components/schemas/PageResponse"
         content:
           type: array
           default: [ ]
           nullable: false
           items:
-            $ref: '#/components/schemas/UserInfoDto'
+            $ref: "#/components/schemas/UserInfoDto"
     FileInfoDto:
       type: object
       nullable: true
@@ -1330,13 +1338,13 @@ components:
           default: [ ]
           description: Список задач в отчете
           items:
-            $ref: '#/components/schemas/TaskDto'
+            $ref: "#/components/schemas/TaskDto"
         notes:
           type: array
           default: [ ]
           description: Список заметок от модератора
           items:
-            $ref: '#/components/schemas/NoteDto'
+            $ref: "#/components/schemas/NoteDto"
     TaskDto:
       type: object
       description: Task information
@@ -1372,7 +1380,7 @@ components:
           type: array
           default: [ ]
           items:
-            $ref: '#/components/schemas/FileInfoDto'
+            $ref: "#/components/schemas/FileInfoDto"
     ReportPageResponse:
       type: object
       nullable: false
@@ -1381,13 +1389,13 @@ components:
         - content
       properties:
         page:
-          $ref: '#/components/schemas/PageResponse'
+          $ref: "#/components/schemas/PageResponse"
         content:
           type: array
           default: [ ]
           nullable: false
           items:
-            $ref: '#/components/schemas/ReportDto'
+            $ref: "#/components/schemas/ReportDto"
     ContractDto:
       type: object
       required:
@@ -1409,7 +1417,7 @@ components:
           format: date
           nullable: false
         type:
-          $ref: '#/components/schemas/ContractTypeEnum'
+          $ref: "#/components/schemas/ContractTypeEnum"
     ResidencePermitDto:
       type: object
       required:
@@ -1459,9 +1467,9 @@ components:
           type: string
           nullable: false
         frontSidePhoto:
-          $ref: '#/components/schemas/FileInfoDto'
+          $ref: "#/components/schemas/FileInfoDto"
         backSidePhoto:
-          $ref: '#/components/schemas/FileInfoDto'
+          $ref: "#/components/schemas/FileInfoDto"
     ApplicationDto:
       type: object
       required:
@@ -1525,7 +1533,7 @@ components:
           type: string
           maxLength: 100
         gender:
-          $ref: '#/components/schemas/GenderEnumDto'
+          $ref: "#/components/schemas/GenderEnumDto"
         hasExperience:
           type: boolean
         experience:
@@ -1550,12 +1558,12 @@ components:
           type: string
           maxLength: 2000
         contract:
-          $ref: '#/components/schemas/ContractDto'
+          $ref: "#/components/schemas/ContractDto"
         notes:
           type: array
           default: [ ]
           items:
-            $ref: '#/components/schemas/NoteDto'
+            $ref: "#/components/schemas/NoteDto"
     ApplicationsFilter:
       type: object
       required:
@@ -1599,13 +1607,13 @@ components:
         - content
       properties:
         page:
-          $ref: '#/components/schemas/PageResponse'
+          $ref: "#/components/schemas/PageResponse"
         content:
           type: array
           default: [ ]
           nullable: false
           items:
-            $ref: '#/components/schemas/ApplicationDto'
+            $ref: "#/components/schemas/ApplicationDto"
     NoteDto:
       type: object
       nullable: false
@@ -1734,9 +1742,9 @@ components:
         content:
           type: array
           items:
-            $ref: '#/components/schemas/VolunteerHeatMapItem'
+            $ref: "#/components/schemas/VolunteerHeatMapItem"
         page:
-          $ref: '#/components/schemas/PageResponse'
+          $ref: "#/components/schemas/PageResponse"
     VolunteerHeatMapItem:
       type: object
       required:
@@ -1744,12 +1752,12 @@ components:
         - weeks
       properties:
         volunteerInfo:
-          $ref: '#/components/schemas/UserInfoDto'
+          $ref: "#/components/schemas/UserInfoDto"
         weeks:
           type: array
           description: Информация по каждой неделе
           items:
-            $ref: '#/components/schemas/HeatMapItem'
+            $ref: "#/components/schemas/HeatMapItem"
         totalWorked:
           type: number
           description: Кол-во засчитанных часов по отчетам по всем неделям
@@ -1793,11 +1801,11 @@ components:
     ReportsHeatMapFilter:
       type: object
       properties:
-        startDate:
-          type: string
-          format: date
-          description: Дата, начиная с которой, вывести тепловую карту
-          example: "2025-01-01"
+        year:
+          type: integer
+          nullable: true
+          description: Год, по которому составить тепловую карту, по умолчанию текущий
+          example: 2026
         program:
           type: string
           nullable: true

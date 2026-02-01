@@ -23,14 +23,25 @@ class HeatMapService(
 ) {
 
     @Transactional(readOnly = true)
-    fun getCurrentUserHeatMap(year: Int): VolunteerHeatMapItem {
+    fun getCurrentUserHeatMap(): Map<String, VolunteerHeatMapItem> {
         val account = userService.getCurrentAccount()
-        val weeks = reportHeatMapRepository.findVolunteerHeatmap(
+        val currentYear = now().year
+        val previousYear = currentYear - 1
+        val currentYearData = reportHeatMapRepository.findVolunteerHeatmap(
             usernames = setOf(account.username),
-            startDate = LocalDate.of(year, 1, 1),
-            endDate = if (now().year == year) now() else LocalDate.of(year, 12, 31)
+            startDate = LocalDate.of(currentYear, 1, 1),
+            endDate = now()
         )
-        return createHeatMapItem(account, heatMapMapper.map(weeks))
+        val previousYearData = reportHeatMapRepository.findVolunteerHeatmap(
+            usernames = setOf(account.username),
+            startDate = LocalDate.of(previousYear, 1, 1),
+            endDate = LocalDate.of(previousYear, 12, 31)
+        )
+
+        return mapOf(
+            currentYear.toString() to createHeatMapItem(account, heatMapMapper.map(currentYearData)),
+            previousYear.toString() to createHeatMapItem(account, heatMapMapper.map(previousYearData))
+        )
     }
 
     @Transactional(readOnly = true)
@@ -44,12 +55,11 @@ class HeatMapService(
             pageRequest,
             UserSearchFilter(program = filter.program, project = filter.project, onlyActive = true)
         )
-        val startDate = filter.startDate ?: DEFAULT_START_DATE // Из фильтра или начало года
-        val endDate = if (now().year == startDate.year) now() else LocalDate.of(startDate.year, 12, 31)
+        val year = filter.year ?: now().year
         val data = reportHeatMapRepository.findVolunteerHeatmap(
             usernames = accounts.map { it.username }.toSet(),
-            startDate = startDate,
-            endDate = endDate
+            startDate = LocalDate.of(year, 1, 1),
+            endDate = if (now().year == year) now() else LocalDate.of(year, 12, 31)
         )
         val heatMap = HashMap<String, MutableList<HeatMapItem>>()
         data.forEach { row ->
@@ -73,9 +83,5 @@ class HeatMapService(
             totalWorked = weeks.sumOf { it.hoursWorked },
             totalRequired = if (totalRequired == ZERO) ZERO else totalRequired.minus(valueOf(10)),
         )
-    }
-
-    companion object {
-        private val DEFAULT_START_DATE = LocalDate.of(now().year, 1, 1)
     }
 }
