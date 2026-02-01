@@ -13,21 +13,26 @@ import rs.russian.generated.model.*
 import rs.russian.portal.file.service.FileService
 import rs.russian.portal.program.repository.ProgramRepository
 import rs.russian.portal.program.repository.ProjectRepository
+import rs.russian.portal.shared.exception.InvalidRequestException
 import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.domain.Account
+import rs.russian.portal.user.domain.ResidencePermit
 import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.domain.specification.searchSpecification
 import rs.russian.portal.user.mapper.ContractMapper
 import rs.russian.portal.user.mapper.UserMapper
+import rs.russian.portal.user.mapper.ResidencePermitMapper
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.authentik.AuthentikService
+import java.util.UUID
 
 @Service
 class AccountService(
     private val userMapper: UserMapper,
     private val programRepository: ProgramRepository,
+    private val residencePermitMapper: ResidencePermitMapper,
     private val projectRepository: ProjectRepository,
     private val fileService: FileService,
     private val contractMapper: ContractMapper,
@@ -151,6 +156,34 @@ class AccountService(
     }
 
     @Transactional
+    fun updateResidencePermits(id: Int, permits: List<ResidencePermitDto>): Account {
+        val account = getAccount(id)
+
+        // Validate dates
+        permits.forEach { permit ->
+            if (permit.validUntil <= permit.issuingDate) {
+                throw InvalidRequestException("Valid until date must be after issuing date")
+            }
+        }
+
+        val existingPermitsMap: Map<String, ResidencePermit> = account.residencePermits
+            .filter { it.id != null }
+            .associateBy { it.id.toString() }
+        val updatedPermits = permits.map { dto ->
+            val existingEntity = existingPermitsMap[dto.id.toString()]
+            if (existingEntity != null) {
+                residencePermitMapper.update(dto, existingEntity)
+                existingEntity
+            } else {
+                residencePermitMapper.toEntity(dto, account)
+            }
+        }.toMutableSet()
+        account.residencePermits.clear()
+        account.residencePermits.addAll(updatedPermits)
+        return accountRepository.save(account)
+    }
+
+    @Transactional
     fun updateInfo(accountId: Int, newInfo: UserInfo) {
         val account = getAccount(accountId)
         newInfo.id = account.username
@@ -201,6 +234,13 @@ class AccountService(
         userInfo.program = project.program
         account.info = userInfo
         return account
+    }
+
+    @Transactional
+    fun deleteResidencePermit(accountId: Int, permitId: UUID): Account {
+        val account = getAccount(accountId)
+        account.residencePermits.removeIf { it.id == permitId }
+        return accountRepository.save(account)
     }
 
     /**

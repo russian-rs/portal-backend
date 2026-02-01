@@ -12,6 +12,7 @@ import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.service.AccountService
 import rs.russian.portal.user.service.SessionService
+import java.util.UUID
 
 @RestController
 class UserController(
@@ -27,7 +28,13 @@ class UserController(
 
     override fun getInfo(login: String): ResponseEntity<UserInfoDto> {
         val account = accountService.getAccountByLogin(login)
-        return ResponseEntity.ok(userMapper.map(account.info))
+        val dto = userMapper.map(account.info)
+        val currentAccount = accountService.getCurrentAccount()
+        if (currentAccount.id != account.id && !currentAccount.groups.contains(ADMIN_VOLUNTEER)) {
+            // Filter residence permits: allowed only for self or ADMIN_VOLUNTEER
+            dto.residencePermits = mutableListOf()
+        }
+        return ResponseEntity.ok(dto)
     }
 
     override fun logout(all: Boolean): ResponseEntity<Unit> {
@@ -106,5 +113,20 @@ class UserController(
                 ).info
             )
         )
+    }
+
+    override fun updateResidencePermits(id: Int, residencePermitDto: List<ResidencePermitDto>): ResponseEntity<UserInfoDto> {
+        val currentAccount = accountService.getCurrentAccount()
+        if (currentAccount.id != id && !currentAccount.groups.contains(ADMIN_VOLUNTEER)) {
+            throw NotAuthorizedException()
+        }
+        val account = accountService.updateResidencePermits(id, residencePermitDto)
+        return ResponseEntity.ok(userMapper.map(account.info))
+    }
+
+    @Authorized(allowed = [ADMIN_VOLUNTEER])
+    override fun deleteResidencePermit(id: Int, permitId: UUID): ResponseEntity<UserInfoDto> {
+        val account = accountService.deleteResidencePermit(id, permitId)
+        return ResponseEntity.ok(userMapper.map(account.info))
     }
 }

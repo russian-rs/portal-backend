@@ -19,6 +19,7 @@ import java.time.LocalDateTime
     attributeNodes = [
         NamedAttributeNode("info", subgraph = UserInfo.GRAPH_FULL),
         NamedAttributeNode("contracts"),
+        NamedAttributeNode("residencePermits", subgraph = Account.GRAPH_RESIDENCE_PERMIT_PHOTOS),
     ],
     subgraphs = [
         NamedSubgraph(
@@ -32,6 +33,13 @@ import java.time.LocalDateTime
         NamedSubgraph(
             name = Program.GRAPH_FULL,
             attributeNodes = [NamedAttributeNode("projects")]
+        ),
+        NamedSubgraph(
+            name = Account.GRAPH_RESIDENCE_PERMIT_PHOTOS,
+            attributeNodes = [
+                NamedAttributeNode("frontSidePhoto"),
+                NamedAttributeNode("backSidePhoto")
+            ]
         )
     ]
 )
@@ -52,7 +60,10 @@ class Account(
     var groups: Set<UserGroup> = mutableSetOf(),
 
     @OneToMany(mappedBy = "account", cascade = [ALL], orphanRemoval = true)
-    var contracts: MutableSet<Contract> = HashSet(),
+    var contracts: MutableSet<Contract> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "account", cascade = [ALL], orphanRemoval = true)
+    var residencePermits: MutableSet<ResidencePermit> = mutableSetOf(),
 
     var active: Boolean = true,
 
@@ -65,5 +76,6 @@ class Account(
     companion object {
         const val GRAPH_FULL = "Account.Full"
         const val GRAPH_USERNAME = "Account.Username"
+        const val GRAPH_RESIDENCE_PERMIT_PHOTOS = "ResidencePermit.photos"
     }
 }

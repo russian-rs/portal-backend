@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.27.0
+  version: 1.28.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -151,6 +151,48 @@ paths:
               type: array
               items:
                 $ref: '#/components/schemas/ContractDto'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
+  /user/account/{id}/residence-permits:
+    put:
+      operationId: updateResidencePermits
+      description: Обновить список ВНЖ волонтера
+      tags:
+        - user
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/ResidencePermitDto'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfoDto'
+  /user/account/{id}/residence-permits/{permitId}:
+    delete:
+      operationId: deleteResidencePermit
+      description: Удалить ВНЖ волонтера (только для администраторов)
+      tags: [ user ]
+      parameters:
+        - { in: path, name: id, required: true, schema: { type: integer } }
+        - { in: path, name: permitId, required: true, schema: { type: string, format: uuid } }
       responses:
         '200':
           description: Success
@@ -1163,6 +1205,11 @@ components:
           default: [ ]
           items:
             $ref: '#/components/schemas/ContractDto'
+        residencePermits:
+          type: array
+          default: [ ]
+          items:
+            $ref: '#/components/schemas/ResidencePermitDto'
     UserInfoUpdateRequest:
       type: object
       description: обновить информацию о пользователе
@@ -1363,6 +1410,58 @@ components:
           nullable: false
         type:
           $ref: '#/components/schemas/ContractTypeEnum'
+    ResidencePermitDto:
+      type: object
+      required:
+        - id
+        - nationality
+        - registrationNumber
+        - validUntil
+        - purposeOfStay
+        - issuingAuthority
+        - stateOfBirth
+        - issuingDate
+        - identityNumber
+        - frontSidePhoto
+        - backSidePhoto
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+        nationality:
+          type: string
+          nullable: false
+        registrationNumber:
+          type: string
+          nullable: false
+        validUntil:
+          type: string
+          format: date
+          nullable: false
+        purposeOfStay:
+          type: string
+          nullable: false
+        note:
+          type: string
+          nullable: true
+        issuingAuthority:
+          type: string
+          nullable: false
+        stateOfBirth:
+          type: string
+          nullable: false
+        issuingDate:
+          type: string
+          format: date
+          nullable: false
+        identityNumber:
+          type: string
+          nullable: false
+        frontSidePhoto:
+          $ref: '#/components/schemas/FileInfoDto'
+        backSidePhoto:
+          $ref: '#/components/schemas/FileInfoDto'
     ApplicationDto:
       type: object
       required:
