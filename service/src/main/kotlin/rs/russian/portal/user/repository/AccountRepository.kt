@@ -13,6 +13,7 @@ import rs.russian.portal.user.domain.Account.Companion.GRAPH_FULL
 import rs.russian.portal.user.repository.projections.AgeSliceCountProjection
 import rs.russian.portal.user.repository.projections.GenderCountProjection
 import rs.russian.portal.user.repository.projections.UsersStatisticGroupCountProjection
+import java.time.LocalDate
 import java.util.*
 
 @Repository
@@ -78,4 +79,41 @@ interface AccountRepository : JpaRepository<Account, Int> {
         nativeQuery = true
     )
     fun countByStatisticGroup(): List<UsersStatisticGroupCountProjection>
+
+    @Query(
+        value = """
+        SELECT *
+        FROM account
+        WHERE active = true
+          AND groups @> CAST(:groupJson AS jsonb)
+        """,
+        nativeQuery = true
+    )
+    fun findAllActiveByGroup(groupJson: String): List<Account>
+
+    @EntityGraph(value = GRAPH_FULL)
+    @Query(
+        """
+        SELECT a
+        FROM Account a
+        JOIN a.contracts c
+        WHERE a.active = true
+        GROUP BY a
+        HAVING MAX(c.endDate) = :date
+        """
+    )
+    fun findAllWithLatestContractEndDate(date: LocalDate): List<Account>
+
+    @EntityGraph(value = GRAPH_FULL)
+    @Query(
+        """
+        SELECT a
+        FROM Account a
+        JOIN a.contracts c
+        WHERE a.active = true
+        GROUP BY a
+        HAVING MAX(c.endDate) <= :date
+        """
+    )
+    fun findAllWithLatestContractEndDateOnOrBefore(date: LocalDate): List<Account>
 }

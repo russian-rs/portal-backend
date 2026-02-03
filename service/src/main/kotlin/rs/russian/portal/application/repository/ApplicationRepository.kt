@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository
 import rs.russian.portal.application.domain.Application
 import rs.russian.portal.application.domain.Application.Companion.GRAPH_FULL
 import rs.russian.portal.application.domain.ApplicationStatus
+import rs.russian.portal.application.domain.ApplicationType
 import java.util.*
 
 @Repository
@@ -33,6 +34,12 @@ interface ApplicationRepository : JpaRepository<Application, UUID> {
 
     @EntityGraph(GRAPH_FULL)
     fun findAllByIdIn(idList: Collection<UUID>, sort: Sort): List<Application>
+
+    fun existsByEmailAndTypeAndStatusNotIn(
+        email: String,
+        type: ApplicationType,
+        statuses: List<ApplicationStatus>
+    ): Boolean
 
     fun findAll(specification: Specification<Application>, pageable: Pageable): Page<Application>
 }
