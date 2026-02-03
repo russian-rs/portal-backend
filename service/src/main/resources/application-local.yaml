@@ -23,6 +23,7 @@ app:
   schedulers:
     email-outbox: "-"
     user-sync: "-"
+    contract-expiration: "-"
 
 ds:
   cf:
