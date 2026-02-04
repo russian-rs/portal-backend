@@ -1,5 +1,9 @@
 # Volunteer Portal Backend
 
+[![License: GNU GPL v3](https://img.shields.io/badge/License-GNU-yellow.svg)](https://opensource.org/license/gpl-3-0)
+[![Security Checks](https://github.com/russian-rs/portal-ui/actions/workflows/security-checks.yml/badge.svg)](https://github.com/russian-rs/portal-backend/actions/workflows/security-checks.yml)
+
+
 A production-ready backend for volunteer management portals built with Kotlin and Spring Boot. Features include volunteer application processing, user management with SSO integration, file storage, email notifications, and reporting.
 
 ## Features
