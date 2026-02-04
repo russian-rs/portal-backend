@@ -381,7 +381,7 @@ This project is designed to be forked and customized for your organization:
 
 ## License
 
-This project is licensed under the GNU GPL License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the GNU GPL v3 License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
