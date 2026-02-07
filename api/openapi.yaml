@@ -7,8 +7,6 @@ info:
     url: https://russian.rs
 
 servers:
-  - url: https://portal-test.russian.rs/api
-    description: Test Environment
   - url: https://portal.russian.rs/api
     description: Prod Environment
 
