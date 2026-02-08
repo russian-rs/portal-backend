@@ -43,7 +43,7 @@ class FileValidationService {
     }
 
     private fun validateMimeType(file: Resource, expectedExtension: FileExt) {
-        val detectedMimeType = file.inputStream.use { tika.detect(it) }
+        val detectedMimeType = file.inputStream.use { tika.detect(it, file.filename) }
         val expectedMimeType = expectedExtension.mime
 
         val isValid = isMimeTypeValid(detectedMimeType, expectedMimeType, expectedExtension)
@@ -83,12 +83,18 @@ class FileValidationService {
         expectedExtension == FileExt.XLS &&
             detectedMimeType in listOf("application/vnd.ms-excel", "application/x-tika-msoffice") -> true
 
-        // Office Open XML types
+        // Office Open XML types (Tika stream detection may return generic x-tika-ooxml for all OOXML formats)
         expectedExtension == FileExt.DOCX &&
-            detectedMimeType.startsWith("application/vnd.openxmlformats-officedocument.wordprocessingml") -> true
+            detectedMimeType in listOf(
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "application/x-tika-ooxml",
+            ) -> true
 
         expectedExtension == FileExt.XLSX &&
-            detectedMimeType.startsWith("application/vnd.openxmlformats-officedocument.spreadsheetml") -> true
+            detectedMimeType in listOf(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "application/x-tika-ooxml",
+            ) -> true
 
         else -> false
     }
