@@ -3,7 +3,6 @@ package rs.russian.portal.user.service.wordpress
 import org.wordpress.api.CustomWordpressApi
 import org.wordpress.api.UsersWordpressApi
 import org.wordpress.model.WpUser
-import rs.russian.portal.config.WordpressInstance
 
 class WordpressUserServiceImpl(
     override val instanceName: String,
@@ -13,9 +12,9 @@ class WordpressUserServiceImpl(
 
     override fun getAvailableRoles() = customWpApi.rolesList()
 
-    override fun getUser(username: String): WpUser? {
-        val users = apiClient.searchUsers(search = username.replace("@", ""))
-        return users.find { it.username == username }
+    override fun getUser(email: String): WpUser? {
+        val users = apiClient.searchUsers(search = email)
+        return users.find { it.email == email }
     }
 
     override fun createUser(user: WpUser): WpUser {
@@ -26,8 +25,8 @@ class WordpressUserServiceImpl(
         return apiClient.updateUser(user.id, user)
     }
 
-    override fun deleteUser(username: String) {
-        getUser(username)?.let {
+    override fun deleteUser(email: String) {
+        getUser(email)?.let {
             apiClient.deleteUser(it.id)
         }
     }

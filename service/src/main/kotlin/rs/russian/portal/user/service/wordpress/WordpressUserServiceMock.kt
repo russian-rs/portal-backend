@@ -13,31 +13,32 @@ import kotlin.random.Random
 @Service
 @Profile("local")
 class WordpressUserServiceMock : WordpressUserService {
+
     override val instanceName: String = "Local"
     override lateinit var apiClient: UsersWordpressApi // will not be inited
     override lateinit var customWpApi: CustomWordpressApi // will not be inited
 
-    override fun getUser(username: String): WpUser? {
+    override fun getUser(email: String): WpUser? {
         log.info("Mock get user")
         return WpUser(
             id = Random.nextInt(),
-            username = username,
-            email = "${username}@russian.rs"
+            username = email.substringBefore('@'),
+            email = email
         )
     }
 
     override fun createUser(user: WpUser): WpUser {
-        log.info("Mock create user")
+        log.info("Mock create user {}", user.username)
         return user
     }
 
     override fun updateUser(user: WpUser): WpUser {
-        log.info("Mock update user")
+        log.info("Mock update user {}", user.username)
         return user
     }
 
-    override fun deleteUser(username: String) {
-        log.info("Mock delete user")
+    override fun deleteUser(email: String) {
+        log.info("Mock delete user {}", email)
     }
 
     override fun getAvailableRoles(): List<WpRole> =
