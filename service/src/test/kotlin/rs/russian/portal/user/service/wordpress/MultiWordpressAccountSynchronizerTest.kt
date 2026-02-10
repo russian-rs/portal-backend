@@ -31,18 +31,19 @@ class MultiWordpressAccountSynchronizerTest {
             MultiWordpressAccountSynchronizer(wordpressUserServices, wordpressUserMapper)
 
         account = mockk()
-        every { account.username } returns "testuser"
+        every { account.username } returns USERNAME
+        every { account.email } returns EMAIL
     }
 
     @Test
     fun `sync() should sync user to all WordPress instances`() {
         // Arrange
-        val updatingWpUser = WpUser(1, "", "", mutableListOf())
-        val creatingWpUser = WpUser(0, "", "", mutableListOf())
-        val updatedWpUser = WpUser(1, "", "", mutableListOf())
+        val updatingWpUser = WpUser(1, USERNAME, EMAIL, mutableListOf())
+        val creatingWpUser = WpUser(0, USERNAME, EMAIL, mutableListOf())
+        val updatedWpUser = WpUser(1, USERNAME, EMAIL, mutableListOf())
 
-        every { mainService.getUser("testuser") } returns updatingWpUser
-        every { secondaryService.getUser("testuser") } returns null
+        every { mainService.getUser(EMAIL) } returns updatingWpUser
+        every { secondaryService.getUser(EMAIL) } returns null
         every { wordpressUserMapper.map(account) } returns creatingWpUser
         every { wordpressUserMapper.update(account, any()) } returns Unit
         every { mainService.updateUser(updatingWpUser) } returns updatedWpUser
@@ -52,11 +53,11 @@ class MultiWordpressAccountSynchronizerTest {
         multiWordpressAccountSynchroniser.sync(listOf(account))
 
         // Assert
-        verify { mainService.getUser("testuser") }
+        verify { mainService.getUser(EMAIL) }
         verify { wordpressUserMapper.update(account, updatingWpUser) }
         verify { mainService.updateUser(updatingWpUser) }
 
-        verify { secondaryService.getUser("testuser") }
+        verify { secondaryService.getUser(EMAIL) }
         verify { wordpressUserMapper.map(account) }
         verify { secondaryService.createUser(creatingWpUser) }
     }
@@ -64,8 +65,8 @@ class MultiWordpressAccountSynchronizerTest {
     @Test
     fun `sync() should handle exceptions per instance`() {
         // Arrange
-        every { mainService.getUser("testuser") } throws RuntimeException("API error")
-        every { secondaryService.getUser("testuser") } returns null
+        every { mainService.getUser(EMAIL) } throws RuntimeException("API error")
+        every { secondaryService.getUser(EMAIL) } returns null
         every { wordpressUserMapper.map(account) } returns WpUser(0, "", "", mutableListOf())
         every { secondaryService.createUser(any()) } returns mockk()
 
@@ -73,8 +74,8 @@ class MultiWordpressAccountSynchronizerTest {
         multiWordpressAccountSynchroniser.sync(listOf(account))
 
         // Assert
-        verify { mainService.getUser("testuser") }
-        verify { secondaryService.getUser("testuser") }
+        verify { mainService.getUser(EMAIL) }
+        verify { secondaryService.getUser(EMAIL) }
         verify { wordpressUserMapper.map(account) }
         verify { secondaryService.createUser(any()) }
     }
@@ -82,28 +83,33 @@ class MultiWordpressAccountSynchronizerTest {
     @Test
     fun `delete() should delete user from all WordPress instances`() {
         // Arrange
-        every { mainService.deleteUser("testuser") } returns Unit
-        every { secondaryService.deleteUser("testuser") } returns Unit
+        every { mainService.deleteUser(EMAIL) } returns Unit
+        every { secondaryService.deleteUser(EMAIL) } returns Unit
 
         // Act
         multiWordpressAccountSynchroniser.delete(account)
 
         // Assert
-        verify { mainService.deleteUser("testuser") }
-        verify { secondaryService.deleteUser("testuser") }
+        verify { mainService.deleteUser(EMAIL) }
+        verify { secondaryService.deleteUser(EMAIL) }
     }
 
     @Test
     fun `delete() should handle exceptions per instance`() {
         // Arrange
-        every { mainService.deleteUser("testuser") } throws RuntimeException("API error")
-        every { secondaryService.deleteUser("testuser") } returns Unit
+        every { mainService.deleteUser(EMAIL) } throws RuntimeException("API error")
+        every { secondaryService.deleteUser(EMAIL) } returns Unit
 
         // Act - this should not throw even though one service fails
         multiWordpressAccountSynchroniser.delete(account)
 
         // Assert
-        verify { mainService.deleteUser("testuser") }
-        verify { secondaryService.deleteUser("testuser") }
+        verify { mainService.deleteUser(EMAIL) }
+        verify { secondaryService.deleteUser(EMAIL) }
+    }
+
+    companion object {
+        private const val USERNAME = "testuser"
+        private const val EMAIL = "testuser@mail.com"
     }
 }

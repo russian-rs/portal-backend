@@ -15,7 +15,9 @@ import kotlin.test.assertNull
 class WordpressUserServiceImplTest {
 
     private lateinit var usersWordpressApi: UsersWordpressApi
+
     private lateinit var customWordpressApi: CustomWordpressApi
+
     private lateinit var wordpressUserService: WordpressUserServiceImpl
 
     @BeforeEach
@@ -28,53 +30,36 @@ class WordpressUserServiceImplTest {
     @Test
     fun `getUser should return user when found`() {
         // Arrange
-        val username = "testuser"
-        val wpUser = WpUser(id = 1, username = username, email = "test@example.com")
+        val wpUser = WpUser(id = 1, username = USERNAME, email = EMAIL)
         every { usersWordpressApi.searchUsers(any(), any()) } returns mutableListOf(wpUser)
 
         // Act
-        val result = wordpressUserService.getUser(username)
+        val result = wordpressUserService.getUser(EMAIL)
 
         // Assert
         assertEquals(wpUser, result)
-        verify { usersWordpressApi.searchUsers(search = "testuser") }
+        verify { usersWordpressApi.searchUsers(search = EMAIL) }
     }
 
     @Test
     fun `getUser should return null when user not found`() {
         // Arrange
-        val username = "testuser"
         every { usersWordpressApi.searchUsers(any(), any()) } returns mutableListOf(
             WpUser(id = 1, username = "otheruser", email = "other@example.com")
         )
 
         // Act
-        val result = wordpressUserService.getUser(username)
+        val result = wordpressUserService.getUser(EMAIL)
 
         // Assert
         assertNull(result)
-        verify { usersWordpressApi.searchUsers(search = "testuser") }
-    }
-
-    @Test
-    fun `getUser should handle email username format`() {
-        // Arrange
-        val username = "test@example.com"
-        val wpUser = WpUser(id = 1, username = username, email = username)
-        every { usersWordpressApi.searchUsers(any(), any()) } returns mutableListOf(wpUser)
-
-        // Act
-        val result = wordpressUserService.getUser(username)
-
-        // Assert
-        assertEquals(wpUser, result)
-        verify { usersWordpressApi.searchUsers(search = "testexample.com") }
+        verify { usersWordpressApi.searchUsers(search = EMAIL) }
     }
 
     @Test
     fun `createUser should delegate to api client`() {
         // Arrange
-        val wpUser = WpUser(id = 0, username = "testuser", email = "test@example.com")
+        val wpUser = WpUser(id = 0, username = USERNAME, email = EMAIL)
         val createdUser = wpUser.copy(id = 1)
         every { usersWordpressApi.createUser(any()) } returns createdUser
 
@@ -89,7 +74,7 @@ class WordpressUserServiceImplTest {
     @Test
     fun `updateUser should delegate to api client`() {
         // Arrange
-        val wpUser = WpUser(id = 1, username = "testuser", email = "test@example.com")
+        val wpUser = WpUser(id = 1, username = USERNAME, email = EMAIL)
         every { usersWordpressApi.updateUser(any(), any()) } returns wpUser
 
         // Act
@@ -103,30 +88,33 @@ class WordpressUserServiceImplTest {
     @Test
     fun `deleteUser should find user and delete by id`() {
         // Arrange
-        val username = "testuser"
-        val wpUser = WpUser(id = 1, username = username, email = "test@example.com")
+        val wpUser = WpUser(id = 1, username = USERNAME, email = EMAIL)
         every { usersWordpressApi.searchUsers(any(), any()) } returns mutableListOf(wpUser)
         every { usersWordpressApi.deleteUser(any()) } returns DeleteUser200Response()
 
         // Act
-        wordpressUserService.deleteUser(username)
+        wordpressUserService.deleteUser(EMAIL)
 
         // Assert
-        verify { usersWordpressApi.searchUsers(search = "testuser") }
+        verify { usersWordpressApi.searchUsers(search = EMAIL) }
         verify { usersWordpressApi.deleteUser(1) }
     }
 
     @Test
     fun `deleteUser should do nothing if user not found`() {
         // Arrange
-        val username = "testuser"
         every { usersWordpressApi.searchUsers(any(), any()) } returns mutableListOf()
 
         // Act
-        wordpressUserService.deleteUser(username)
+        wordpressUserService.deleteUser(EMAIL)
 
         // Assert
-        verify { usersWordpressApi.searchUsers(search = "testuser") }
+        verify { usersWordpressApi.searchUsers(search = EMAIL) }
         verify(exactly = 0) { usersWordpressApi.deleteUser(any()) }
+    }
+
+    companion object {
+        private const val USERNAME = "testuser"
+        private const val EMAIL = "testuser@mail.com"
     }
 }
