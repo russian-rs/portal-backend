@@ -27,7 +27,7 @@ dependencyCheck {
     failBuildOnCVSS = 7
     suppressionFile = file("dependency-check-suppressions.xml").absolutePath
     nvd {
-        apiKey = System.getenv('NVD_API_KEY') ?: ''
+        apiKey = System.getenv("NVD_API_KEY") ?: ""
     }
 }
 
@@ -55,7 +55,7 @@ dependencies {
     // Data
     implementation("org.postgresql:postgresql")
     implementation("org.liquibase:liquibase-core")
-    implementation('io.hypersistence:hypersistence-utils-hibernate-63:3.8.3')
+    implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.8.3")
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.0.2")
     implementation("net.javacrumbs.shedlock:shedlock-provider-jdbc-template:6.0.2")
     compileOnly("org.hibernate:hibernate-jpamodelgen:6.6.3.Final")
@@ -89,19 +89,19 @@ dependencies {
     implementation("com.github.ben-manes.caffeine:caffeine:3.1.8")
 
     // Security
-    implementation('com.auth0:java-jwt:4.4.0')
-    implementation('com.digitalsanctuary:ds-spring-cf-turnstile:1.1.5')
+    implementation("com.auth0:java-jwt:4.4.0")
+    implementation("com.digitalsanctuary:ds-spring-cf-turnstile:1.1.5")
 
     // Mapstruct
-    implementation('org.mapstruct:mapstruct:1.6.3')
-    kapt('org.mapstruct:mapstruct-processor:1.6.3')
+    implementation("org.mapstruct:mapstruct:1.6.3")
+    kapt("org.mapstruct:mapstruct-processor:1.6.3")
 
     // CSV
-    implementation('com.opencsv:opencsv:5.12.0')
-    implementation('com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.20.1')
+    implementation("com.opencsv:opencsv:5.12.0")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.20.1")
 
     // Logging
-    implementation('ch.qos.logback:logback-classic:1.5.13')
+    implementation("ch.qos.logback:logback-classic:1.5.13")
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
     implementation("com.squareup.okhttp3:logging-interceptor:$OKHTTP_VERSION")
 
@@ -110,15 +110,15 @@ dependencies {
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
-    testImplementation("io.mockk:mockk:1.14.0")
-    testImplementation("org.testcontainers:postgresql:1.19.6")
-    testImplementation("org.testcontainers:junit-jupiter:1.19.6")
-    testImplementation("com.redis:testcontainers-redis:2.2.2")
-    testImplementation("io.rest-assured:rest-assured:5.5.6")
-    testImplementation("io.rest-assured:kotlin-extensions:5.5.6")
-    testImplementation("io.rest-assured:json-path:5.5.6")
+    testImplementation("io.mockk:mockk:1.14.9")
+    testImplementation("org.testcontainers:postgresql:1.21.4")
+    testImplementation("org.testcontainers:junit-jupiter:1.21.4")
+    testImplementation("com.redis:testcontainers-redis:2.2.4")
+    testImplementation("io.rest-assured:rest-assured:5.5.7")
+    testImplementation("io.rest-assured:kotlin-extensions:5.5.7")
+    testImplementation("io.rest-assured:json-path:5.5.7")
     testImplementation("io.zonky.test:embedded-database-spring-test:2.7.1")
-    testImplementation("io.zonky.test:embedded-postgres:2.0.7")
+    testImplementation("io.zonky.test:embedded-postgres:2.2.0")
 }
 
 kotlin {
