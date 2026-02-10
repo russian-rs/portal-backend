@@ -111,6 +111,64 @@ class ContractExpirationSchedulerTest {
         }
     }
 
+    @Test
+    fun `run should continue deactivation if one account fails`() {
+        val today = LocalDate.now()
+        val account1 = createAccount(4, "expired-1", "expired1@example.com", today.minusDays(2))
+        val account2 = createAccount(5, "expired-2", "expired2@example.com", today.minusDays(2))
+        val admin = createAccount(6, "admin2", "admin2@example.com", today.minusDays(30))
+        val adminBody = "admin-body-2"
+
+        every { accountRepository.findByLatestContractDate(today.plusDays(7), true) } returns emptyList()
+        every { accountRepository.findByLatestContractDate(today.minusDays(1), false) } returns listOf(account1, account2)
+        every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER) } returns listOf(admin)
+        every {
+            applicationRepository.existsByEmailAndTypeAndStatusNotIn(
+                account1.email,
+                ApplicationType.PROLONGATION,
+                listOf(ApplicationStatus.DONE, ApplicationStatus.DENY)
+            )
+        } returns false
+        every {
+            applicationRepository.existsByEmailAndTypeAndStatusNotIn(
+                account2.email,
+                ApplicationType.PROLONGATION,
+                listOf(ApplicationStatus.DONE, ApplicationStatus.DENY)
+            )
+        } returns false
+        every { templateEngine.process("contract_deactivation_admin", any<Context>()) } returns adminBody
+        every { accountService.switchActiveState(account1.id!!, false) } throws RuntimeException("boom")
+
+        scheduler.run()
+
+        verify { accountService.switchActiveState(account1.id!!, false) }
+        verify { accountService.switchActiveState(account2.id!!, false) }
+    }
+
+    @Test
+    fun `run should deactivate accounts expired before the cutoff date`() {
+        val today = LocalDate.now()
+        val account = createAccount(7, "expired-old", "expired-old@example.com", today.minusDays(3))
+        val admin = createAccount(8, "admin3", "admin3@example.com", today.minusDays(30))
+        val adminBody = "admin-body-3"
+
+        every { accountRepository.findByLatestContractDate(today.plusDays(7), true) } returns emptyList()
+        every { accountRepository.findByLatestContractDate(today.minusDays(1), false) } returns listOf(account)
+        every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER) } returns listOf(admin)
+        every {
+            applicationRepository.existsByEmailAndTypeAndStatusNotIn(
+                account.email,
+                ApplicationType.PROLONGATION,
+                listOf(ApplicationStatus.DONE, ApplicationStatus.DENY)
+            )
+        } returns false
+        every { templateEngine.process("contract_deactivation_admin", any<Context>()) } returns adminBody
+
+        scheduler.run()
+
+        verify { accountService.switchActiveState(account.id!!, false) }
+    }
+
     private fun createAccount(id: Int, username: String, email: String, endDate: LocalDate): Account {
         val account = Account(
             id = id,

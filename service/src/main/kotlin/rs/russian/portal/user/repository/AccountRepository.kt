@@ -87,7 +87,7 @@ interface AccountRepository : JpaRepository<Account, Int> {
         SELECT a
         FROM Account a
         WHERE a.active = true
-          AND function('jsonb_contains', a.groups, :group)
+          AND function('jsonb_contains', a.groups, :group) = true
         """
     )
     fun findAllActiveByGroup(group: UserGroup): List<Account>

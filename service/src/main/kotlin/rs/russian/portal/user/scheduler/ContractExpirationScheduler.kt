@@ -2,7 +2,6 @@ import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import org.springframework.transaction.annotation.Transactional
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
 import rs.russian.portal.application.domain.ApplicationStatus.DENY
@@ -28,7 +27,6 @@ class ContractExpirationScheduler(
 
     @Scheduled(cron = "\${app.schedulers.contract-expiration}")
     @SchedulerLock(name = "contractExpiration")
-    @Transactional
     fun run() {
         val today = LocalDate.now()
         val reminderDate = today.plusDays(REMINDER_DAYS)
@@ -39,39 +37,60 @@ class ContractExpirationScheduler(
     private fun sendExpirationReminders(reminderDate: LocalDate) {
         val accounts = accountRepository.findByLatestContractDate(reminderDate, true)
         val notified = accounts.filterNot { hasActiveProlongation(it) }
+        var failures = 0
         notified.forEach { account ->
-            val endDate = account.contracts.maxOfOrNull { it.endDate } ?: return@forEach
-            val formattedDate = endDate.format(DATE_FORMATTER)
-            val deactivationDate = endDate.plusDays(1).format(DATE_FORMATTER)
-            if (account.email.isNotBlank()) {
-                val message = templateEngine.process(
-                    "contract_expiration_reminder",
-                    Context().also {
-                        it.setVariables(
-                            mapOf(
-                                "contractEndDate" to formattedDate,
-                                "deactivationDate" to deactivationDate
+            try {
+                val endDate = account.contracts.maxOfOrNull { it.endDate } ?: return@forEach
+                val formattedDate = endDate.format(DATE_FORMATTER)
+                val deactivationDate = endDate.plusDays(1).format(DATE_FORMATTER)
+                if (account.email.isNotBlank()) {
+                    val message = templateEngine.process(
+                        "contract_expiration_reminder",
+                        Context().also {
+                            it.setVariables(
+                                mapOf(
+                                    "contractEndDate" to formattedDate,
+                                    "deactivationDate" to deactivationDate
+                                )
                             )
-                        )
-                    }
-                )
-                emailService.sendCommonEmail(account, REMINDER_SUBJECT, message)
-            } else {
-                log.warn("Skipping reminder for account {} due to missing email", account.username)
+                        }
+                    )
+                    emailService.sendCommonEmail(account, REMINDER_SUBJECT, message)
+                } else {
+                    log.warn("Skipping reminder for account {} due to missing email", account.username)
+                }
+            } catch (ex: Exception) {
+                failures += 1
+                log.error("Failed to send contract reminder for account {}", account.username, ex)
             }
         }
-        log.info("[SCHEDULER] Contract reminders sent: {}", notified.size)
+        log.info(
+            "[SCHEDULER] Contract reminders sent: {} (failures: {})",
+            notified.size - failures,
+            failures
+        )
     }
 
     private fun deactivateExpiredAccounts(today: LocalDate) {
-        val accounts = accountRepository.findByLatestContractDate(today.minusDays(1), false)
+        val cutoffDate = today.minusDays(1)
+        val accounts = accountRepository.findByLatestContractDate(cutoffDate, false)
         val expired = accounts.filterNot { hasActiveProlongation(it) }
         val admins = accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER)
+        var failures = 0
         expired.forEach { account ->
-            account.id?.let { accountService.switchActiveState(it, false) }
-            notifyAdminsOfDeactivation(admins, account)
+            try {
+                account.id?.let { accountService.switchActiveState(it, false) }
+                notifyAdminsOfDeactivation(admins, account)
+            } catch (ex: Exception) {
+                failures += 1
+                log.error("Failed to deactivate account {}", account.username, ex)
+            }
         }
-        log.info("[SCHEDULER] Accounts deactivated due to expired contracts: {}", expired.size)
+        log.info(
+            "[SCHEDULER] Accounts deactivated due to expired contracts: {} (failures: {})",
+            expired.size - failures,
+            failures
+        )
     }
 
     private fun hasActiveProlongation(account: Account): Boolean {
