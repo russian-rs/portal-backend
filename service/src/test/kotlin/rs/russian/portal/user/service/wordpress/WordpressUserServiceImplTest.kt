@@ -1,5 +1,6 @@
 package rs.russian.portal.user.service.wordpress
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -24,7 +25,7 @@ class WordpressUserServiceImplTest {
     fun setUp() {
         usersWordpressApi = mockk()
         customWordpressApi = mockk()
-        wordpressUserService = WordpressUserServiceImpl("test", usersWordpressApi, customWordpressApi)
+        wordpressUserService = WordpressUserServiceImpl("test", usersWordpressApi, customWordpressApi, ObjectMapper())
     }
 
     @Test
