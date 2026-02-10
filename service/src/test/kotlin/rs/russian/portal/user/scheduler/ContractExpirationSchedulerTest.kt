@@ -54,9 +54,9 @@ class ContractExpirationSchedulerTest {
         val account = createAccount(1, "volunteer", "volunteer@example.com", reminderDate)
         val reminderBody = "reminder-body-$formattedDate"
 
-        every { accountRepository.findAllWithLatestContractEndDate(reminderDate) } returns listOf(account)
-        every { accountRepository.findAllWithLatestContractEndDateOnOrBefore(today.minusDays(1)) } returns emptyList()
-        every { accountRepository.findAllActiveByGroup(buildGroupJson(UserGroup.ADMIN_VOLUNTEER)) } returns emptyList()
+        every { accountRepository.findByLatestContractDate(reminderDate, true) } returns listOf(account)
+        every { accountRepository.findByLatestContractDate(today.minusDays(1), false) } returns emptyList()
+        every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER) } returns emptyList()
         every {
             applicationRepository.existsByEmailAndTypeAndStatusNotIn(
                 account.email,
@@ -86,9 +86,9 @@ class ContractExpirationSchedulerTest {
         val admin = createAccount(3, "admin", "admin@example.com", today.minusDays(30))
         val adminBody = "admin-body-${account.fullName}"
 
-        every { accountRepository.findAllWithLatestContractEndDate(today.plusDays(7)) } returns emptyList()
-        every { accountRepository.findAllWithLatestContractEndDateOnOrBefore(today.minusDays(1)) } returns listOf(account)
-        every { accountRepository.findAllActiveByGroup(buildGroupJson(UserGroup.ADMIN_VOLUNTEER)) } returns listOf(admin)
+        every { accountRepository.findByLatestContractDate(today.plusDays(7), true) } returns emptyList()
+        every { accountRepository.findByLatestContractDate(today.minusDays(1), false) } returns listOf(account)
+        every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER) } returns listOf(admin)
         every {
             applicationRepository.existsByEmailAndTypeAndStatusNotIn(
                 account.email,
@@ -127,10 +127,6 @@ class ContractExpirationSchedulerTest {
         )
         account.contracts.add(contract)
         return account
-    }
-
-    private fun buildGroupJson(group: UserGroup): String {
-        return "[\"${group.name}\"]"
     }
 
     companion object {
