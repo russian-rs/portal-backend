@@ -7,9 +7,11 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.Account.Companion.GRAPH_FULL
+import rs.russian.portal.user.domain.enums.UserGroup
 import rs.russian.portal.user.repository.projections.AgeSliceCountProjection
 import rs.russian.portal.user.repository.projections.GenderCountProjection
 import rs.russian.portal.user.repository.projections.UsersStatisticGroupCountProjection
@@ -81,39 +83,38 @@ interface AccountRepository : JpaRepository<Account, Int> {
     fun countByStatisticGroup(): List<UsersStatisticGroupCountProjection>
 
     @Query(
-        value = """
-        SELECT *
-        FROM account
-        WHERE active = true
-          AND groups @> CAST(:groupJson AS jsonb)
-        """,
-        nativeQuery = true
+        """
+        SELECT a
+        FROM Account a
+        WHERE a.active = true
+          AND function('jsonb_contains', a.groups, :group)
+        """
     )
-    fun findAllActiveByGroup(groupJson: String): List<Account>
+    fun findAllActiveByGroup(group: UserGroup): List<Account>
 
     @EntityGraph(value = GRAPH_FULL)
     @Query(
         """
         SELECT a
         FROM Account a
-        JOIN a.contracts c
         WHERE a.active = true
-        GROUP BY a
-        HAVING MAX(c.endDate) = :date
+          AND (
+              SELECT MAX(c.endDate)
+              FROM Contract c
+              WHERE c.account = a
+          ) <= :date
+          AND (
+              :strict = false
+              OR (
+                  SELECT MAX(c.endDate)
+                  FROM Contract c
+                  WHERE c.account = a
+              ) = :date
+          )
         """
     )
-    fun findAllWithLatestContractEndDate(date: LocalDate): List<Account>
-
-    @EntityGraph(value = GRAPH_FULL)
-    @Query(
-        """
-        SELECT a
-        FROM Account a
-        JOIN a.contracts c
-        WHERE a.active = true
-        GROUP BY a
-        HAVING MAX(c.endDate) <= :date
-        """
-    )
-    fun findAllWithLatestContractEndDateOnOrBefore(date: LocalDate): List<Account>
+    fun findByLatestContractDate(
+        @Param("date") date: LocalDate,
+        @Param("strict") strict: Boolean
+    ): List<Account>
 }

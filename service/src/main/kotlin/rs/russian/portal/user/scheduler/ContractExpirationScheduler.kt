@@ -37,7 +37,7 @@ class ContractExpirationScheduler(
     }
 
     private fun sendExpirationReminders(reminderDate: LocalDate) {
-        val accounts = accountRepository.findAllWithLatestContractEndDate(reminderDate)
+        val accounts = accountRepository.findByLatestContractDate(reminderDate, true)
         val notified = accounts.filterNot { hasActiveProlongation(it) }
         notified.forEach { account ->
             val endDate = account.contracts.maxOfOrNull { it.endDate } ?: return@forEach
@@ -64,9 +64,9 @@ class ContractExpirationScheduler(
     }
 
     private fun deactivateExpiredAccounts(today: LocalDate) {
-        val accounts = accountRepository.findAllWithLatestContractEndDateOnOrBefore(today.minusDays(1))
+        val accounts = accountRepository.findByLatestContractDate(today.minusDays(1), false)
         val expired = accounts.filterNot { hasActiveProlongation(it) }
-        val admins = accountRepository.findAllActiveByGroup(buildGroupJson(UserGroup.ADMIN_VOLUNTEER))
+        val admins = accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER)
         expired.forEach { account ->
             account.id?.let { accountService.switchActiveState(it, false) }
             notifyAdminsOfDeactivation(admins, account)
@@ -107,10 +107,6 @@ class ContractExpirationScheduler(
                 log.warn("Skipping admin notification for account {} due to missing email", admin.username)
             }
         }
-    }
-
-    private fun buildGroupJson(group: UserGroup): String {
-        return "[\"${group.name}\"]"
     }
 
     companion object {
