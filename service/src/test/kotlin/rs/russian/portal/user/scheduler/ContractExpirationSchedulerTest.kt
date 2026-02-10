@@ -6,6 +6,8 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.thymeleaf.TemplateEngine
+import org.thymeleaf.context.Context
 import rs.russian.portal.application.domain.ApplicationStatus
 import rs.russian.portal.application.domain.ApplicationType
 import rs.russian.portal.application.repository.ApplicationRepository
@@ -25,6 +27,7 @@ class ContractExpirationSchedulerTest {
     private lateinit var applicationRepository: ApplicationRepository
     private lateinit var accountService: AccountService
     private lateinit var emailService: EmailService
+    private lateinit var templateEngine: TemplateEngine
     private lateinit var scheduler: ContractExpirationScheduler
 
     @BeforeEach
@@ -33,11 +36,13 @@ class ContractExpirationSchedulerTest {
         applicationRepository = mockk(relaxed = true)
         accountService = mockk(relaxed = true)
         emailService = mockk(relaxed = true)
+        templateEngine = mockk(relaxed = true)
         scheduler = ContractExpirationScheduler(
             accountRepository,
             applicationRepository,
             accountService,
-            emailService
+            emailService,
+            templateEngine
         )
     }
 
@@ -47,6 +52,7 @@ class ContractExpirationSchedulerTest {
         val reminderDate = today.plusDays(7)
         val formattedDate = reminderDate.format(DATE_FORMATTER)
         val account = createAccount(1, "volunteer", "volunteer@example.com", reminderDate)
+        val reminderBody = "reminder-body-$formattedDate"
 
         every { accountRepository.findAllWithLatestContractEndDate(reminderDate) } returns listOf(account)
         every { accountRepository.findAllWithLatestContractEndDateOnOrBefore(today.minusDays(1)) } returns emptyList()
@@ -58,14 +64,16 @@ class ContractExpirationSchedulerTest {
                 listOf(ApplicationStatus.DONE, ApplicationStatus.DENY)
             )
         } returns false
+        every { templateEngine.process("contract_expiration_reminder", any<Context>()) } returns reminderBody
 
         scheduler.run()
 
+        verify { templateEngine.process("contract_expiration_reminder", any<Context>()) }
         verify {
             emailService.sendCommonEmail(
                 account,
                 "Окончание контракта",
-                match { it.contains("заканчивается") && it.contains(formattedDate) }
+                reminderBody
             )
         }
         verify(exactly = 0) { accountService.switchActiveState(any(), false) }
@@ -76,6 +84,7 @@ class ContractExpirationSchedulerTest {
         val today = LocalDate.now()
         val account = createAccount(2, "expired", "expired@example.com", today.minusDays(1))
         val admin = createAccount(3, "admin", "admin@example.com", today.minusDays(30))
+        val adminBody = "admin-body-${account.fullName}"
 
         every { accountRepository.findAllWithLatestContractEndDate(today.plusDays(7)) } returns emptyList()
         every { accountRepository.findAllWithLatestContractEndDateOnOrBefore(today.minusDays(1)) } returns listOf(account)
@@ -87,15 +96,17 @@ class ContractExpirationSchedulerTest {
                 listOf(ApplicationStatus.DONE, ApplicationStatus.DENY)
             )
         } returns false
+        every { templateEngine.process("contract_deactivation_admin", any<Context>()) } returns adminBody
 
         scheduler.run()
 
         verify { accountService.switchActiveState(account.id!!, false) }
+        verify { templateEngine.process("contract_deactivation_admin", any<Context>()) }
         verify {
             emailService.sendCommonEmail(
                 admin,
                 "Деактивация учетной записи волонтера",
-                match { it.contains(account.fullName) }
+                adminBody
             )
         }
     }
