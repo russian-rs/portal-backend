@@ -3,6 +3,8 @@ import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Transactional
+import org.thymeleaf.TemplateEngine
+import org.thymeleaf.context.Context
 import rs.russian.portal.application.domain.ApplicationStatus.DENY
 import rs.russian.portal.application.domain.ApplicationStatus.DONE
 import rs.russian.portal.application.domain.ApplicationType.PROLONGATION
@@ -20,7 +22,8 @@ class ContractExpirationScheduler(
     private val accountRepository: AccountRepository,
     private val applicationRepository: ApplicationRepository,
     private val accountService: AccountService,
-    private val emailService: EmailService
+    private val emailService: EmailService,
+    private val templateEngine: TemplateEngine
 ) {
 
     @Scheduled(cron = "\${app.schedulers.contract-expiration}")
@@ -41,7 +44,17 @@ class ContractExpirationScheduler(
             val formattedDate = endDate.format(DATE_FORMATTER)
             val deactivationDate = endDate.plusDays(1).format(DATE_FORMATTER)
             if (account.email.isNotBlank()) {
-                val message = buildVolunteerReminderMessage(formattedDate, deactivationDate)
+                val message = templateEngine.process(
+                    "contract_expiration_reminder",
+                    Context().also {
+                        it.setVariables(
+                            mapOf(
+                                "contractEndDate" to formattedDate,
+                                "deactivationDate" to deactivationDate
+                            )
+                        )
+                    }
+                )
                 emailService.sendCommonEmail(account, REMINDER_SUBJECT, message)
             } else {
                 log.warn("Skipping reminder for account {} due to missing email", account.username)
@@ -69,12 +82,6 @@ class ContractExpirationScheduler(
         return applicationRepository.existsByEmailAndTypeAndStatusNotIn(email, PROLONGATION, listOf(DONE, DENY))
     }
 
-    private fun buildVolunteerReminderMessage(contractEndDate: String, deactivationDate: String): String {
-        return "Ваш контракт заканчивается $contractEndDate. " +
-                "Если вы не планируете продлевать его, ничего делать не нужно — " +
-                "ваша учетная запись будет деактивирована $deactivationDate."
-    }
-
     private fun notifyAdminsOfDeactivation(admins: List<Account>, account: Account) {
         if (admins.isEmpty()) {
             log.warn("No admins found for deactivation notification")
@@ -82,7 +89,17 @@ class ContractExpirationScheduler(
         }
         val endDate = account.contracts.maxOfOrNull { it.endDate } ?: return
         val formattedDate = endDate.format(DATE_FORMATTER)
-        val message = buildAdminDeactivationMessage(account, formattedDate)
+        val message = templateEngine.process(
+            "contract_deactivation_admin",
+            Context().also {
+                it.setVariables(
+                    mapOf(
+                        "fullName" to account.fullName,
+                        "contractEndDate" to formattedDate
+                    )
+                )
+            }
+        )
         admins.forEach { admin ->
             if (admin.email.isNotBlank()) {
                 emailService.sendCommonEmail(admin, DEACTIVATION_SUBJECT, message)
@@ -90,11 +107,6 @@ class ContractExpirationScheduler(
                 log.warn("Skipping admin notification for account {} due to missing email", admin.username)
             }
         }
-    }
-
-    private fun buildAdminDeactivationMessage(account: Account, formattedDate: String): String {
-        return "Учетная запись волонтера ${account.fullName} деактивирована. " +
-                "Дата окончания контракта: $formattedDate."
     }
 
     private fun buildGroupJson(group: UserGroup): String {
