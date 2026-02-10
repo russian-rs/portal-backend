@@ -2,7 +2,6 @@ package rs.russian.portal.user.service.wordpress
 
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
-import org.wordpress.model.WpUser
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.mapper.WordpressUserMapper
 import rs.russian.portal.user.service.AccountSynchronizer
@@ -36,13 +35,15 @@ class MultiWordpressAccountSynchronizer(
     ): Boolean {
         try {
             var wpUser = service.getUser(account.email)
+            var roles = account.groups
+                .map { it.oauthGroup }
+                .filter { existingRoles.contains(it) }
+                .toSet()
             if (wpUser == null) { // new user
-                wpUser = wordpressUserMapper.map(account)
-                wpUser.filterAvailableRoles(existingRoles)
+                wpUser = wordpressUserMapper.create(account, roles)
                 service.createUser(wpUser)
             } else {
-                wordpressUserMapper.update(account, wpUser)
-                wpUser.filterAvailableRoles(existingRoles)
+                wordpressUserMapper.update(account, roles, wpUser)
                 service.updateUser(wpUser)
             }
             return true
@@ -51,10 +52,6 @@ class MultiWordpressAccountSynchronizer(
             return false
         }
     }
-
-    private fun WpUser.filterAvailableRoles(existingRoles: List<String>) = this
-        .roles
-        .retainAll(existingRoles)
 
     override fun delete(account: Account) {
         wordpressUserServices.forEach { (name, service) ->
