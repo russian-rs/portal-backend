@@ -105,7 +105,7 @@ class ReportStatisticService(
     }
 
     fun getTotalUserCount(): Int {
-        return accountRepository.count().toInt()
+        return accountRepository.countByActiveTrue().toInt()
     }
 
     fun getCountByStatisticGroup(): List<UsersStatisticGroupCountProjection> {
