@@ -45,6 +45,8 @@ interface AccountRepository : JpaRepository<Account, Int> {
         """
     SELECT ui.gender AS gender, COUNT(ui) AS count
     FROM UserInfo ui
+    JOIN ui.account a
+    WHERE a.active = true
     GROUP BY ui.gender
 """
     )
@@ -61,7 +63,8 @@ interface AccountRepository : JpaRepository<Account, Int> {
     FROM (
         SELECT EXTRACT(YEAR FROM AGE(CURRENT_DATE, ui.birth_date)) AS age
         FROM user_info ui
-        WHERE ui.birth_date IS NOT NULL
+        JOIN account a ON a.username = ui.username
+        WHERE ui.birth_date IS NOT NULL AND a.active = true
     ) AS derived
     """,
         nativeQuery = true
@@ -74,8 +77,10 @@ interface AccountRepository : JpaRepository<Account, Int> {
                 s.code AS groupCode,
                 COUNT(DISTINCT ui.username) AS userCount
             FROM user_info ui
+            JOIN account a ON a.username = ui.username
             JOIN project_statistic_group psg ON ui.project_code = psg.project_code
             JOIN statistic_group s ON s.code = psg.statistic_group_code
+            WHERE a.active = true
             GROUP BY s.code
         """,
         nativeQuery = true
@@ -117,4 +122,6 @@ interface AccountRepository : JpaRepository<Account, Int> {
         @Param("date") date: LocalDate,
         @Param("strict") strict: Boolean
     ): List<Account>
+
+    fun countByActiveTrue(): Long
 }

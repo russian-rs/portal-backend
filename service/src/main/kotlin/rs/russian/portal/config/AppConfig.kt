@@ -2,6 +2,7 @@
 
 package rs.russian.portal.config
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.dataformat.csv.CsvMapper
@@ -53,6 +54,7 @@ class AppConfig {
     fun objectMapper(): ObjectMapper = ObjectMapper()
         .registerKotlinModule()
         .registerModules(JavaTimeModule())
+        .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
         .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 
     @Bean
