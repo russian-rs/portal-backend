@@ -10,13 +10,13 @@ interface WordpressUserService {
     var apiClient: UsersWordpressApi
     var customWpApi: CustomWordpressApi
 
-    fun getUser(username: String): WpUser?
+    fun getUser(email: String): WpUser?
 
     fun createUser(user: WpUser): WpUser
 
     fun updateUser(user: WpUser): WpUser
 
-    fun deleteUser(username: String)
+    fun deleteUser(email: String)
 
     fun getAvailableRoles(): List<WpRole>
 }

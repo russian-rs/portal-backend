@@ -6,7 +6,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 
 fun buildBearerApiClient(bearerToken: String): OkHttpClient {
     val loggingInterceptor = HttpLoggingInterceptor().apply {
-        level = HttpLoggingInterceptor.Level.BASIC
+        level = HttpLoggingInterceptor.Level.NONE
     }
 
     val headerInterceptor = Interceptor { chain ->
