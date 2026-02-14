@@ -29,6 +29,7 @@ class UserSyncScheduler(
     @Scheduled(cron = "\${app.schedulers.user-sync}")
     @SchedulerLock(name = "syncUsers")
     fun sync() {
+        log.info("Starting user sync")
         val syncStart = LocalDateTime.now()
         val authentikUsers = authentikUserService.getAllUsers()
         val usersToSync = authentikUsers
