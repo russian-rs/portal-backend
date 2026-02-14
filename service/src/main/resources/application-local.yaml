@@ -11,7 +11,7 @@ app:
     bucket: ${S3_BUCKET:portal-files}
     bucket-service: ${S3_BUCKET_SERVICE:portal-data}
   authentik:
-    base-url: https://REDACTED_HOST
+    base-url: ${AUTHENTIK_BASE_URL:https://your-authentik-instance.example.com}
     # Можно взять в Coolify в настройках окружения
     api-key: ${AUTHENTIK_API_KEY:no-key}
   wordpress:
@@ -54,11 +54,11 @@ spring:
       client:
         provider:
           authentik:
-            issuer-uri: https://REDACTED_HOST/application/o/${spring.application.name}/
-            authorization-uri: https://REDACTED_HOST/application/o/authorize/
-            token-uri: https://REDACTED_HOST/application/o/token/
-            user-info-uri: https://REDACTED_HOST/application/o/userinfo/
-            jwk-set-uri: https://REDACTED_HOST/application/o/${spring.application.name}/jwks/
+            issuer-uri: ${AUTHENTIK_BASE_URL}/application/o/${spring.application.name}/
+            authorization-uri: ${AUTHENTIK_BASE_URL}/application/o/authorize/
+            token-uri: ${AUTHENTIK_BASE_URL}/application/o/token/
+            user-info-uri: ${AUTHENTIK_BASE_URL}/application/o/userinfo/
+            jwk-set-uri: ${AUTHENTIK_BASE_URL}/application/o/${spring.application.name}/jwks/
         registration:
           authentik:
             # Можно взять в Coolify в настройках окружения
