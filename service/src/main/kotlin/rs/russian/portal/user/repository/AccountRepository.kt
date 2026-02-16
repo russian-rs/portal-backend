@@ -7,12 +7,15 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.Account.Companion.GRAPH_FULL
+import rs.russian.portal.user.domain.enums.UserGroup
 import rs.russian.portal.user.repository.projections.AgeSliceCountProjection
 import rs.russian.portal.user.repository.projections.GenderCountProjection
 import rs.russian.portal.user.repository.projections.UsersStatisticGroupCountProjection
+import java.time.LocalDate
 import java.util.*
 
 @Repository
@@ -83,6 +86,42 @@ interface AccountRepository : JpaRepository<Account, Int> {
         nativeQuery = true
     )
     fun countByStatisticGroup(): List<UsersStatisticGroupCountProjection>
+
+    @Query(
+        """
+        SELECT a
+        FROM Account a
+        WHERE a.active = true
+          AND function('jsonb_contains', a.groups, :group) = true
+        """
+    )
+    fun findAllActiveByGroup(group: UserGroup): List<Account>
+
+    @EntityGraph(value = GRAPH_FULL)
+    @Query(
+        """
+        SELECT a
+        FROM Account a
+        WHERE a.active = true
+          AND (
+              SELECT MAX(c.endDate)
+              FROM Contract c
+              WHERE c.account = a
+          ) <= :date
+          AND (
+              :strict = false
+              OR (
+                  SELECT MAX(c.endDate)
+                  FROM Contract c
+                  WHERE c.account = a
+              ) = :date
+          )
+        """
+    )
+    fun findByLatestContractDate(
+        @Param("date") date: LocalDate,
+        @Param("strict") strict: Boolean
+    ): List<Account>
 
     fun countByActiveTrue(): Long
 }
