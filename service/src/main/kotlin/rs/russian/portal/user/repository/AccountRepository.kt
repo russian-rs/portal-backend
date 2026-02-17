@@ -46,11 +46,20 @@ interface AccountRepository : JpaRepository<Account, Int> {
     SELECT ui.gender AS gender, COUNT(ui) AS count
     FROM UserInfo ui
     JOIN ui.account a
-    WHERE a.active = true
+    WHERE EXISTS (
+        SELECT c.id
+        FROM Contract c
+        WHERE c.account = a
+          AND c.startDate <= :yearEnd
+          AND c.endDate >= :yearStart
+    )
     GROUP BY ui.gender
 """
     )
-    fun countByGender(): List<GenderCountProjection>
+    fun countByGender(
+        @Param("yearStart") yearStart: LocalDate,
+        @Param("yearEnd") yearEnd: LocalDate
+    ): List<GenderCountProjection>
 
     @Query(
         """
@@ -64,12 +73,22 @@ interface AccountRepository : JpaRepository<Account, Int> {
         SELECT EXTRACT(YEAR FROM AGE(CURRENT_DATE, ui.birth_date)) AS age
         FROM user_info ui
         JOIN account a ON a.username = ui.username
-        WHERE ui.birth_date IS NOT NULL AND a.active = true
+        WHERE ui.birth_date IS NOT NULL
+          AND EXISTS (
+              SELECT 1
+              FROM contract c
+              WHERE c.username = a.username
+                AND c.start_date <= :yearEnd
+                AND c.end_date >= :yearStart
+          )
     ) AS derived
     """,
         nativeQuery = true
     )
-    fun countByAgeSlices(): AgeSliceCountProjection
+    fun countByAgeSlices(
+        @Param("yearStart") yearStart: LocalDate,
+        @Param("yearEnd") yearEnd: LocalDate
+    ): AgeSliceCountProjection
 
     @Query(
         value = """
@@ -80,12 +99,21 @@ interface AccountRepository : JpaRepository<Account, Int> {
             JOIN account a ON a.username = ui.username
             JOIN project_statistic_group psg ON ui.project_code = psg.project_code
             JOIN statistic_group s ON s.code = psg.statistic_group_code
-            WHERE a.active = true
+            WHERE EXISTS (
+                SELECT 1
+                FROM contract c
+                WHERE c.username = a.username
+                  AND c.start_date <= :yearEnd
+                  AND c.end_date >= :yearStart
+            )
             GROUP BY s.code
         """,
         nativeQuery = true
     )
-    fun countByStatisticGroup(): List<UsersStatisticGroupCountProjection>
+    fun countByStatisticGroup(
+        @Param("yearStart") yearStart: LocalDate,
+        @Param("yearEnd") yearEnd: LocalDate
+    ): List<UsersStatisticGroupCountProjection>
 
     @Query(
         """
@@ -123,5 +151,22 @@ interface AccountRepository : JpaRepository<Account, Int> {
         @Param("strict") strict: Boolean
     ): List<Account>
 
-    fun countByActiveTrue(): Long
+    @Query(
+        """
+        SELECT COUNT(DISTINCT a.username)
+        FROM account a
+        WHERE EXISTS (
+            SELECT 1
+            FROM contract c
+            WHERE c.username = a.username
+              AND c.start_date <= :yearEnd
+              AND c.end_date >= :yearStart
+        )
+        """,
+        nativeQuery = true
+    )
+    fun countByActiveDuringYear(
+        @Param("yearStart") yearStart: LocalDate,
+        @Param("yearEnd") yearEnd: LocalDate
+    ): Long
 }
