@@ -12,6 +12,7 @@ import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.repository.projections.AgeSliceCountProjection
 import rs.russian.portal.user.repository.projections.GenderCountProjection
 import rs.russian.portal.user.repository.projections.UsersStatisticGroupCountProjection
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import kotlin.test.assertEquals
@@ -31,39 +32,49 @@ class ReportStatisticServiceTest {
     }
 
     @Test
-    fun `getStatistics should use active users count for totals`() {
+    fun `getStatistics should use users active during selected calendar year for totals`() {
+        val year = 2025
+        val yearStart = LocalDate.of(year, 1, 1)
+        val yearEnd = LocalDate.of(year, 12, 31)
+
         every { reportRepository.fetchProgramStatsByGroup(any(), any()) } returns emptyList()
-        every { accountRepository.countByGender() } returns listOf(
+        every { accountRepository.countByGender(yearStart, yearEnd) } returns listOf(
             genderProjection(Gender.MALE, 3),
             genderProjection(Gender.FEMALE, 2)
         )
-        every { accountRepository.countByAgeSlices() } returns ageSliceProjection(1, 1, 1, 1, 1)
-        every { accountRepository.countByStatisticGroup() } returns listOf(
+        every { accountRepository.countByAgeSlices(yearStart, yearEnd) } returns ageSliceProjection(1, 1, 1, 1, 1)
+        every { accountRepository.countByStatisticGroup(yearStart, yearEnd) } returns listOf(
             statisticGroupProjection("KULTURNA_DOBA", 2),
             statisticGroupProjection("ZIVOTNA_SREDINA", 1)
         )
-        every { accountRepository.countByActiveTrue() } returns 5L
+        every { accountRepository.countByActiveDuringYear(yearStart, yearEnd) } returns 5L
 
-        val result = service.getStatistics(2025)
+        val result = service.getStatistics(year)
         val finalUsersStatistics = assertNotNull(result.finalUsersStatistics)
         val volunteerStatistics = assertNotNull(result.volunteerStatistics)
 
         assertEquals(5, finalUsersStatistics.totalCount)
         assertEquals(2, finalUsersStatistics.otherCount)
         assertEquals(5, volunteerStatistics.foreignersCount)
-        verify(exactly = 2) { accountRepository.countByActiveTrue() }
+        verify(exactly = 1) { accountRepository.countByGender(yearStart, yearEnd) }
+        verify(exactly = 1) { accountRepository.countByAgeSlices(yearStart, yearEnd) }
+        verify(exactly = 1) { accountRepository.countByStatisticGroup(yearStart, yearEnd) }
+        verify(exactly = 2) { accountRepository.countByActiveDuringYear(yearStart, yearEnd) }
     }
 
     @Test
     fun `getStatistics should map volunteer slices and genders`() {
+        val yearStart = LocalDate.of(2025, 1, 1)
+        val yearEnd = LocalDate.of(2025, 12, 31)
+
         every { reportRepository.fetchProgramStatsByGroup(any(), any()) } returns emptyList()
-        every { accountRepository.countByGender() } returns listOf(
+        every { accountRepository.countByGender(yearStart, yearEnd) } returns listOf(
             genderProjection(Gender.MALE, 7),
             genderProjection(Gender.FEMALE, 4)
         )
-        every { accountRepository.countByAgeSlices() } returns ageSliceProjection(2, 3, 4, 5, 6)
-        every { accountRepository.countByStatisticGroup() } returns emptyList()
-        every { accountRepository.countByActiveTrue() } returns 11L
+        every { accountRepository.countByAgeSlices(yearStart, yearEnd) } returns ageSliceProjection(2, 3, 4, 5, 6)
+        every { accountRepository.countByStatisticGroup(yearStart, yearEnd) } returns emptyList()
+        every { accountRepository.countByActiveDuringYear(yearStart, yearEnd) } returns 11L
 
         val result = service.getStatistics(2025)
         val volunteerStatistics = assertNotNull(result.volunteerStatistics)
@@ -80,6 +91,8 @@ class ReportStatisticServiceTest {
     @Test
     fun `getStatistics should request yearly program stats and aggregate totals`() {
         val capturedRanges = mutableListOf<Pair<OffsetDateTime, OffsetDateTime>>()
+        val yearStart = LocalDate.of(2024, 1, 1)
+        val yearEnd = LocalDate.of(2024, 12, 31)
         every { reportRepository.fetchProgramStatsByGroup(any(), any()) } answers {
             capturedRanges += firstArg<OffsetDateTime>() to secondArg<OffsetDateTime>()
             listOf(
@@ -87,10 +100,10 @@ class ReportStatisticServiceTest {
                 programProjection("MEDIA", 2, 2.0)
             )
         }
-        every { accountRepository.countByGender() } returns emptyList()
-        every { accountRepository.countByAgeSlices() } returns ageSliceProjection(0, 0, 0, 0, 0)
-        every { accountRepository.countByStatisticGroup() } returns emptyList()
-        every { accountRepository.countByActiveTrue() } returns 0L
+        every { accountRepository.countByGender(yearStart, yearEnd) } returns emptyList()
+        every { accountRepository.countByAgeSlices(yearStart, yearEnd) } returns ageSliceProjection(0, 0, 0, 0, 0)
+        every { accountRepository.countByStatisticGroup(yearStart, yearEnd) } returns emptyList()
+        every { accountRepository.countByActiveDuringYear(yearStart, yearEnd) } returns 0L
 
         val result = service.getStatistics(2024)
         val programStatistics = assertNotNull(result.programStatistics)
@@ -105,6 +118,11 @@ class ReportStatisticServiceTest {
         assertEquals(7.5, programStatistics.items[0].data.totalTimeSpent)
         assertEquals(5, programStatistics.total.count)
         assertEquals(9.5, programStatistics.total.totalTimeSpent)
+
+        verify(exactly = 1) { accountRepository.countByGender(yearStart, yearEnd) }
+        verify(exactly = 1) { accountRepository.countByAgeSlices(yearStart, yearEnd) }
+        verify(exactly = 1) { accountRepository.countByStatisticGroup(yearStart, yearEnd) }
+        verify(exactly = 2) { accountRepository.countByActiveDuringYear(yearStart, yearEnd) }
     }
 
     private fun programProjection(groupCode: String, count: Long, totalTimeSpent: Double): ProgramStatProjection =
