@@ -13,6 +13,7 @@ import rs.russian.portal.user.domain.enums.Gender
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.repository.projections.AgeSliceCountProjection
 import rs.russian.portal.user.repository.projections.UsersStatisticGroupCountProjection
+import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 
@@ -25,16 +26,19 @@ class ReportStatisticService(
 
     @Transactional(readOnly = true)
     fun getStatistics(year: Int) = Statistics().apply {
+        val yearStart = LocalDate.of(year, 1, 1)
+        val yearEnd = yearStart.plusYears(1).minusDays(1)
+
         programStatistics = getProgramStat(year)
-        volunteerStatistics = getVolunteerStat()
-        finalUsersStatistics = getFinalUsersStat()
+        volunteerStatistics = getVolunteerStat(yearStart, yearEnd)
+        finalUsersStatistics = getFinalUsersStat(yearStart, yearEnd)
         this.year = year
     }
 
-    private fun getVolunteerStat(): VolunteerStatistics {
-        val ageSlices = getAgeSliceStatistics()
-        val genderSlices = getGenderStatistics()
-        val totalUsers = getTotalUserCount()
+    private fun getVolunteerStat(yearStart: LocalDate, yearEnd: LocalDate): VolunteerStatistics {
+        val ageSlices = getAgeSliceStatistics(yearStart, yearEnd)
+        val genderSlices = getGenderStatistics(yearStart, yearEnd)
+        val totalUsers = getTotalUserCount(yearStart, yearEnd)
 
         return VolunteerStatistics().apply {
             maleCount = genderSlices.get(Gender.MALE)
@@ -50,9 +54,9 @@ class ReportStatisticService(
         }
     }
 
-    private fun getFinalUsersStat(): FinalUsersStatistics {
-        val usersByStatGroup = getCountByStatisticGroup()
-        val totalUsers = getTotalUserCount()
+    private fun getFinalUsersStat(yearStart: LocalDate, yearEnd: LocalDate): FinalUsersStatistics {
+        val usersByStatGroup = getCountByStatisticGroup(yearStart, yearEnd)
+        val totalUsers = getTotalUserCount(yearStart, yearEnd)
 
         val culturalAssetsCount = usersByStatGroup
             .filter { it.groupCode == "KULTURNA_DOBA" }
@@ -96,19 +100,19 @@ class ReportStatisticService(
         return ProgramStatistics(items = items as MutableList<ProgramStatItem>, total = total)
     }
 
-    fun getGenderStatistics(): Map<Gender?, Int> {
-        return accountRepository.countByGender().associate { it.gender to it.count }
+    fun getGenderStatistics(yearStart: LocalDate, yearEnd: LocalDate): Map<Gender?, Int> {
+        return accountRepository.countByGender(yearStart, yearEnd).associate { it.gender to it.count }
     }
 
-    fun getAgeSliceStatistics(): AgeSliceCountProjection {
-        return accountRepository.countByAgeSlices()
+    fun getAgeSliceStatistics(yearStart: LocalDate, yearEnd: LocalDate): AgeSliceCountProjection {
+        return accountRepository.countByAgeSlices(yearStart, yearEnd)
     }
 
-    fun getTotalUserCount(): Int {
-        return accountRepository.countByActiveTrue().toInt()
+    fun getTotalUserCount(yearStart: LocalDate, yearEnd: LocalDate): Int {
+        return accountRepository.countByActiveDuringYear(yearStart, yearEnd).toInt()
     }
 
-    fun getCountByStatisticGroup(): List<UsersStatisticGroupCountProjection> {
-        return accountRepository.countByStatisticGroup()
+    fun getCountByStatisticGroup(yearStart: LocalDate, yearEnd: LocalDate): List<UsersStatisticGroupCountProjection> {
+        return accountRepository.countByStatisticGroup(yearStart, yearEnd)
     }
 }
