@@ -59,7 +59,7 @@ class ReportStatisticService(
         val totalUsers = getTotalUserCount(yearStart, yearEnd)
 
         val culturalAssetsCount = usersByStatGroup
-            .filter { it.groupCode == "KULTURNA_DOBA" }
+            .filter { it.groupCode == "KULTURNA_DOBRA" }
             .sumOf { it.userCount }
         val naturalAssetsCount = usersByStatGroup
             .filter { it.groupCode == "ZIVOTNA_SREDINA" }
