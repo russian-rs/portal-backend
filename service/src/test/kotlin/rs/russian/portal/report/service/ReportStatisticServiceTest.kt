@@ -44,7 +44,7 @@ class ReportStatisticServiceTest {
         )
         every { accountRepository.countByAgeSlices(yearStart, yearEnd) } returns ageSliceProjection(1, 1, 1, 1, 1)
         every { accountRepository.countByStatisticGroup(yearStart, yearEnd) } returns listOf(
-            statisticGroupProjection("KULTURNA_DOBA", 2),
+            statisticGroupProjection("KULTURNA_DOBRA", 2),
             statisticGroupProjection("ZIVOTNA_SREDINA", 1)
         )
         every { accountRepository.countByActiveDuringYear(yearStart, yearEnd) } returns 5L

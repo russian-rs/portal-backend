@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/release-1.14.0/fix-kulturna-dobra-statistic-group.yaml
