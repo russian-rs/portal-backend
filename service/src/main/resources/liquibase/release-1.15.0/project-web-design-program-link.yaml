@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.15.0-project-web-design-program-link
+      author: Valerii Linden
+      preConditions:
+        - onFail: MARK_RAN
+          and:
+            - columnExists:
+                tableName: project
+                columnName: program_code
+            - sqlCheck:
+                expectedResult: 1
+                sql: SELECT COUNT(*) FROM project WHERE code = 'WEB_DESIGN'
+      changes:
+        - update:
+            tableName: project
+            columns:
+              - column:
+                  name: program_code
+                  value: DESIGN
+            where: code = 'WEB_DESIGN'

@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.15.0-project-web-design
+      author: Valerii Linden
+      preConditions:
+        - onFail: MARK_RAN
+          sqlCheck:
+            expectedResult: 0
+            sql: SELECT COUNT(*) FROM project WHERE code = 'WEB_DESIGN'
+      changes:
+        - insert:
+            tableName: project
+            columns:
+              - column: { name: code, value: WEB_DESIGN }
+              - column: { name: name_ru, value: Веб-дизайн }
+              - column: { name: name_en, value: Web Design }
+              - column: { name: name_sr, value: Veb dizajn }
