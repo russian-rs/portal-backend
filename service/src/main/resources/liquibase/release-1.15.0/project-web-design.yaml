@@ -12,6 +12,7 @@ databaseChangeLog:
             tableName: project
             columns:
               - column: { name: code, value: WEB_DESIGN }
+              - column: { name: program_code, value: DESIGN }
               - column: { name: name_ru, value: Веб-дизайн }
               - column: { name: name_en, value: Web Design }
               - column: { name: name_sr, value: Veb dizajn }
