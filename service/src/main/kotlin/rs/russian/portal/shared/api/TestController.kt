@@ -14,7 +14,7 @@ import rs.russian.portal.user.domain.enums.UserGroup.ADMIN
 @RestController
 class TestController(
     private val emailService: EmailService,
-    private val applicationContext: ApplicationContext
+    private val applicationContext: ApplicationContext,
 ) {
 
     @Authorized(allowed = [ADMIN])
@@ -43,7 +43,7 @@ class TestController(
     @PostMapping("/email/test")
     fun sendTestEmail(
         @RequestParam(name = "to", required = true) to: String,
-        @RequestBody(required = true) text: String
+        @RequestBody(required = true) text: String,
     ): String? {
         emailService.sendCommonEmail(to, subject = "Тестовое письмо", text = text)
         return "OK"

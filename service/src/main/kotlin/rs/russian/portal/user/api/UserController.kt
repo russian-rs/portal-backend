@@ -12,7 +12,7 @@ import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
 import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.service.AccountService
 import rs.russian.portal.user.service.SessionService
-import java.util.UUID
+import java.util.*
 
 @RestController
 class UserController(
@@ -115,7 +115,10 @@ class UserController(
         )
     }
 
-    override fun updateResidencePermits(id: Int, residencePermitDto: List<ResidencePermitDto>): ResponseEntity<UserInfoDto> {
+    override fun updateResidencePermits(
+        id: Int,
+        residencePermitDto: List<ResidencePermitDto>,
+    ): ResponseEntity<UserInfoDto> {
         val currentAccount = accountService.getCurrentAccount()
         if (currentAccount.id != id && !currentAccount.groups.contains(ADMIN_VOLUNTEER)) {
             throw NotAuthorizedException()

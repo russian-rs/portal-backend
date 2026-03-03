@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.29.0
+  version: 1.30.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -1333,6 +1333,11 @@ components:
           type: string
           description: Код проекта
           example: PORTAL
+        isAuto:
+          type: boolean
+          nullable: false
+          description: Автоматически сгенерированный отчет
+          example: false
         tasks:
           type: array
           default: [ ]

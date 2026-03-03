@@ -28,18 +28,18 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(NoSuchElementException::class)
     fun handleNoSuchElement(ex: NoSuchElementException, request: WebRequest): ResponseEntity<ErrorResponse> {
-        return ResponseEntity(ErrorResponse(NOT_FOUND.reasonPhrase), NOT_FOUND)
+        return ResponseEntity(ErrorResponse(ex.message ?: NOT_FOUND.reasonPhrase), NOT_FOUND)
     }
 
     @ExceptionHandler(EntityNotFoundException::class)
     fun handleEntityNotFound(ex: EntityNotFoundException, request: WebRequest): ResponseEntity<ErrorResponse> {
-        return ResponseEntity(ErrorResponse(NOT_FOUND.reasonPhrase), NOT_FOUND)
+        return ResponseEntity(ErrorResponse(ex.message ?: NOT_FOUND.reasonPhrase), NOT_FOUND)
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException::class)
     fun handleMaxUploadSizeExceededException(
         ex: MaxUploadSizeExceededException,
-        request: WebRequest
+        request: WebRequest,
     ): ResponseEntity<ErrorResponse> {
         return ResponseEntity(ErrorResponse(PAYLOAD_TOO_LARGE.reasonPhrase), PAYLOAD_TOO_LARGE)
     }
@@ -54,7 +54,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(TypeMismatchException::class)
     fun handleTypeMismatchException(
         ex: TypeMismatchException,
-        request: WebRequest
+        request: WebRequest,
     ): ResponseEntity<ErrorResponse> {
         return ResponseEntity(ErrorResponse(BAD_REQUEST.reasonPhrase), BAD_REQUEST)
     }
@@ -62,18 +62,18 @@ class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleMethodArgumentNotValidException(
         ex: MethodArgumentNotValidException,
-        request: WebRequest
+        request: WebRequest,
     ): ResponseEntity<ErrorResponse> {
         val errors = ex.bindingResult.fieldErrors
             .joinToString("; ") { "${it.field}: ${it.defaultMessage}" }
         log.warn("Validation failed on URL: {} - Errors: {}", getRequestUrl(request), errors)
-        return ResponseEntity(ErrorResponse(BAD_REQUEST.reasonPhrase), BAD_REQUEST)
+        return ResponseEntity(ErrorResponse("Bad request: $errors"), BAD_REQUEST)
     }
 
     @ExceptionHandler(ConstraintViolationException::class)
     fun handleConstraintViolationException(
         ex: ConstraintViolationException,
-        request: WebRequest
+        request: WebRequest,
     ): ResponseEntity<ErrorResponse> {
         val errors = ex.constraintViolations
             .joinToString("; ") { "${it.propertyPath}: ${it.message}" }
@@ -84,7 +84,7 @@ class GlobalExceptionHandler {
     @ExceptionHandler(InvalidRequestException::class)
     fun handleInvalidRequestException(
         ex: InvalidRequestException,
-        request: WebRequest
+        request: WebRequest,
     ): ResponseEntity<ErrorResponse> {
         return ResponseEntity(ErrorResponse(ex.message), BAD_REQUEST)
     }
@@ -107,7 +107,10 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(AsyncRequestNotUsableException::class)
-    fun handleAsyncRequestNotUsableException(ex: AsyncRequestNotUsableException, request: WebRequest): ResponseEntity<ErrorResponse>? {
+    fun handleAsyncRequestNotUsableException(
+        ex: AsyncRequestNotUsableException,
+        request: WebRequest,
+    ): ResponseEntity<ErrorResponse>? {
         val url = getRequestUrl(request)
         val rootCause = ex.cause?.message ?: ex.message
         log.warn("Async request not usable (likely broken pipe) on URL: {} - Root cause: {}", url, rootCause)
@@ -139,6 +142,7 @@ class GlobalExceptionHandler {
                 }
                 url.toString()
             }
+
             else -> request.getDescription(true)
         }
     }
