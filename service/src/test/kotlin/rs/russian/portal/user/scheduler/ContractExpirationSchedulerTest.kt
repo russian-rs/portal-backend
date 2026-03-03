@@ -1,4 +1,5 @@
 package rs.russian.portal.user.scheduler
+
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -54,7 +55,7 @@ class ContractExpirationSchedulerTest {
 
         every { accountRepository.findByLatestContractDate(reminderDate, true) } returns listOf(account)
         every { accountRepository.findByLatestContractDate(today.minusDays(1), false) } returns emptyList()
-        every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER) } returns emptyList()
+        every { accountRepository.findAllActiveByGroup(any<String>()) } returns emptyList()
         every {
             applicationRepository.existsByEmailAndTypeAndStatusNotIn(
                 account.email,
@@ -86,7 +87,7 @@ class ContractExpirationSchedulerTest {
 
         every { accountRepository.findByLatestContractDate(today.plusDays(7), true) } returns emptyList()
         every { accountRepository.findByLatestContractDate(today.minusDays(1), false) } returns listOf(account)
-        every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER) } returns listOf(admin)
+        every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns listOf(admin)
         every {
             applicationRepository.existsByEmailAndTypeAndStatusNotIn(
                 account.email,
@@ -118,8 +119,11 @@ class ContractExpirationSchedulerTest {
         val adminBody = "admin-body-2"
 
         every { accountRepository.findByLatestContractDate(today.plusDays(7), true) } returns emptyList()
-        every { accountRepository.findByLatestContractDate(today.minusDays(1), false) } returns listOf(account1, account2)
-        every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER) } returns listOf(admin)
+        every { accountRepository.findByLatestContractDate(today.minusDays(1), false) } returns listOf(
+            account1,
+            account2
+        )
+        every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns listOf(admin)
         every {
             applicationRepository.existsByEmailAndTypeAndStatusNotIn(
                 account1.email,
@@ -152,7 +156,7 @@ class ContractExpirationSchedulerTest {
 
         every { accountRepository.findByLatestContractDate(today.plusDays(7), true) } returns emptyList()
         every { accountRepository.findByLatestContractDate(today.minusDays(1), false) } returns listOf(account)
-        every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER) } returns listOf(admin)
+        every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns listOf(admin)
         every {
             applicationRepository.existsByEmailAndTypeAndStatusNotIn(
                 account.email,
