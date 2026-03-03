@@ -1,3 +1,5 @@
+package rs.russian.portal.user.scheduler
+
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
