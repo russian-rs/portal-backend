@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "rs.russian"
-version = "1.12.1"
+version = "1.16.0"
 
 repositories {
     mavenCentral()
@@ -34,6 +34,7 @@ dependencyCheck {
 dependencies {
     // API
     implementation(project(":server-api"))
+    implementation(project(":server-external-api"))
     implementation(project(":authentik-api"))
     implementation(project(":wordpress-api"))
     implementation(project(":outline-api"))
@@ -51,6 +52,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 
     // Data
     implementation("org.postgresql:postgresql")

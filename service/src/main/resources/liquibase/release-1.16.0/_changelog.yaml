@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.16.0-report-add-auto-flag
+      author: Maksim Aminov
+      changes:
+        - addColumn:
+            tableName: report
+            columns:
+              - column:
+                  name: is_auto
+                  type: boolean
+                  defaultValue: false
+                  constraints:
+                    nullable: false

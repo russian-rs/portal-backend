@@ -2,6 +2,7 @@ package rs.russian.portal.user.service
 
 import io.authentik.model.User
 import jakarta.persistence.EntityManager
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -22,11 +23,11 @@ import rs.russian.portal.user.domain.ResidencePermit
 import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.domain.specification.searchSpecification
 import rs.russian.portal.user.mapper.ContractMapper
-import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.mapper.ResidencePermitMapper
+import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.authentik.AuthentikService
-import java.util.UUID
+import java.util.*
 
 @Service
 class AccountService(
@@ -45,7 +46,8 @@ class AccountService(
     fun getAccount(id: Int): Account = accountRepository.findById(id).orElseThrow()
 
     @Transactional(readOnly = true)
-    fun getAccountByLogin(login: String): Account = accountRepository.findByUsername(login).orElseThrow()
+    fun getAccountByLogin(login: String): Account = accountRepository.findByUsername(login)
+        .orElseThrow { EntityNotFoundException("Account with login $login not found") }
 
     @Transactional(readOnly = true)
     fun findAccountByLogin(login: String?): Account? {
