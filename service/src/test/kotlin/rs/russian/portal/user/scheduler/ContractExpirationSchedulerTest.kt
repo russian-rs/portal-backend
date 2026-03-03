@@ -1,6 +1,4 @@
 package rs.russian.portal.user.scheduler
-
-import ContractExpirationScheduler
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
