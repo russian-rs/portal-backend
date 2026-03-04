@@ -107,6 +107,14 @@ components:
           nullable: false
           minLength: 10
           description: Описание задачи
+        nameSr:
+          type: string
+          nullable: true
+          minLength: 10
+        descriptionSr:
+          type: string
+          nullable: true
+          minLength: 10
         timeSpent:
           type: integer
           nullable: false
@@ -193,6 +201,14 @@ components:
           nullable: false
           minLength: 10
           description: Описание задачи
+        nameSr:
+          type: string
+          nullable: true
+          minLength: 10
+        descriptionSr:
+          type: string
+          nullable: true
+          minLength: 10
         timeSpent:
           type: integer
           nullable: false
