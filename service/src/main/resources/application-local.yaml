@@ -24,6 +24,7 @@ app:
     email-outbox: "-"
     user-sync: "-"
     contract-expiration: "-"
+  openrouter-api-key: ${OPENROUTER_API_KEY}
 
 ds:
   cf:
