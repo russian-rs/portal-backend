@@ -32,6 +32,7 @@ class ReportService(
     private val noteService: NoteService,
     private val reportRepository: ReportRepository,
     private val entityManager: EntityManager,
+    private val taskTranslationService: TaskTranslationService
 ) {
 
     @Transactional(readOnly = true)
@@ -52,6 +53,7 @@ class ReportService(
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toMutableSet())
+                taskTranslationService.translateTask(task)
             }
         }
         return reportRepository.save(report.also { it.tasks = tasks.toMutableSet() })
@@ -70,6 +72,7 @@ class ReportService(
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toSet())
+                taskTranslationService.translateTask(task)
             }
         }
         report.status = ReportStatus.CREATED

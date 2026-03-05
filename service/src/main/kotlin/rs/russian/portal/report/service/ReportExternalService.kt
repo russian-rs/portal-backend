@@ -16,6 +16,7 @@ class ReportExternalService(
     private val reportMapper: ReportMapper,
     private val accountService: AccountService,
     private val reportRepository: ReportRepository,
+    private val taskTranslationService: TaskTranslationService,
 ) {
 
     @Transactional
@@ -32,7 +33,9 @@ class ReportExternalService(
             if (createTaskRequest.date.isAfter(LocalDate.now())) {
                 throw InvalidRequestException("Task date (${createTaskRequest.date}) must be in the past")
             }
-            reportMapper.map(createTaskRequest, report)
+            reportMapper.map(createTaskRequest, report).also { task ->
+                taskTranslationService.translateTask(task)
+            }
         }
         return reportRepository.save(report.also { it.tasks = tasks.toMutableSet() })
     }

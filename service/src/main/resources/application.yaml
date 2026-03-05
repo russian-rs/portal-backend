@@ -53,7 +53,7 @@ app:
     user-sync: ${SCHEDULER_USER_SYNC_CRON:0 0 */1 * * *} # every hour
     expired-applications: ${SCHEDULER_EXPIRED_APPLICATIONS_CRON:0 0 6 */1 * *} # every day at 6 a.m.
     contract-expiration: ${SCHEDULER_CONTRACT_EXPIRATION_CRON:0 0 7 */1 * *} # every day at 7 a.m.
-  openrouter-api-key: ${OPENROUTER_API_KEY}
+  openrouter-api-key: ${OPENROUTER_API_KEY:}
 
 --- # Data
 spring:

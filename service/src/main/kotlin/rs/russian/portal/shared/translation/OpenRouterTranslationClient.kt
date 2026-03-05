@@ -19,7 +19,7 @@ class OpenRouterTranslationClient(
 
     override fun translate(sourceLang: String, targetLang: String, text: String): String {
         val apiToken = token.takeIf { it.isNotBlank() }
-            ?: throw IllegalStateException("OpenRouter API key is not configured")
+            ?: return text
 
         val requestBody = objectMapper.writeValueAsString(
             mapOf(
