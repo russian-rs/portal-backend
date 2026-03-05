@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 1.17.0-task-add-sr-fields
-      author: Maksim Aminov
+      author: Valerii Linden
       changes:
         - addColumn:
             tableName: task
