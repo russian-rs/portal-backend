@@ -59,7 +59,7 @@ interface AccountRepository : JpaRepository<Account, Int> {
     )
     fun countByGender(
         @Param("yearStart") yearStart: LocalDate,
-        @Param("yearEnd") yearEnd: LocalDate
+        @Param("yearEnd") yearEnd: LocalDate,
     ): List<GenderCountProjection>
 
     @Query(
@@ -88,7 +88,7 @@ interface AccountRepository : JpaRepository<Account, Int> {
     )
     fun countByAgeSlices(
         @Param("yearStart") yearStart: LocalDate,
-        @Param("yearEnd") yearEnd: LocalDate
+        @Param("yearEnd") yearEnd: LocalDate,
     ): AgeSliceCountProjection
 
     @Query(
@@ -113,18 +113,19 @@ interface AccountRepository : JpaRepository<Account, Int> {
     )
     fun countByStatisticGroup(
         @Param("yearStart") yearStart: LocalDate,
-        @Param("yearEnd") yearEnd: LocalDate
+        @Param("yearEnd") yearEnd: LocalDate,
     ): List<UsersStatisticGroupCountProjection>
 
     @Query(
         """
-        SELECT a
-        FROM Account a
+        SELECT *
+        FROM account a
         WHERE a.active = true
-          AND function('jsonb_contains', a.groups, :group) = true
-        """
+          AND a.groups @> jsonb_build_array(:group)
+        """,
+        nativeQuery = true
     )
-    fun findAllActiveByGroup(group: UserGroup): List<Account>
+    fun findAllActiveByGroup(@Param("group") group: String): List<Account>
 
     @EntityGraph(value = GRAPH_FULL)
     @Query(
@@ -168,7 +169,7 @@ interface AccountRepository : JpaRepository<Account, Int> {
     )
     fun findByLatestContractDate(
         @Param("date") date: LocalDate,
-        @Param("strict") strict: Boolean
+        @Param("strict") strict: Boolean,
     ): List<Account>
 
     @Query(
@@ -187,6 +188,6 @@ interface AccountRepository : JpaRepository<Account, Int> {
     )
     fun countByActiveDuringYear(
         @Param("yearStart") yearStart: LocalDate,
-        @Param("yearEnd") yearEnd: LocalDate
+        @Param("yearEnd") yearEnd: LocalDate,
     ): Long
 }

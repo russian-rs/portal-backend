@@ -1,0 +1,206 @@
+openapi: 3.0.1
+info:
+  title: volunteer-portal-external-api
+  version: 1.0.0
+  contact:
+    email: dev@russian.rs
+    url: https://russian.rs
+
+servers:
+  - url: https://REDACTED_HOST/api/ext
+    description: Test Environment
+  - url: https://portal.russian.rs/api/ext
+    description: Prod Environment
+
+paths:
+  /report:
+    post:
+      operationId: createReport
+      description: Создание отчета
+      security:
+        - bearerAuth: [ ]
+      tags:
+        - report-external
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateReportRequest"
+      responses:
+        "200":
+          description: Отчет успешно создан
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReportView"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Для авторизации используйте JWT токен (access_token), полученный от сервера аутентификации.
+        Токен передается в заголовке `Authorization: Bearer ***`.
+        Полученный токен действует ограниченное время и должен быть обновлен перед истечением срока действия.
+        
+        **Получение токена (Password Flow):**
+        - Test: `https://REDACTED_HOST/application/o/token/`
+        - Prod: `https://id.russian.rs/application/o/token/`
+        
+        **Параметры запроса (form-data/x-www-form-urlencoded):**
+        - `grant_type`: `password`
+        - `client_id`: Client id провайдера (portal)
+        - `username`: Логин service account
+        - `password`: Пароль (app password) от service account
+        - `scope`: `profile service_account`
+
+  schemas:
+    CreateReportRequest:
+      type: object
+      nullable: false
+      description: Запрос на создание отчета
+      required:
+        - user
+        - tasks
+      properties:
+        user:
+          type: string
+          nullable: false
+          description: Логин пользователя
+          example: "johndoe"
+        tasks:
+          type: array
+          default: [ ]
+          nullable: false
+          minItems: 1
+          maxItems: 10
+          description: Список задач в отчете
+          items:
+            $ref: "#/components/schemas/CreateTaskRequest"
+    CreateTaskRequest:
+      type: object
+      nullable: false
+      description: Информация о задаче
+      required:
+        - date
+        - name
+        - description
+        - timeSpent
+      properties:
+        date:
+          type: string
+          format: date
+          nullable: false
+          description: Когда задача была выполнена (YYYY-MM-DD)
+          example: "2026-02-28"
+        name:
+          type: string
+          nullable: false
+          minLength: 10
+          description: Название задачи
+          example: "Осмотр площадки"
+        description:
+          type: string
+          nullable: false
+          minLength: 10
+          description: Описание задачи
+        timeSpent:
+          type: integer
+          nullable: false
+          minimum: 60
+          maximum: 600
+          description: Время в минутах потраченное на задачу
+          example: 120
+        result:
+          type: string
+          description: Результат выполнения задачи (ссылка)
+          example: "https://example.com/result"
+    ReportView:
+      type: object
+      nullable: false
+      description: Информация об отчете
+      required:
+        - id
+        - user
+        - createTime
+        - week
+        - tasks
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+          description: Идентификатор отчета
+          example: "e9a67fd1-1dd9-4420-a752-2414281e1a25"
+        user:
+          type: string
+          nullable: false
+          description: Логин пользователя
+          example: "johndoe"
+        createTime:
+          type: string
+          format: date-time
+          nullable: false
+          description: Время создания отчета
+          example: "2026-03-03T21:35:30.842729+01:00"
+        week:
+          type: integer
+          nullable: false
+          description: Номер отчетной недели
+          example: 52
+        tasks:
+          type: array
+          default: [ ]
+          nullable: false
+          minItems: 1
+          description: Список задач в отчете
+          items:
+            $ref: "#/components/schemas/ReportTaskView"
+    ReportTaskView:
+      type: object
+      nullable: false
+      description: Информация о выполненной задаче
+      required:
+        - id
+        - date
+        - name
+        - description
+        - timeSpent
+      properties:
+        id:
+          type: string
+          format: uuid
+          nullable: false
+          description: Идентификатор задачи
+          example: "6bd2f88b-1aaa-487c-8646-e9825cbda6dd"
+        date:
+          type: string
+          format: date
+          nullable: false
+          description: Когда задача была выполнена (YYYY-MM-DD)
+          example: "2026-02-28"
+        name:
+          type: string
+          nullable: false
+          minLength: 10
+          description: Название задачи
+          example: "Осмотр площадки"
+        description:
+          type: string
+          nullable: false
+          minLength: 10
+          description: Описание задачи
+        timeSpent:
+          type: integer
+          nullable: false
+          minimum: 60
+          maximum: 600
+          description: Время в минутах потраченное на задачу
+          example: 120
+        result:
+          type: string
+          description: Результат выполнения задачи (ссылка)
+          example: "https://example.com/result"

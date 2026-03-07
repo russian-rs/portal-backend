@@ -12,11 +12,13 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter
 import org.springframework.security.oauth2.core.oidc.user.OidcUser
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
+import org.springframework.security.web.header.HeaderWriterFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository
-import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler
+import rs.russian.portal.shared.security.ServiceAccountLoggingFilter
 import rs.russian.portal.user.service.AccountService
 
 @Configuration
@@ -56,8 +58,11 @@ class SecurityConfig(
             it.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
             // Plain handler for SPA (no XOR encoding needed for header-based tokens)
             it.csrfTokenRequestHandler(CsrfTokenRequestAttributeHandler())
-            // Disable CSRF for public endpoints (they have captcha protection)
+            // Disable CSRF for public endpoints (they have captcha protection) or if it's a service request (JWT)
             it.ignoringRequestMatchers(*CSRF_DISABLED_ENDPOINTS)
+            it.ignoringRequestMatchers({ req ->
+                req.getHeader("Authorization")?.startsWith("Bearer ") ?: false
+            })
         }
         .authorizeHttpRequests {
             it
@@ -84,8 +89,12 @@ class SecurityConfig(
             }
         }
         .sessionManagement {
-            it.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+            it.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
         }
+        .oauth2ResourceServer {
+            it.jwt {}
+        }
+        .addFilterAfter(ServiceAccountLoggingFilter(), HeaderWriterFilter::class.java)
         .headers {
             it.contentSecurityPolicy { csp ->
                 csp.policyDirectives(buildCspPolicy())

@@ -1,3 +1,5 @@
+package rs.russian.portal.user.scheduler
+
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.slf4j.LoggerFactory
 import org.springframework.scheduling.annotation.Scheduled
@@ -22,7 +24,7 @@ class ContractExpirationScheduler(
     private val applicationRepository: ApplicationRepository,
     private val accountService: AccountService,
     private val emailService: EmailService,
-    private val templateEngine: TemplateEngine
+    private val templateEngine: TemplateEngine,
 ) {
 
     @Scheduled(cron = "\${app.schedulers.contract-expiration}")
@@ -75,7 +77,7 @@ class ContractExpirationScheduler(
         val cutoffDate = today.minusDays(1)
         val accounts = accountRepository.findByLatestContractDate(cutoffDate, false)
         val expired = accounts.filterNot { hasActiveProlongation(it) }
-        val admins = accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER)
+        val admins = accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name)
         var failures = 0
         expired.forEach { account ->
             try {

@@ -1,0 +1,65 @@
+plugins {
+    id("java-library")
+    id("org.openapi.generator")
+    id("org.jetbrains.kotlin.jvm")
+}
+
+def openApiPath = "$projectDir/openapi.yaml"
+
+group = "rs.russian.api"
+version = resolveApiVersion(openApiPath)
+
+repositories {
+    mavenCentral()
+}
+
+kotlin {
+    jvmToolchain(21)
+}
+
+dependencies {
+    compileOnly("jakarta.validation:jakarta.validation-api:$JAKARTA_VALIDATION_VERSION")
+    compileOnly("org.jetbrains.kotlinx:kotlinx-coroutines-core:$KOTLINX_VERSION")
+    compileOnly("org.springframework.boot:spring-boot-starter-web:$SPRING_VERSION")
+}
+
+openApiValidate {
+    inputSpec = openApiPath
+}
+
+openApiGenerate {
+    generatorName = "kotlin-spring"
+    inputSpec = openApiPath
+    outputDir = "${projectDir}/build/openapi"
+    apiPackage = "rs.russian.generated.api"
+    modelPackage = "rs.russian.generated.model"
+    configOptions = [
+            "useTags"              : "true",
+            "useSwaggerUI"         : "false",
+            "interfaceOnly"        : "true",
+            "useSpringBoot3"       : "true",
+            "serializableModel"    : "true",
+            "skipDefaultInterface" : "true",
+            "documentationProvider": "none",
+            "modelMutable"         : "true",
+            "useBeanValidation"    : "true"
+    ]
+}
+
+sourceSets {
+    main {
+        java.srcDir("build/openapi/src/main/kotlin")
+    }
+}
+
+tasks.named("openApiGenerate") {
+    dependsOn(tasks.named("openApiValidate"))
+}
+
+tasks.named("compileKotlin") {
+    dependsOn(tasks.named("openApiGenerate"))
+}
+
+tasks.named("compileJava") {
+    dependsOn(tasks.named("openApiGenerate"))
+}
