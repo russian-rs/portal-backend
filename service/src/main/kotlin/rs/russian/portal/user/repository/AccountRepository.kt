@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.Account.Companion.GRAPH_FULL
+import rs.russian.portal.user.domain.enums.DepersonalizationStatus
 import rs.russian.portal.user.domain.enums.UserGroup
 import rs.russian.portal.user.repository.projections.AgeSliceCountProjection
 import rs.russian.portal.user.repository.projections.GenderCountProjection
@@ -124,6 +125,25 @@ interface AccountRepository : JpaRepository<Account, Int> {
         """
     )
     fun findAllActiveByGroup(group: UserGroup): List<Account>
+
+    @EntityGraph(value = GRAPH_FULL)
+    @Query(
+        """
+        SELECT a
+        FROM Account a
+        WHERE a.active = false
+          AND a.depersonalizationStatus = :status
+          AND (
+              SELECT MAX(c.endDate)
+              FROM Contract c
+              WHERE c.account = a
+          ) <= :thresholdDate
+        """
+    )
+    fun findForDepersonalizationWarning(
+        @Param("thresholdDate") thresholdDate: LocalDate,
+        @Param("status") status: DepersonalizationStatus = DepersonalizationStatus.NONE,
+    ): List<Account>
 
     @EntityGraph(value = GRAPH_FULL)
     @Query(
