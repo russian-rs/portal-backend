@@ -37,7 +37,7 @@ class DepersonalizationWarningScheduler(
             return
         }
 
-        val admins = accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER)
+        val admins = accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name)
         if (admins.isEmpty()) {
             log.warn("No ADMIN_VOLUNTEER coordinators found, marking accounts as WARNED without sending emails")
         }
