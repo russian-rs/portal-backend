@@ -2,23 +2,23 @@ package rs.russian.portal.shared.ai
 
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.ai.openai.OpenAiChatOptions
-import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
+import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 
 @Component
+@Primary
+@ConditionalOnExpression(
+    "T(org.springframework.util.StringUtils).hasText('\${spring.ai.openai.api-key:}') || " +
+        "T(org.springframework.util.StringUtils).hasText('\${spring.ai.openai.chat.api-key:}')"
+)
 class SpringAiLlmClient(
-    chatClientBuilder: ChatClient.Builder,
-    @param:Value("\${spring.ai.openai.api-key:}")
-    private val apiKey: String
+    chatClientBuilder: ChatClient.Builder
 ) : LlmClient {
 
     private val chatClient = chatClientBuilder.build()
 
     override fun generateText(request: LlmGenerationRequest): String {
-        if (apiKey.isBlank()) {
-            throw IllegalStateException("LLM API key is not configured")
-        }
-
         val promptSpec = chatClient.prompt()
             .system(request.systemPrompt)
             .user(request.userPrompt)
