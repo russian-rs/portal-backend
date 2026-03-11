@@ -17,6 +17,7 @@ class SpringAiLlmClient(
 ) : LlmClient {
 
     private val chatClient = chatClientBuilder.build()
+    override fun isAvailable(): Boolean = true
 
     override fun generateText(request: LlmGenerationRequest): String {
         val promptSpec = chatClient.prompt()

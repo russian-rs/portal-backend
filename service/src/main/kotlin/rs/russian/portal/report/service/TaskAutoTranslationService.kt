@@ -15,6 +15,9 @@ class TaskAutoTranslationService(
 ) {
 
     fun localizeTask(task: Task) {
+        if (!llmClient.isAvailable()) {
+            return
+        }
         if (task.nameSr.isNullOrBlank()) {
             task.nameSr = localizeField(task.name, "name")
         }
