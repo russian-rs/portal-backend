@@ -24,7 +24,12 @@ app:
     email-outbox: "-"
     user-sync: "-"
     contract-expiration: "-"
-  openrouter-api-key: ${OPENROUTER_API_KEY:}
+
+spring:
+  ai:
+    openai:
+      api-key: ${OPENROUTER_API_KEY:}
+      base-url: ${OPENROUTER_BASE_URL:https://openrouter.ai/api}
 
 ds:
   cf:

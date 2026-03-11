@@ -1,0 +1,85 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.17.0-create-ai-profile-table
+      author: Valerii Linden
+      changes:
+        - createTable:
+            tableName: ai_profile
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: version
+                  type: TIMESTAMP
+              - column:
+                  name: code
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: system_prompt
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: target_language
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: model
+                  type: VARCHAR(255)
+              - column:
+                  name: temperature
+                  type: DOUBLE PRECISION
+              - column:
+                  name: enabled
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: ai_profile
+            columnNames: code
+            constraintName: uq_ai_profile_code
+
+  - changeSet:
+      id: 1.18.0-seed-serbian-translator-profile
+      author: Valerii Linden
+      changes:
+        - insert:
+            tableName: ai_profile
+            columns:
+              - column:
+                  name: id
+                  value: 43ef0df4-2c41-4f5a-9b03-a17217e7f5d7
+              - column:
+                  name: version
+                  valueComputed: CURRENT_TIMESTAMP
+              - column:
+                  name: code
+                  value: SERBIAN_TRANSLATOR
+              - column:
+                  name: system_prompt
+                  value: >-
+                    You are a localization assistant for task management data.
+                    Translate user text into Serbian Latin (sr-Latn).
+                    Preserve meaning, tone, names, numbers, URLs, and formatting.
+                    If text is already Serbian Latin, return it unchanged.
+                    Return only the resulting text without extra comments.
+              - column:
+                  name: target_language
+                  value: Serbian-Latin
+              - column:
+                  name: model
+                  value: google/gemini-2.5-flash
+              - column:
+                  name: temperature
+                  valueNumeric: 0.1
+              - column:
+                  name: enabled
+                  valueBoolean: true

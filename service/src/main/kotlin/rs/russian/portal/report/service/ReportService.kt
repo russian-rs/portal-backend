@@ -24,6 +24,7 @@ import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.service.AccountService
 import java.util.*
 
+
 @Service
 class ReportService(
     private val accountService: AccountService,
@@ -32,7 +33,7 @@ class ReportService(
     private val noteService: NoteService,
     private val reportRepository: ReportRepository,
     private val entityManager: EntityManager,
-    private val taskTranslationService: TaskTranslationService
+    private val taskAutoTranslationService: TaskAutoTranslationService
 ) {
 
     @Transactional(readOnly = true)
@@ -53,7 +54,7 @@ class ReportService(
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toMutableSet())
-                taskTranslationService.translateTask(task)
+                taskAutoTranslationService.localizeTask(task)
             }
         }
         return reportRepository.save(report.also { it.tasks = tasks.toMutableSet() })
@@ -72,7 +73,7 @@ class ReportService(
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toSet())
-                taskTranslationService.translateTask(task)
+                taskAutoTranslationService.localizeTask(task)
             }
         }
         report.status = ReportStatus.CREATED

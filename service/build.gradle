@@ -53,6 +53,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.ai:spring-ai-starter-model-openai")
 
     // Data
     implementation("org.postgresql:postgresql")
@@ -121,6 +122,12 @@ dependencies {
     testImplementation("io.rest-assured:json-path:5.5.7")
     testImplementation("io.zonky.test:embedded-database-spring-test:2.7.1")
     testImplementation("io.zonky.test:embedded-postgres:2.2.0")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.ai:spring-ai-bom:1.0.3")
+    }
 }
 
 kotlin {
