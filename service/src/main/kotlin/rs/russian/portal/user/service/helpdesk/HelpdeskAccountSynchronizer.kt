@@ -30,9 +30,8 @@ class HelpdeskAccountSynchronizer(
                 return
             }
             helpdeskApiClient.deleteUser(helpdeskUser.id!!)
-            log.info("Successfully delete HelpDesk user $accountEmail")
         } catch (e: Throwable) {
-            log.error("Error deleting account $accountEmail from HelpDesk", e)
+            log.error("Error deleting account $accountEmail from HelpDesk: {}", e.message, e)
         }
     }
 
@@ -67,12 +66,12 @@ class HelpdeskAccountSynchronizer(
                 helpdeskApiClient.createUser(helpdeskUserDto)
             }
         } catch (e: Throwable) {
-            log.error("Failed to sync account to HelpDesk $email", e)
+            log.error("Failed to sync account to HelpDesk $email: {}", e.message, e)
         }
     }
 
     companion object {
-        private val DEFAULT_ROLE = "default"
+        private const val DEFAULT_ROLE = "default"
         private val log = LoggerFactory.getLogger(this::class.java)
     }
 

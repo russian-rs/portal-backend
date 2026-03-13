@@ -18,7 +18,7 @@ import java.time.LocalDateTime
 @Component
 class ExpiredApplicationsScheduler(
     private val applicationService: ApplicationService,
-    private val applicationRepository: ApplicationRepository
+    private val applicationRepository: ApplicationRepository,
 ) {
 
     @Scheduled(cron = "\${app.schedulers.expired-applications}")
@@ -26,11 +26,14 @@ class ExpiredApplicationsScheduler(
     fun run() {
         log.info("[SCHEDULER] Denying expired applications")
         val spec: Specification<Application> =
-            less<Application, LocalDateTime>(Application_.VERSION, LocalDateTime.now().minusMonths(1))
+            less<Application, LocalDateTime>(Application_.VERSION, LocalDateTime.now().minusDays(45))
                 .and(notContains(Application_.STATUS, listOf(DONE, DENY, PAUSED)))
         val applications = applicationRepository.findAll(spec, Pageable.unpaged())
         applications.forEach {
-            applicationService.save(it.also { it.status = DENY })
+            applicationService.save(it.also {
+                it.status = DENY
+                it.refuseReason = "Application expired"
+            })
         }
         log.info("[SCHEDULER] Denied {} applications", applications.size)
     }
