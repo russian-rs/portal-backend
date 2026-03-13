@@ -15,6 +15,8 @@ plugins {
 group = "rs.russian"
 version = "1.16.0"
 
+ext['commons-lang3.version'] = '3.18.0'
+
 repositories {
     mavenCentral()
 }
@@ -103,7 +105,7 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.20.1")
 
     // Logging
-    implementation("ch.qos.logback:logback-classic:1.5.13")
+    implementation("ch.qos.logback:logback-classic")
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
     implementation("com.squareup.okhttp3:logging-interceptor:$OKHTTP_VERSION")
 
