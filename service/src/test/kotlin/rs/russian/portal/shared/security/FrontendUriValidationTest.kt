@@ -20,7 +20,7 @@ class FrontendUriValidationTest {
         "http://127.0.0.1:*",
         "https://russian.rs",
         "https://portal.russian.rs",
-        "https://portal-test.russian.rs",
+        "https://portal-ok.russian.rs",
         "https://api.portal.russian.rs",
     ])
     fun `should accept valid URLs`(url: String) {
