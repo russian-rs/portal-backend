@@ -7,7 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import rs.russian.portal.report.repository.ReportRepository
 import rs.russian.portal.testconfig.AbstractIntegrationTest
 import rs.russian.portal.user.domain.Account
+import rs.russian.portal.user.domain.Contract
+import rs.russian.portal.user.domain.enums.DepersonalizationStatus
 import rs.russian.portal.user.domain.enums.UserGroup
+import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -143,5 +146,164 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
 
         // Then
         assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `findForDepersonalizationWarning should return inactive accounts with contract end before threshold`() {
+        // Given
+        val thresholdDate = LocalDate.of(2021, 5, 1)
+        val account = Account(
+            id = 10401,
+            username = "depers_warn_unique",
+            email = "depers_unique@example.com",
+            fullName = "Depers User",
+            active = false,
+            depersonalizationStatus = DepersonalizationStatus.NONE,
+        )
+        val contract = Contract(
+            account = account,
+            startDate = LocalDate.of(2019, 1, 1),
+            endDate = LocalDate.of(2021, 4, 30),
+        )
+        account.contracts.add(contract)
+        accountRepository.save(account)
+        accountRepository.flush()
+
+        // When
+        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
+            .filter { it.username.endsWith("_unique") }
+
+        // Then
+        assertEquals(1, result.size)
+        assertEquals("depers_warn_unique", result[0].username)
+    }
+
+    @Test
+    fun `findForDepersonalizationWarning should not return active accounts`() {
+        // Given
+        val thresholdDate = LocalDate.of(2021, 5, 1)
+        val account = Account(
+            id = 10501,
+            username = "active_depers_unique",
+            email = "active_depers_unique@example.com",
+            fullName = "Active Depers User",
+            active = true,
+            depersonalizationStatus = DepersonalizationStatus.NONE,
+        )
+        val contract = Contract(
+            account = account,
+            startDate = LocalDate.of(2019, 1, 1),
+            endDate = LocalDate.of(2021, 4, 30),
+        )
+        account.contracts.add(contract)
+        accountRepository.save(account)
+        accountRepository.flush()
+
+        // When
+        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
+            .filter { it.username.endsWith("_unique") }
+
+        // Then
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `findForDepersonalizationWarning should not return already warned accounts`() {
+        // Given
+        val thresholdDate = LocalDate.of(2021, 5, 1)
+        val account = Account(
+            id = 10601,
+            username = "warned_depers_unique",
+            email = "warned_depers_unique@example.com",
+            fullName = "Warned User",
+            active = false,
+            depersonalizationStatus = DepersonalizationStatus.WARNED,
+        )
+        val contract = Contract(
+            account = account,
+            startDate = LocalDate.of(2019, 1, 1),
+            endDate = LocalDate.of(2021, 4, 30),
+        )
+        account.contracts.add(contract)
+        accountRepository.save(account)
+        accountRepository.flush()
+
+        // When
+        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
+            .filter { it.username.endsWith("_unique") }
+
+        // Then
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `findForDepersonalizationWarning should not return accounts with contract end after threshold`() {
+        // Given
+        val thresholdDate = LocalDate.of(2021, 5, 1)
+        val account = Account(
+            id = 10701,
+            username = "future_depers_unique",
+            email = "future_depers_unique@example.com",
+            fullName = "Future User",
+            active = false,
+            depersonalizationStatus = DepersonalizationStatus.NONE,
+        )
+        val contract = Contract(
+            account = account,
+            startDate = LocalDate.of(2019, 1, 1),
+            endDate = LocalDate.of(2021, 5, 2),
+        )
+        account.contracts.add(contract)
+        accountRepository.save(account)
+        accountRepository.flush()
+
+        // When
+        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
+            .filter { it.username.endsWith("_unique") }
+
+        // Then
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `findForDepersonalizationWarning should use max contract end date when multiple contracts exist`() {
+        // Given
+        val thresholdDate = LocalDate.of(2022, 6, 1)
+        val account = Account(
+            id = 10801,
+            username = "multi_contract_unique",
+            email = "multi_contract_unique@example.com",
+            fullName = "Multi Contract User",
+            active = false,
+            depersonalizationStatus = DepersonalizationStatus.NONE,
+        )
+        val oldContract = Contract(
+            account = account,
+            startDate = LocalDate.of(2019, 1, 1),
+            endDate = LocalDate.of(2020, 1, 1),
+        )
+        val recentContract = Contract(
+            account = account,
+            startDate = LocalDate.of(2021, 1, 1),
+            endDate = LocalDate.of(2022, 7, 1),
+        )
+        account.contracts.addAll(listOf(oldContract, recentContract))
+        accountRepository.save(account)
+        accountRepository.flush()
+
+        // When — threshold is before the latest contract end, so should NOT match
+        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
+            .filter { it.username.endsWith("_unique") }
+
+        // Then
+        assertTrue(result.isEmpty())
+
+        // When — threshold after the latest contract end, should match
+        val resultAfter = accountRepository.findForDepersonalizationWarning(LocalDate.of(2022, 7, 2))
+            .filter { it.username.endsWith("_unique") }
+
+        // Then
+        assertEquals(1, resultAfter.size)
+        assertEquals("multi_contract_unique", resultAfter[0].username)
     }
 }
