@@ -39,7 +39,7 @@ class OutlineAccountSynchronizer(
 
             log.info("Outline was synced successfully (${accounts.size} accounts, ${sourceGroups.size} groups)")
         } catch (e: Exception) {
-            log.error("Error during Outline sync", e)
+            log.error("Error during Outline sync: {}", e.message, e)
         }
     }
 
@@ -114,10 +114,8 @@ class OutlineAccountSynchronizer(
                 return
             }
             outlineApiClient.usersSuspend(outlineUser.id!!)
-
-            log.info("Successfully suspended Outline user $accountEmail")
         } catch (e: Exception) {
-            log.error("Error suspending Outline user $accountEmail", e)
+            log.error("Error suspending Outline user $accountEmail: {}", e.message, e)
         }
     }
 

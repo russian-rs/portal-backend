@@ -1331,6 +1331,11 @@ components:
           type: string
           description: Код проекта
           example: PORTAL
+        isAuto:
+          type: boolean
+          nullable: false
+          description: Автоматически сгенерированный отчет
+          example: false
         tasks:
           type: array
           default: [ ]

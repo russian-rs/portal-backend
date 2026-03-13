@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.14.0-fix-kulturna-dobra-statistic-group
+      author: Valerii Linden
+      changes:
+        - sql:
+            splitStatements: false
+            sql: |
+              INSERT INTO statistic_group (code, name_ru, name_en, name_sr)
+              SELECT
+                'KULTURNA_DOBRA',
+                'Культурные ценности',
+                'Cultural assets',
+                'Kulturna dobra'
+              WHERE EXISTS (
+                SELECT 1
+                FROM statistic_group
+                WHERE code = 'KULTURNA_DOBA'
+              )
+                AND NOT EXISTS (
+                  SELECT 1
+                  FROM statistic_group
+                  WHERE code = 'KULTURNA_DOBRA'
+                );
+
+              UPDATE project_statistic_group
+              SET statistic_group_code = 'KULTURNA_DOBRA'
+              WHERE statistic_group_code = 'KULTURNA_DOBA';
+
+              UPDATE statistic_group
+              SET
+                name_ru = 'Культурные ценности',
+                name_en = 'Cultural assets',
+                name_sr = 'Kulturna dobra'
+              WHERE code = 'KULTURNA_DOBRA';
+
+              DELETE FROM statistic_group
+              WHERE code = 'KULTURNA_DOBA';

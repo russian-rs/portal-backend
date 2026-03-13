@@ -1,5 +1,6 @@
 package rs.russian.portal.config
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import org.slf4j.LoggerFactory
@@ -20,10 +21,11 @@ import java.util.concurrent.ConcurrentHashMap
 private val log = LoggerFactory.getLogger(WpApiConfig::class.java)
 
 @Configuration
-open class WpApiConfig(
+class WpApiConfig(
     private val wpProps: WordpressProperties,
     private val tokenWordpressApis: Map<String, TokenWordpressApi>,
     private val env: Environment,
+    private val objectMapper: ObjectMapper,
 ) {
     private val tokens: MutableMap<String, String?> =
         if (env.activeProfiles.any { "local".equals(it, ignoreCase = true) }) {
@@ -54,13 +56,14 @@ open class WpApiConfig(
             instance.name to WordpressUserServiceImpl(
                 instanceName = instance.name,
                 apiClient = userWordpressApi,
-                customWpApi = customWordpressApi
+                customWpApi = customWordpressApi,
+                objectMapper = objectMapper
             )
         }
 
     @Bean
     @Profile("!local")
-    open fun wordpressUserServices(): Map<String, WordpressUserService> = wpUserServices
+    fun wordpressUserServices(): Map<String, WordpressUserService> = wpUserServices
 
     private fun createWordpressApiClient(instance: WordpressInstance): OkHttpClient {
         val authInterceptor = Interceptor { chain ->

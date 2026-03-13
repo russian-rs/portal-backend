@@ -70,9 +70,11 @@ class Report(
     @OneToMany(mappedBy = "entityId", cascade = [ALL], orphanRemoval = true)
     var notes: MutableSet<Note> = mutableSetOf(),
 
-    var deleted: Boolean = false
+    var isAuto: Boolean = false,
 
-) : JpaEntity<UUID>() {
+    var deleted: Boolean = false,
+
+    ) : JpaEntity<UUID>() {
 
     override fun equalityProperties() = setOf(Report::id, Report::status, Report::deleted)
 

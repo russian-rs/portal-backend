@@ -20,6 +20,10 @@ spring:
       hibernate:
         format_sql: true
 
-
-
-
+---
+zonky:
+  test:
+    database:
+      postgres:
+        docker:
+          image: postgres:16-alpine
