@@ -1371,6 +1371,12 @@ components:
           type: string
         description:
           type: string
+        nameSr:
+          type: string
+          nullable: true
+        descriptionSr:
+            type: string
+            nullable: true
         customer:
           type: string
           description: Login of customer
