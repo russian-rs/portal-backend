@@ -2,21 +2,15 @@ package rs.russian.portal.shared.ai
 
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.ai.openai.OpenAiChatOptions
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression
 import org.springframework.context.annotation.Primary
 import org.springframework.stereotype.Component
 
 @Component
 @Primary
-@ConditionalOnExpression(
-    "T(org.springframework.util.StringUtils).hasText('\${spring.ai.openai.api-key:}') || " +
-        "T(org.springframework.util.StringUtils).hasText('\${spring.ai.openai.chat.api-key:}')"
-)
 class SpringAiLlmClient(
-    chatClientBuilder: ChatClient.Builder
+    private val chatClient: ChatClient
 ) : LlmClient {
 
-    private val chatClient = chatClientBuilder.build()
     override fun isAvailable(): Boolean = true
 
     override fun generateText(request: LlmGenerationRequest): String {

@@ -19,6 +19,8 @@ import rs.russian.portal.report.domain.enums.ReportStatus
 import rs.russian.portal.report.domain.specification.from
 import rs.russian.portal.report.mapper.ReportMapper
 import rs.russian.portal.report.repository.ReportRepository
+import rs.russian.portal.shared.ai.domain.AiProfileCode
+import rs.russian.portal.shared.ai.service.TextTranslationService
 import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.service.AccountService
@@ -33,7 +35,7 @@ class ReportService(
     private val noteService: NoteService,
     private val reportRepository: ReportRepository,
     private val entityManager: EntityManager,
-    private val taskAutoTranslationService: TaskAutoTranslationService
+    private val textTranslationService: TextTranslationService
 ) {
 
     @Transactional(readOnly = true)
@@ -54,7 +56,15 @@ class ReportService(
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toMutableSet())
-                taskAutoTranslationService.localizeTask(task)
+                if (task.nameSr.isNullOrBlank()) {
+                    task.nameSr = textTranslationService.translate(task.name, AiProfileCode.SERBIAN_TRANSLATOR)
+                }
+                if (task.descriptionSr.isNullOrBlank()) {
+                    task.descriptionSr = textTranslationService.translate(
+                        task.description,
+                        AiProfileCode.SERBIAN_TRANSLATOR
+                    )
+                }
             }
         }
         return reportRepository.save(report.also { it.tasks = tasks.toMutableSet() })
@@ -73,7 +83,15 @@ class ReportService(
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toSet())
-                taskAutoTranslationService.localizeTask(task)
+                if (task.nameSr.isNullOrBlank()) {
+                    task.nameSr = textTranslationService.translate(task.name, AiProfileCode.SERBIAN_TRANSLATOR)
+                }
+                if (task.descriptionSr.isNullOrBlank()) {
+                    task.descriptionSr = textTranslationService.translate(
+                        task.description,
+                        AiProfileCode.SERBIAN_TRANSLATOR
+                    )
+                }
             }
         }
         report.status = ReportStatus.CREATED

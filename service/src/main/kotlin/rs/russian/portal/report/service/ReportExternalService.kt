@@ -7,6 +7,8 @@ import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.enums.ReportStatus
 import rs.russian.portal.report.mapper.ReportMapper
 import rs.russian.portal.report.repository.ReportRepository
+import rs.russian.portal.shared.ai.domain.AiProfileCode
+import rs.russian.portal.shared.ai.service.TextTranslationService
 import rs.russian.portal.shared.exception.InvalidRequestException
 import rs.russian.portal.user.service.AccountService
 import java.time.LocalDate
@@ -16,7 +18,7 @@ class ReportExternalService(
     private val reportMapper: ReportMapper,
     private val accountService: AccountService,
     private val reportRepository: ReportRepository,
-    private val taskAutoTranslationService: TaskAutoTranslationService,
+    private val textTranslationService: TextTranslationService,
 ) {
 
     @Transactional
@@ -34,7 +36,15 @@ class ReportExternalService(
                 throw InvalidRequestException("Task date (${createTaskRequest.date}) must be in the past")
             }
             reportMapper.map(createTaskRequest, report).also { task ->
-                taskAutoTranslationService.localizeTask(task)
+                if (task.nameSr.isNullOrBlank()) {
+                    task.nameSr = textTranslationService.translate(task.name, AiProfileCode.SERBIAN_TRANSLATOR)
+                }
+                if (task.descriptionSr.isNullOrBlank()) {
+                    task.descriptionSr = textTranslationService.translate(
+                        task.description,
+                        AiProfileCode.SERBIAN_TRANSLATOR
+                    )
+                }
             }
         }
         return reportRepository.save(report.also { it.tasks = tasks.toMutableSet() })
