@@ -7,7 +7,7 @@ import rs.russian.portal.report.domain.Report
 import rs.russian.portal.report.domain.enums.ReportStatus
 import rs.russian.portal.report.mapper.ReportMapper
 import rs.russian.portal.report.repository.ReportRepository
-import rs.russian.portal.shared.ai.domain.AiProfileCode
+import rs.russian.portal.shared.ai.domain.AiProfileCode.SERBIAN_TRANSLATOR
 import rs.russian.portal.shared.ai.service.TextTranslationService
 import rs.russian.portal.shared.exception.InvalidRequestException
 import rs.russian.portal.user.service.AccountService
@@ -37,13 +37,10 @@ class ReportExternalService(
             }
             reportMapper.map(createTaskRequest, report).also { task ->
                 if (task.nameSr.isNullOrBlank()) {
-                    task.nameSr = textTranslationService.translate(task.name, AiProfileCode.SERBIAN_TRANSLATOR)
+                    task.nameSr = textTranslationService.translate(task.name, SERBIAN_TRANSLATOR)
                 }
                 if (task.descriptionSr.isNullOrBlank()) {
-                    task.descriptionSr = textTranslationService.translate(
-                        task.description,
-                        AiProfileCode.SERBIAN_TRANSLATOR
-                    )
+                    task.descriptionSr = textTranslationService.translate(task.description, SERBIAN_TRANSLATOR)
                 }
             }
         }

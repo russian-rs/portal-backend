@@ -3,10 +3,8 @@ package rs.russian.portal.config
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Profile
 
 @Configuration
-@Profile("!test")
 class AiClientConfiguration {
 
     @Bean

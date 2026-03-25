@@ -19,7 +19,7 @@ import rs.russian.portal.report.domain.enums.ReportStatus
 import rs.russian.portal.report.domain.specification.from
 import rs.russian.portal.report.mapper.ReportMapper
 import rs.russian.portal.report.repository.ReportRepository
-import rs.russian.portal.shared.ai.domain.AiProfileCode
+import rs.russian.portal.shared.ai.domain.AiProfileCode.SERBIAN_TRANSLATOR
 import rs.russian.portal.shared.ai.service.TextTranslationService
 import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.security.currentUserLogin
@@ -57,13 +57,10 @@ class ReportService(
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toMutableSet())
                 if (task.nameSr.isNullOrBlank()) {
-                    task.nameSr = textTranslationService.translate(task.name, AiProfileCode.SERBIAN_TRANSLATOR)
+                    task.nameSr = textTranslationService.translate(task.name, SERBIAN_TRANSLATOR)
                 }
                 if (task.descriptionSr.isNullOrBlank()) {
-                    task.descriptionSr = textTranslationService.translate(
-                        task.description,
-                        AiProfileCode.SERBIAN_TRANSLATOR
-                    )
+                    task.descriptionSr = textTranslationService.translate(task.description, SERBIAN_TRANSLATOR)
                 }
             }
         }
@@ -84,13 +81,10 @@ class ReportService(
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toSet())
                 if (task.nameSr.isNullOrBlank()) {
-                    task.nameSr = textTranslationService.translate(task.name, AiProfileCode.SERBIAN_TRANSLATOR)
+                    task.nameSr = textTranslationService.translate(task.name, SERBIAN_TRANSLATOR)
                 }
                 if (task.descriptionSr.isNullOrBlank()) {
-                    task.descriptionSr = textTranslationService.translate(
-                        task.description,
-                        AiProfileCode.SERBIAN_TRANSLATOR
-                    )
+                    task.descriptionSr = textTranslationService.translate(task.description, SERBIAN_TRANSLATOR)
                 }
             }
         }
