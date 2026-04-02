@@ -168,8 +168,8 @@ class DepersonalizationWarningSchedulerTest {
     }
 
     companion object {
-        private val WARNING_PERIOD: Period = Period.of(4, 10, 0)
-        private val TOTAL_PERIOD: Period = Period.ofYears(5)
+        private val WARNING_PERIOD: Period = Period.of(2, 10, 0)
+        private val TOTAL_PERIOD: Period = Period.ofYears(3)
         private const val SUBJECT = "Предстоящая деперсонализация данных волонтера"
     }
 }

@@ -20,9 +20,9 @@ class DepersonalizationWarningScheduler(
     private val accountRepository: AccountRepository,
     private val emailService: EmailService,
     private val templateEngine: TemplateEngine,
-    @Value("\${app.depersonalization.warning-period:P4Y10M}")
+    @Value("\${app.depersonalization.warning-period:P2Y10M}")
     private val warningPeriod: Period,
-    @Value("\${app.depersonalization.total-period:P5Y}")
+    @Value("\${app.depersonalization.total-period:P3Y}")
     private val totalPeriod: Period,
 ) {
 
