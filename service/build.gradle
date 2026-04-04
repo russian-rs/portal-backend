@@ -16,6 +16,7 @@ group = "rs.russian"
 version = "1.16.0"
 
 ext['commons-lang3.version'] = '3.18.0'
+ext['netty.version'] = '4.1.132.Final'
 
 repositories {
     mavenCentral()
@@ -128,7 +129,7 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.ai:spring-ai-bom:1.0.3")
+        mavenBom("org.springframework.ai:spring-ai-bom:1.0.5")
     }
 }
 
