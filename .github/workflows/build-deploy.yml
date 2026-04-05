@@ -11,6 +11,9 @@ env:
 jobs:
   Build:
     runs-on: ubuntu-latest
+    env:
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      SPRING_AI_MODEL_CHAT: openai
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
