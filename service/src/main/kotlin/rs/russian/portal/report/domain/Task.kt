@@ -23,6 +23,10 @@ class Task(
     var date: LocalDate,
     var name: String,
     var description: String,
+    @Column(name = "name_sr")
+    var nameSr: String? = null,
+    @Column(name = "description_sr")
+    var descriptionSr: String? = null,
     var timeSpent: Int,
     var result: String? = null,
 

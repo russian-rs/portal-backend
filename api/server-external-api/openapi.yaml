@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-external-api
-  version: 1.0.0
+  version: 1.0.1
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -107,6 +107,14 @@ components:
           nullable: false
           minLength: 10
           description: Описание задачи
+        nameSr:
+          type: string
+          nullable: true
+          minLength: 10
+        descriptionSr:
+          type: string
+          nullable: true
+          minLength: 10
         timeSpent:
           type: integer
           nullable: false
@@ -193,6 +201,14 @@ components:
           nullable: false
           minLength: 10
           description: Описание задачи
+        nameSr:
+          type: string
+          nullable: true
+          minLength: 10
+        descriptionSr:
+          type: string
+          nullable: true
+          minLength: 10
         timeSpent:
           type: integer
           nullable: false

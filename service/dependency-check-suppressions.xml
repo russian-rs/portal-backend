@@ -10,4 +10,9 @@
         <packageUrl regex="true">^pkg:maven/com\.ibm\.icu/icu4j@.*$</packageUrl>
         <cpe>cpe:/a:unicode:international_components_for_unicode</cpe>
     </suppress>
+    <suppress>
+        <notes>False positive - CVE-2025-68161 affects log4j-core SslSocketManager, not log4j-api. This project uses logback via SLF4J and does not include log4j-core.</notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j\-api@.*$</packageUrl>
+        <cve>CVE-2025-68161</cve>
+    </suppress>
 </suppressions>

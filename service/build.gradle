@@ -15,6 +15,9 @@ plugins {
 group = "rs.russian"
 version = "1.16.0"
 
+ext['commons-lang3.version'] = '3.18.0'
+ext['netty.version'] = '4.1.132.Final'
+
 repositories {
     mavenCentral()
 }
@@ -53,6 +56,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
+    implementation("org.springframework.ai:spring-ai-starter-model-openai")
 
     // Data
     implementation("org.postgresql:postgresql")
@@ -103,7 +107,7 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-csv:2.20.1")
 
     // Logging
-    implementation("ch.qos.logback:logback-classic:1.5.13")
+    implementation("ch.qos.logback:logback-classic")
     implementation("net.logstash.logback:logstash-logback-encoder:8.0")
     implementation("com.squareup.okhttp3:logging-interceptor:$OKHTTP_VERSION")
 
@@ -121,6 +125,12 @@ dependencies {
     testImplementation("io.rest-assured:json-path:5.5.7")
     testImplementation("io.zonky.test:embedded-database-spring-test:2.7.1")
     testImplementation("io.zonky.test:embedded-postgres:2.2.0")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom("org.springframework.ai:spring-ai-bom:1.0.5")
+    }
 }
 
 kotlin {

@@ -1,12 +1,14 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.31.0
+  version: 1.32.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
 
 servers:
+  - url: https://REDACTED_HOST/api
+    description: Test Environment
   - url: https://portal.russian.rs/api
     description: Prod Environment
 
@@ -986,6 +988,25 @@ paths:
         "200":
           description: CSRF token cookie set successfully
 
+  /translate/serbian:
+    post:
+      operationId: translateToSerbian
+      tags:
+        - translate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TextTranslationRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TextTranslationResponse"
+
 components:
   responses:
     ServerError:
@@ -1127,6 +1148,24 @@ components:
           type: string
           description: Описание ошибки
           nullable: false
+    TextTranslationRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          nullable: false
+          description: Source text to translate into Serbian
+    TextTranslationResponse:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          nullable: false
+          description: Translated Serbian text
     GenderEnumDto:
       type: string
       enum:
@@ -1369,6 +1408,12 @@ components:
           type: string
         description:
           type: string
+        nameSr:
+          type: string
+          nullable: true
+        descriptionSr:
+            type: string
+            nullable: true
         customer:
           type: string
           description: Login of customer
