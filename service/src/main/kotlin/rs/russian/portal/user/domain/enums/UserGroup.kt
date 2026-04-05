@@ -13,6 +13,7 @@ enum class UserGroup(val oauthGroup: String) {
     GUIDES("um_guidesman"),
     INSIDE_VOLUNTEER("um_inside_volounteer"),
     MAIN_VOLUNTEER("um_main_volounteer"),
+    PLAYGROUNDS_VOLUNTEER("playgrounds_volunteer"),
     LAWYERS("um_lawyers"),
     MEDIA("um_media"),
     INSTRUCTOR("stm_lms_instructor"),
