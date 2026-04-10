@@ -76,14 +76,16 @@ class ReportService(
     @Transactional
     fun updateReport(reportDto: ReportDto): Report {
         val report = getReport(reportDto.id)
+        val existingTasksById = report.tasks.associateBy { it.id }
         val tasks = reportDto.tasks.map { taskDto ->
+            val existingTask = taskDto.id?.let(existingTasksById::get)
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toSet())
-                if (task.nameSr.isNullOrBlank()) {
+                if (task.nameSr.isNullOrBlank() || existingTask?.name != task.name) {
                     task.nameSr = textTranslationService.translate(task.name, SERBIAN_TRANSLATOR)
                 }
-                if (task.descriptionSr.isNullOrBlank()) {
+                if (task.descriptionSr.isNullOrBlank() || existingTask?.description != task.description) {
                     task.descriptionSr = textTranslationService.translate(task.description, SERBIAN_TRANSLATOR)
                 }
             }
