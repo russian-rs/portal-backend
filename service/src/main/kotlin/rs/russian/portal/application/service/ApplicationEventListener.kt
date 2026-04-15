@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.transaction.event.TransactionalEventListener
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
+import rs.russian.portal.application.domain.Application
 import rs.russian.generated.model.ContractDto
 import rs.russian.portal.application.domain.ApplicationStatus
 import rs.russian.portal.application.domain.ApplicationType
@@ -62,6 +63,7 @@ class ApplicationEventListener(
                         )
                     )
                     accountService.updateInfo(account.id!!, applicationMapper.mapToInfo(application, account))
+                    updateProgramAndProject(application, account.id!!)
                 }
             }
             if (application.type == ApplicationType.PROLONGATION) {
@@ -77,7 +79,18 @@ class ApplicationEventListener(
                     )
                 )
                 accountService.updateContracts(account.id!!, contracts)
+                updateProgramAndProject(application, account.id!!)
             }
+        }
+    }
+
+    private fun updateProgramAndProject(
+        application: Application,
+        accountId: Int
+    ) {
+        when {
+            application.project != null -> accountService.setProject(accountId, application.project!!.code)
+            application.program != null -> accountService.setProgram(accountId, application.program!!.code)
         }
     }
 }

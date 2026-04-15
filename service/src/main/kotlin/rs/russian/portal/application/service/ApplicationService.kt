@@ -57,6 +57,7 @@ class ApplicationService(
         }
         val application = Application(email = email, name = name)
         applicationMapper.toEntity(request, application)
+        normalizeProgramAndProject(application)
         val existUser = accountService.findAccountByEmail(email)
         if (existUser != null) {
             application.type = ApplicationType.PROLONGATION
@@ -84,6 +85,7 @@ class ApplicationService(
     fun update(applicationDto: ApplicationDto): Application {
         val application = get(applicationDto.id)
         applicationMapper.update(applicationDto, application)
+        normalizeProgramAndProject(application)
         if (application.status == DONE && application.contractFrom == null) {
             throw InvalidRequestException("Contract dates not specified")
         }
@@ -124,5 +126,16 @@ class ApplicationService(
         applications.forEach { account -> entityManager.detach(account) }
         val applicationsFull = applicationRepository.findAllByIdIn(applications.mapNotNull { it.id }, pageable.sort)
         return PageImpl(applicationsFull, applications.pageable, applications.totalElements)
+    }
+
+    private fun normalizeProgramAndProject(application: Application) {
+        val projectProgram = application.project?.program
+        if (application.project != null) {
+            if (application.program == null) {
+                application.program = projectProgram
+            } else if (application.program?.code != projectProgram?.code) {
+                throw InvalidRequestException("Project does not belong to program")
+            }
+        }
     }
 }

@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.18.0-application-add-program-project-fields
+      author: Codex
+      changes:
+        - addColumn:
+            tableName: application
+            columns:
+              - column:
+                  name: program_code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true
+              - column:
+                  name: project_code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: true
+        - addForeignKeyConstraint:
+            baseTableName: application
+            baseColumnNames: program_code
+            referencedTableName: program
+            referencedColumnNames: code
+            constraintName: fk_application_program
+        - addForeignKeyConstraint:
+            baseTableName: application
+            baseColumnNames: project_code
+            referencedTableName: project
+            referencedColumnNames: code
+            constraintName: fk_application_project
+      rollback:
+        - dropForeignKeyConstraint:
+            baseTableName: application
+            constraintName: fk_application_project
+        - dropForeignKeyConstraint:
+            baseTableName: application
+            constraintName: fk_application_program
+        - dropColumn:
+            tableName: application
+            columnName: project_code
+        - dropColumn:
+            tableName: application
+            columnName: program_code

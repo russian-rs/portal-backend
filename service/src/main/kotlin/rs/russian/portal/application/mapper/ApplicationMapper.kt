@@ -12,6 +12,10 @@ import rs.russian.generated.model.ContractDto
 import rs.russian.portal.application.domain.Application
 import rs.russian.portal.application.domain.ApplicationStatus
 import rs.russian.portal.note.mapper.NoteMapper
+import rs.russian.portal.program.domain.Program
+import rs.russian.portal.program.domain.Project
+import rs.russian.portal.program.repository.ProgramRepository
+import rs.russian.portal.program.repository.ProjectRepository
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.UserInfo
 import java.time.LocalDateTime
@@ -28,6 +32,12 @@ abstract class ApplicationMapper {
     @Autowired
     private lateinit var noteMapper: NoteMapper
 
+    @Autowired
+    private lateinit var programRepository: ProgramRepository
+
+    @Autowired
+    private lateinit var projectRepository: ProjectRepository
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "status", ignore = true)
@@ -38,6 +48,8 @@ abstract class ApplicationMapper {
     @Mapping(target = "contractFrom", source = "contract.startDate")
     @Mapping(target = "contractUntil", source = "contract.endDate")
     @Mapping(target = "contractType", source = "contract.type")
+    @Mapping(target = "program", source = "program", qualifiedByName = ["programByCode"])
+    @Mapping(target = "project", source = "project", qualifiedByName = ["projectByCode"])
     abstract fun toEntity(applicationDto: ApplicationDto, @MappingTarget application: Application)
 
     @Mapping(target = "id", ignore = true)
@@ -48,9 +60,13 @@ abstract class ApplicationMapper {
     @Mapping(target = "contractFrom", source = "contract.startDate")
     @Mapping(target = "contractUntil", source = "contract.endDate")
     @Mapping(target = "contractType", source = "contract.type")
+    @Mapping(target = "program", source = "program", qualifiedByName = ["programByCode"])
+    @Mapping(target = "project", source = "project", qualifiedByName = ["projectByCode"])
     abstract fun update(applicationDto: ApplicationDto, @MappingTarget application: Application)
 
     @Mapping(target = "contract", source = "application", qualifiedByName = ["contract"])
+    @Mapping(target = "program", source = "program.code")
+    @Mapping(target = "project", source = "project.code")
     abstract fun toDto(application: Application): ApplicationDto
 
     @Mapping(target = "progress", source = "status")
@@ -63,8 +79,8 @@ abstract class ApplicationMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "city", source = "application.city")
     @Mapping(target = "postalCode", source = "application.postalCode")
-    @Mapping(target = "program", ignore = true)
-    @Mapping(target = "project", ignore = true)
+    @Mapping(target = "program", source = "application", qualifiedByName = ["programForUserInfo"])
+    @Mapping(target = "project", source = "application.project")
     @Mapping(target = "gender", source = "application.gender")
     @Mapping(target = "avatar", ignore = true)
     abstract fun mapToInfo(application: Application, account: Account): UserInfo
@@ -76,6 +92,15 @@ abstract class ApplicationMapper {
     fun map(value: LocalDateTime): OffsetDateTime {
         return OffsetDateTime.of(value, ZoneOffset.UTC)
     }
+
+    @Named("programByCode")
+    fun mapProgram(code: String?): Program? = code?.takeIf { it.isNotBlank() }?.let(programRepository::findByCode)
+
+    @Named("projectByCode")
+    fun mapProject(code: String?): Project? = code?.takeIf { it.isNotBlank() }?.let(projectRepository::findByCode)
+
+    @Named("programForUserInfo")
+    fun mapProgram(application: Application): Program? = application.project?.program ?: application.program
 
     @Named("contract")
     fun mapContract(application: Application): ContractDto? {
