@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.33.1
+  version: 1.33.2
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -1607,6 +1607,14 @@ components:
           maxLength: 2000
         contract:
           $ref: "#/components/schemas/ContractDto"
+        program:
+          type: string
+          description: Код программы
+          example: IT
+        project:
+          type: string
+          description: Код проекта
+          example: PORTAL
         notes:
           type: array
           default: [ ]

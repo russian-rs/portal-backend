@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/release-1.18.0/application-program-project.yaml
