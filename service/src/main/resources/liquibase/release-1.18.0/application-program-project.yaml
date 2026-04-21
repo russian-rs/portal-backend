@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 1.18.0-application-add-program-project-fields
-      author: Codex
+      author: Valerii Linden
       changes:
         - addColumn:
             tableName: application
