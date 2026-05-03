@@ -26,6 +26,14 @@ class Program(
 
     @OneToMany(mappedBy = "program")
     val projects: Set<Project> = emptySet(),
+
+    @ManyToMany
+    @JoinTable(
+        name = "program_official_group",
+        joinColumns = [JoinColumn(name = "program_code")],
+        inverseJoinColumns = [JoinColumn(name = "official_group_code")]
+    )
+    val officialGroups: Set<OfficialGroup> = emptySet(),
 ) {
 
     companion object {

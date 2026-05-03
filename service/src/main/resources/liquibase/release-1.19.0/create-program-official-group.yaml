@@ -1,0 +1,34 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.19.2-create-program-official-group
+      author: Valerii Linden
+      changes:
+        - createTable:
+            tableName: program_official_group
+            columns:
+              - column:
+                  name: program_code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: official_group_code
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: program_official_group
+            baseColumnNames: program_code
+            referencedTableName: program
+            referencedColumnNames: code
+            constraintName: fk_psg_to_program
+        - addForeignKeyConstraint:
+            baseTableName: program_official_group
+            baseColumnNames: official_group_code
+            referencedTableName: official_group
+            referencedColumnNames: code
+            constraintName: fk_psg_to_official_group
+        - addUniqueConstraint:
+            tableName: program_official_group
+            columnNames: program_code,official_group_code
+            constraintName: uq_psg_program_group

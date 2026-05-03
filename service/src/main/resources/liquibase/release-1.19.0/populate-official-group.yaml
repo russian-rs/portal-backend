@@ -1,0 +1,37 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.19.1-populate-official-group
+      author: Valerii Linden
+      runOnChange: true
+      changes:
+        - insert:
+            tableName: official_group
+            columns:
+              - column: { name: code,    value: STRUCNJAK_ZA_OBUKU }
+              - column: { name: name_ru, value: "СПЕЦИАЛИСТ ПО ОБУЧЕНИЮ / ЭКСПЕРТ ПО ТРЕНИНГУ" }
+              - column: { name: name_en, value: "TRAINING SPECIALIST / TRAINING EXPERT" }
+              - column: { name: name_sr, value: "СТРУЧЊАК ЗА ОБУКУ / ТРЕНИНГ ЕКСПЕРТ" }
+
+        - insert:
+            tableName: official_group
+            columns:
+              - column: { name: code,    value: RAZVOJ }
+              - column: { name: name_ru, value: "РАЗВИТИЕ" }
+              - column: { name: name_en, value: "DEVELOPMENT" }
+              - column: { name: name_sr, value: "РАЗВОЈ" }
+
+        - insert:
+            tableName: official_group
+            columns:
+              - column: { name: code,    value: ISTRAZIVAC_TELEKOMUNIKACIJA }
+              - column: { name: name_ru, value: "ИССЛЕДОВАТЕЛЬ ТЕЛЕКОММУНИКАЦИЙ" }
+              - column: { name: name_en, value: "TELECOMMUNICATIONS RESEARCHER" }
+              - column: { name: name_sr, value: "ИСТРАЖИВАЧ ТЕЛЕКОМУНИКАЦИЈА" }
+
+        - insert:
+            tableName: official_group
+            columns:
+              - column: { name: code,    value: ISTRAZIVAC_URBANIZAM }
+              - column: { name: name_ru, value: "ИССЛЕДОВАТЕЛЬ В ОБЛАСТИ УРБАНИЗМА" }
+              - column: { name: name_en, value: "URBANISM RESEARCHER" }
+              - column: { name: name_sr, value: "ИСТРАЖИВАЧ У ОБЛАСТИ УРБАНИЗМ" }
