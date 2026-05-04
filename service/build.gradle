@@ -18,6 +18,9 @@ version = "1.16.0"
 ext['commons-lang3.version'] = '3.18.0'
 ext['netty.version'] = '4.1.132.Final'
 ext['tomcat.version'] = '10.1.54'
+ext['spring-security.version'] = SPRING_SECURITY_VERSION
+ext['thymeleaf.version'] = THYMELEAF_VERSION
+ext['log4j2.version'] = LOG4J2_VERSION
 
 repositories {
     mavenCentral()
@@ -60,7 +63,7 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-starter-model-openai")
 
     // Data
-    implementation("org.postgresql:postgresql")
+    implementation("org.postgresql:postgresql:$POSTGRESQL_VERSION")
     implementation("org.liquibase:liquibase-core")
     implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.8.3")
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.0.2")
@@ -130,7 +133,7 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.ai:spring-ai-bom:1.0.5")
+        mavenBom("org.springframework.ai:spring-ai-bom:$SPRING_AI_VERSION")
     }
 }
 
