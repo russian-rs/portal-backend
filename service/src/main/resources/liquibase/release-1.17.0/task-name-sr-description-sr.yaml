@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.17.0-task-add-sr-fields
+      author: Valerii Linden
+      changes:
+        - addColumn:
+            tableName: task
+            columns:
+              - column:
+                  name: name_sr
+                  type: TEXT
+              - column:
+                  name: description_sr
+                  type: TEXT

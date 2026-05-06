@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.30.0
+  version: 1.33.2
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -988,6 +988,25 @@ paths:
         "200":
           description: CSRF token cookie set successfully
 
+  /translate/serbian:
+    post:
+      operationId: translateToSerbian
+      tags:
+        - translate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TextTranslationRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TextTranslationResponse"
+
 components:
   responses:
     ServerError:
@@ -1129,6 +1148,24 @@ components:
           type: string
           description: Описание ошибки
           nullable: false
+    TextTranslationRequest:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          nullable: false
+          description: Source text to translate into Serbian
+    TextTranslationResponse:
+      type: object
+      required:
+        - text
+      properties:
+        text:
+          type: string
+          nullable: false
+          description: Translated Serbian text
     GenderEnumDto:
       type: string
       enum:
@@ -1371,6 +1408,12 @@ components:
           type: string
         description:
           type: string
+        nameSr:
+          type: string
+          nullable: true
+        descriptionSr:
+            type: string
+            nullable: true
         customer:
           type: string
           description: Login of customer
@@ -1564,6 +1607,14 @@ components:
           maxLength: 2000
         contract:
           $ref: "#/components/schemas/ContractDto"
+        program:
+          type: string
+          description: Код программы
+          example: IT
+        project:
+          type: string
+          description: Код проекта
+          example: PORTAL
         notes:
           type: array
           default: [ ]

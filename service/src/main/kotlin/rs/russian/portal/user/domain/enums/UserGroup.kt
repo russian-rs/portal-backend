@@ -7,6 +7,7 @@ enum class UserGroup(val oauthGroup: String) {
     VOLUNTEER("volunteer"),
     VOLUNTEER_CLEAN_CITY("volunteer_clean_city"),
     DEVELOPER_WP("developer_wp"),
+    PLAYGROUNDS_VOLUNTEER("playgrounds_volunteer"),
     ADMIN_SSO("administrator_sso"),
     ADMIN_WP("admin_wp"),
     DEVELOPER("developer"),

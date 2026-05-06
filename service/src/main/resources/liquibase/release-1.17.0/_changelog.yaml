@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/release-1.17.0/task-name-sr-description-sr.yaml
+  - include:
+      file: liquibase/release-1.17.0/ai-profile.yaml

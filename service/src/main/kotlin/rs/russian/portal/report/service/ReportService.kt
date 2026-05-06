@@ -19,10 +19,13 @@ import rs.russian.portal.report.domain.enums.ReportStatus
 import rs.russian.portal.report.domain.specification.from
 import rs.russian.portal.report.mapper.ReportMapper
 import rs.russian.portal.report.repository.ReportRepository
+import rs.russian.portal.shared.ai.domain.AiProfileCode.SERBIAN_TRANSLATOR
+import rs.russian.portal.shared.ai.service.TextTranslationService
 import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.service.AccountService
 import java.util.*
+
 
 @Service
 class ReportService(
@@ -32,6 +35,7 @@ class ReportService(
     private val noteService: NoteService,
     private val reportRepository: ReportRepository,
     private val entityManager: EntityManager,
+    private val textTranslationService: TextTranslationService
 ) {
 
     @Transactional(readOnly = true)
@@ -52,6 +56,12 @@ class ReportService(
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toMutableSet())
+                if (task.nameSr.isNullOrBlank()) {
+                    task.nameSr = textTranslationService.translate(task.name, SERBIAN_TRANSLATOR)
+                }
+                if (task.descriptionSr.isNullOrBlank()) {
+                    task.descriptionSr = textTranslationService.translate(task.description, SERBIAN_TRANSLATOR)
+                }
             }
         }
         return reportRepository.save(report.also { it.tasks = tasks.toMutableSet() })
@@ -66,10 +76,18 @@ class ReportService(
     @Transactional
     fun updateReport(reportDto: ReportDto): Report {
         val report = getReport(reportDto.id)
+        val existingTasksById = report.tasks.associateBy { it.id }
         val tasks = reportDto.tasks.map { taskDto ->
+            val existingTask = taskDto.id?.let(existingTasksById::get)
             reportMapper.map(taskDto, report).also { task ->
                 task.customer = accountService.findAccountByLogin(taskDto.customer)
                 task.files = fileService.findAllByIds(taskDto.files?.map { it.id }?.toSet())
+                if (task.nameSr.isNullOrBlank() || existingTask?.name != task.name) {
+                    task.nameSr = textTranslationService.translate(task.name, SERBIAN_TRANSLATOR)
+                }
+                if (task.descriptionSr.isNullOrBlank() || existingTask?.description != task.description) {
+                    task.descriptionSr = textTranslationService.translate(task.description, SERBIAN_TRANSLATOR)
+                }
             }
         }
         report.status = ReportStatus.CREATED

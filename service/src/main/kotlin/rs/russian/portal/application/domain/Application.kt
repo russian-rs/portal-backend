@@ -9,6 +9,8 @@ import rs.russian.portal.application.domain.ApplicationStatus.CREATED
 import rs.russian.portal.application.domain.ApplicationType.NEW
 import rs.russian.portal.application.domain.listener.ApplicationEntityListener
 import rs.russian.portal.note.domain.Note
+import rs.russian.portal.program.domain.Program
+import rs.russian.portal.program.domain.Project
 import rs.russian.portal.shared.jpa.JpaEntity
 import rs.russian.portal.user.domain.enums.Gender
 import java.time.LocalDate
@@ -18,7 +20,11 @@ import java.util.*
 @Entity
 @NamedEntityGraph(
     name = Application.GRAPH_FULL,
-    attributeNodes = [NamedAttributeNode("notes")]
+    attributeNodes = [
+        NamedAttributeNode("notes"),
+        NamedAttributeNode("program"),
+        NamedAttributeNode("project")
+    ]
 )
 @EntityListeners(ApplicationEntityListener::class)
 class Application(
@@ -63,6 +69,14 @@ class Application(
     var contractUntil: LocalDate? = null,
     @Enumerated(STRING)
     var contractType: ContractTypeEnum? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "program_code")
+    var program: Program? = null,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_code")
+    var project: Project? = null,
 
     @SQLRestriction("entity_type = 'APPLICATION'")
     @OneToMany(mappedBy = "entityId", cascade = [ALL], orphanRemoval = true)
