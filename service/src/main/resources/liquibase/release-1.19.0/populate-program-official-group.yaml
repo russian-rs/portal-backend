@@ -4,44 +4,44 @@ databaseChangeLog:
       author: Valerii Linden
       runOnChange: true
       changes:
-        - insert:
-            tableName: program_official_group
+        - update:
+            tableName: program
             columns:
-              - column: { name: program_code, value: IT }
               - column: { name: official_group_code, value: RAZVOJ }
+            where: code = 'IT'
 
-        - insert:
-            tableName: program_official_group
+        - update:
+            tableName: program
             columns:
-              - column: { name: program_code, value: MEDIA }
               - column: { name: official_group_code, value: ISTRAZIVAC_TELEKOMUNIKACIJA }
+            where: code = 'MEDIA'
 
-        - insert:
-            tableName: program_official_group
+        - update:
+            tableName: program
             columns:
-              - column: { name: program_code, value: DESIGN }
               - column: { name: official_group_code, value: RAZVOJ }
+            where: code = 'DESIGN'
 
-        - insert:
-            tableName: program_official_group
+        - update:
+            tableName: program
             columns:
-              - column: { name: program_code, value: URBANISM }
               - column: { name: official_group_code, value: ISTRAZIVAC_URBANIZAM }
+            where: code = 'URBANISM'
 
-        - insert:
-            tableName: program_official_group
+        - update:
+            tableName: program
             columns:
-              - column: { name: program_code, value: INFORMATION }
               - column: { name: official_group_code, value: ISTRAZIVAC_TELEKOMUNIKACIJA }
+            where: code = 'INFORMATION'
 
-        - insert:
-            tableName: program_official_group
+        - update:
+            tableName: program
             columns:
-              - column: { name: program_code, value: EDUCATION }
               - column: { name: official_group_code, value: STRUCNJAK_ZA_OBUKU }
+            where: code = 'EDUCATION'
 
-        - insert:
-            tableName: program_official_group
+        - update:
+            tableName: program
             columns:
-              - column: { name: program_code, value: LAW }
               - column: { name: official_group_code, value: RAZVOJ }
+            where: code = 'LAW'

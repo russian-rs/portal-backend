@@ -7,7 +7,8 @@ import jakarta.persistence.*
 @NamedEntityGraph(
     name = Program.GRAPH_FULL,
     attributeNodes = [
-        NamedAttributeNode("projects")
+        NamedAttributeNode("projects"),
+        NamedAttributeNode("officialGroup")
     ]
 )
 class Program(
@@ -27,13 +28,9 @@ class Program(
     @OneToMany(mappedBy = "program")
     val projects: Set<Project> = emptySet(),
 
-    @ManyToMany
-    @JoinTable(
-        name = "program_official_group",
-        joinColumns = [JoinColumn(name = "program_code")],
-        inverseJoinColumns = [JoinColumn(name = "official_group_code")]
-    )
-    val officialGroups: Set<OfficialGroup> = emptySet(),
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "official_group_code")
+    val officialGroup: OfficialGroup? = null,
 ) {
 
     companion object {

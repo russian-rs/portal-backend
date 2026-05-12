@@ -1786,10 +1786,9 @@ components:
           type: array
           description: List of project codes related to this program
           items: { type: string }
-        officialGroups:
-          type: array
-          description: List of official group codes related to this program
-          items: { type: string }
+        officialGroup:
+          type: string
+          description: Official group code related to this program
     ProjectDto:
       type: object
       required:
