@@ -2,12 +2,14 @@ package rs.russian.portal.user.domain
 
 import jakarta.persistence.*
 import jakarta.persistence.CascadeType.ALL
+import jakarta.persistence.EnumType.STRING
 import jakarta.persistence.FetchType.LAZY
 import org.hibernate.annotations.JdbcTypeCode
 import org.hibernate.type.SqlTypes
 import rs.russian.portal.program.domain.Program
 import rs.russian.portal.shared.jpa.JpaEntity
 import rs.russian.portal.shared.jpa.converter.UserGroupSetConverter
+import rs.russian.portal.user.domain.enums.DepersonalizationStatus
 import rs.russian.portal.user.domain.enums.UserGroup
 import rs.russian.portal.user.domain.listener.AccountEntityListener
 import java.time.LocalDateTime
@@ -66,6 +68,9 @@ class Account(
     var residencePermits: MutableSet<ResidencePermit> = mutableSetOf(),
 
     var active: Boolean = true,
+
+    @Enumerated(STRING)
+    var depersonalizationStatus: DepersonalizationStatus = DepersonalizationStatus.NONE,
 
     var lastSynced: LocalDateTime? = null,
 
