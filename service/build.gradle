@@ -16,11 +16,11 @@ group = "rs.russian"
 version = "1.16.0"
 
 ext['commons-lang3.version'] = '3.18.0'
-ext['netty.version'] = '4.1.132.Final'
-ext['tomcat.version'] = '10.1.54'
-ext['spring-security.version'] = SPRING_SECURITY_VERSION
-ext['thymeleaf.version'] = THYMELEAF_VERSION
-ext['log4j2.version'] = LOG4J2_VERSION
+ext['netty.version'] = '4.1.133.Final'
+ext['tomcat.version'] = '10.1.55'
+ext['log4j2.version'] = '2.26.0'
+ext['postgresql.version'] = '42.7.11'
+ext['thymeleaf.version'] = '3.1.5.RELEASE'
 
 repositories {
     mavenCentral()
@@ -133,7 +133,7 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.ai:spring-ai-bom:$SPRING_AI_VERSION")
+        mavenBom("org.springframework.ai:spring-ai-bom:1.1.6")
     }
 }
 

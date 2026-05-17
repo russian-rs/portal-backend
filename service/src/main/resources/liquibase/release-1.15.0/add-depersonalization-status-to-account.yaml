@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.15.0-add-depersonalization-status-to-account
+      author: alexey
+      changes:
+        - addColumn:
+            tableName: account
+            columns:
+              - column:
+                  name: depersonalization_status
+                  type: VARCHAR(255)
+                  defaultValue: NONE
+                  constraints:
+                    nullable: false
