@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.33.2
+  version: 1.33.3
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -1387,6 +1387,10 @@ components:
           description: Список заметок от модератора
           items:
             $ref: "#/components/schemas/NoteDto"
+        moderator:
+          type: string
+          nullable: true
+          description: Логин модератора
     TaskDto:
       type: object
       description: Task information
@@ -1412,8 +1416,8 @@ components:
           type: string
           nullable: true
         descriptionSr:
-            type: string
-            nullable: true
+          type: string
+          nullable: true
         customer:
           type: string
           description: Login of customer

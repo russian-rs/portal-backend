@@ -10,9 +10,9 @@ import org.instancio.Instancio
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.slf4j.LoggerFactory
-import rs.russian.portal.urils.InstancioUtils.Companion.field
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.enums.UserGroup
+import rs.russian.portal.utils.InstancIOUtils.Companion.field
 import java.math.BigDecimal
 import java.util.*
 

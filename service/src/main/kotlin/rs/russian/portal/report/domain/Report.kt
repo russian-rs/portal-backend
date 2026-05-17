@@ -24,6 +24,7 @@ import java.util.*
     attributeNodes = [
         NamedAttributeNode("tasks", subgraph = Task.GRAPH_FULL),
         NamedAttributeNode("account", subgraph = Account.GRAPH_USERNAME),
+        NamedAttributeNode("moderator", subgraph = Account.GRAPH_USERNAME),
         NamedAttributeNode("notes"),
         NamedAttributeNode("program"),
         NamedAttributeNode("project")],
@@ -69,6 +70,10 @@ class Report(
     @SQLRestriction("entity_type = 'REPORT'")
     @OneToMany(mappedBy = "entityId", cascade = [ALL], orphanRemoval = true)
     var notes: MutableSet<Note> = mutableSetOf(),
+
+    @ManyToOne(fetch = LAZY)
+    @JoinColumn(name = "moderator", referencedColumnName = "username")
+    var moderator: Account? = null,
 
     var isAuto: Boolean = false,
 
