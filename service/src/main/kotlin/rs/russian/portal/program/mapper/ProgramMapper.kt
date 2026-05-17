@@ -13,7 +13,7 @@ import rs.russian.portal.program.domain.Project
 abstract class ProgramMapper {
 
     @Mapping(target = "projectCodes", source = "projects", qualifiedByName = ["projectCodes"])
-    @Mapping(target = "officialGroup", source = "officialGroup", qualifiedByName = ["officialGroupCode"])
+    @Mapping(target = "officialGroup", source = "officialGroup.code")
     abstract fun toDto(program: Program?): ProgramDto
 
     @Named("projectCodes")
