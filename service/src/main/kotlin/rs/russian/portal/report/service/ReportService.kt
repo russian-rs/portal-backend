@@ -26,7 +26,6 @@ import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.service.AccountService
 import java.util.*
 
-
 @Service
 class ReportService(
     private val accountService: AccountService,
@@ -35,7 +34,7 @@ class ReportService(
     private val noteService: NoteService,
     private val reportRepository: ReportRepository,
     private val entityManager: EntityManager,
-    private val textTranslationService: TextTranslationService
+    private val textTranslationService: TextTranslationService,
 ) {
 
     @Transactional(readOnly = true)
@@ -124,11 +123,11 @@ class ReportService(
     @Transactional
     fun changeStatus(reportId: UUID, status: ReportStatus, noteText: String? = null) {
         val report = getReport(reportId)
+        val moderator = accountService.getAccountByLogin(currentUserLogin() ?: throw NotAuthorizedException())
         if (!noteText.isNullOrEmpty()) {
-            val currentAccount = accountService.getAccountByLogin(currentUserLogin() ?: throw NotAuthorizedException())
             val note = noteService.save(
                 Note(
-                    createdBy = currentAccount.username,
+                    createdBy = moderator.username,
                     entityId = reportId,
                     entityType = EntityType.REPORT,
                     text = noteText
@@ -137,6 +136,7 @@ class ReportService(
             report.notes.add(note)
         }
         report.status = status
+        report.moderator = moderator
     }
 
     /**

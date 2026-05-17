@@ -32,6 +32,7 @@ abstract class ReportMapper {
     @Mapping(target = "project", source = "project.code")
     @Mapping(target = "week", source = "report", qualifiedByName = ["reportWeek"])
     @Mapping(target = "user", source = "account.username")
+    @Mapping(target = "moderator", source = "moderator.username")
     @Mapping(target = "isAuto", constant = "false")
     abstract fun map(report: Report): ReportDto
 

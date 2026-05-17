@@ -13,7 +13,6 @@ import rs.russian.portal.report.domain.Task
 import rs.russian.portal.report.domain.enums.ReportStatus
 import rs.russian.portal.report.repository.ReportRepository
 import rs.russian.portal.testconfig.AbstractIntegrationTest
-import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.AccountService
 import java.time.LocalDate
 
@@ -86,5 +85,6 @@ class ReportServiceTest : AbstractIntegrationTest() {
         val dto = page.content.first()
         assert(dto.tasks.size == 2)
         assert(dto.status.name == "CREATED")
+        assert(dto.moderator == null)
     }
 }

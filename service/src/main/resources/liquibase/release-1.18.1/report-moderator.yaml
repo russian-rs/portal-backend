@@ -1,0 +1,16 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.18.1-report-moderator-column
+      author: Maksim Aminov
+      changes:
+        - addColumn:
+            tableName: report
+            columns:
+              - column:
+                  name: moderator
+                  type: VARCHAR
+                  constraints:
+                    nullable: true
+                    referencedTableName: account
+                    referencedColumnNames: username
+                    foreignKeyName: fk_report_moderator_login
