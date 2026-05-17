@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/release-1.19.0/create-official-group.yaml
+  - include:
+      file: liquibase/release-1.19.0/populate-official-group.yaml
+  - include:
+      file: liquibase/release-1.19.0/create-program-official-group.yaml
+  - include:
+      file: liquibase/release-1.19.0/populate-program-official-group.yaml

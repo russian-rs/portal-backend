@@ -1,0 +1,47 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.19.3-populate-program-official-group
+      author: Valerii Linden
+      runOnChange: true
+      changes:
+        - update:
+            tableName: program
+            columns:
+              - column: { name: official_group_code, value: RAZVOJ }
+            where: code = 'IT'
+
+        - update:
+            tableName: program
+            columns:
+              - column: { name: official_group_code, value: ISTRAZIVAC_TELEKOMUNIKACIJA }
+            where: code = 'MEDIA'
+
+        - update:
+            tableName: program
+            columns:
+              - column: { name: official_group_code, value: RAZVOJ }
+            where: code = 'DESIGN'
+
+        - update:
+            tableName: program
+            columns:
+              - column: { name: official_group_code, value: ISTRAZIVAC_URBANIZAM }
+            where: code = 'URBANISM'
+
+        - update:
+            tableName: program
+            columns:
+              - column: { name: official_group_code, value: ISTRAZIVAC_TELEKOMUNIKACIJA }
+            where: code = 'INFORMATION'
+
+        - update:
+            tableName: program
+            columns:
+              - column: { name: official_group_code, value: STRUCNJAK_ZA_OBUKU }
+            where: code = 'EDUCATION'
+
+        - update:
+            tableName: program
+            columns:
+              - column: { name: official_group_code, value: RAZVOJ }
+            where: code = 'LAW'
