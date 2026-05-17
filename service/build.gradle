@@ -63,7 +63,7 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-starter-model-openai")
 
     // Data
-    implementation("org.postgresql:postgresql")
+    implementation("org.postgresql:postgresql:$POSTGRESQL_VERSION")
     implementation("org.liquibase:liquibase-core")
     implementation("io.hypersistence:hypersistence-utils-hibernate-63:3.8.3")
     implementation("net.javacrumbs.shedlock:shedlock-spring:6.0.2")

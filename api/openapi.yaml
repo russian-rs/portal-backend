@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.33.2
+  version: 1.34.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -836,7 +836,6 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
 
-
   /projects:
     get:
       operationId: getProjects
@@ -852,6 +851,24 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/ProjectDto"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /official-group:
+    get:
+      operationId: getOfficialGroup
+      tags:
+        - officialGroup
+      summary: Получить список всех доступных официальных групп
+      responses:
+        "200":
+          description: Список официальных групп
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/OfficialGroupDto"
         "500":
           $ref: "#/components/responses/ServerError"
 
@@ -1769,6 +1786,9 @@ components:
           type: array
           description: List of project codes related to this program
           items: { type: string }
+        officialGroup:
+          type: string
+          description: Official group code related to this program
     ProjectDto:
       type: object
       required:
@@ -1788,7 +1808,22 @@ components:
         programCode:
           type: string
           description: Owning program code
-
+    OfficialGroupDto:
+      type: object
+      required:
+        - code
+        - nameRu
+        - nameEn
+        - nameSr
+      properties:
+        code:
+          type: string
+        nameRu:
+          type: string
+        nameEn:
+          type: string
+        nameSr:
+          type: string
     ReportsHeatMapPageResponse:
       type: object
       required:

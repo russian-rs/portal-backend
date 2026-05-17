@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.19.2-create-program-official-group
+      author: Valerii Linden
+      changes:
+        - addColumn:
+            tableName: program
+            columns:
+              - column:
+                  name: official_group_code
+                  type: VARCHAR(50)
+        - addForeignKeyConstraint:
+            baseTableName: program
+            baseColumnNames: official_group_code
+            referencedTableName: official_group
+            referencedColumnNames: code
+            constraintName: fk_program_to_official_group
