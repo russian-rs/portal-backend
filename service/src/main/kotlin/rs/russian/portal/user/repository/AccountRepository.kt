@@ -151,6 +151,25 @@ interface AccountRepository : JpaRepository<Account, Int> {
         """
         SELECT a
         FROM Account a
+        WHERE a.active = false
+          AND a.depersonalizationStatus = :status
+          AND (
+              SELECT MAX(c.endDate)
+              FROM Contract c
+              WHERE c.account = a
+          ) <= :thresholdDate
+        """
+    )
+    fun findForDepersonalization(
+        @Param("thresholdDate") thresholdDate: LocalDate,
+        @Param("status") status: DepersonalizationStatus = DepersonalizationStatus.WARNED,
+    ): List<Account>
+
+    @EntityGraph(value = GRAPH_FULL)
+    @Query(
+        """
+        SELECT a
+        FROM Account a
         WHERE a.active = true
           AND (
               SELECT MAX(c.endDate)
