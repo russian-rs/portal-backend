@@ -5,9 +5,6 @@ import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.thymeleaf.TemplateEngine
-import org.thymeleaf.context.Context
-import rs.russian.portal.mail.service.EmailService
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.Contract
 import rs.russian.portal.user.domain.enums.DepersonalizationStatus
@@ -22,39 +19,31 @@ class DepersonalizationSchedulerTest {
 
     private lateinit var accountRepository: AccountRepository
     private lateinit var depersonalizationService: AccountDepersonalizationService
-    private lateinit var emailService: EmailService
-    private lateinit var templateEngine: TemplateEngine
     private lateinit var scheduler: DepersonalizationScheduler
 
     @BeforeEach
     fun setUp() {
         accountRepository = mockk(relaxed = true)
         depersonalizationService = mockk(relaxed = true)
-        emailService = mockk(relaxed = true)
-        templateEngine = mockk(relaxed = true)
         scheduler = DepersonalizationScheduler(
             accountRepository,
             depersonalizationService,
-            emailService,
-            templateEngine,
             totalPeriod = TOTAL_PERIOD,
         )
     }
 
     @Test
-    fun `run depersonalizes accounts and notifies admins`() {
+    fun `run depersonalizes accounts and passes admins for notification`() {
         val thresholdDate = LocalDate.now().minus(TOTAL_PERIOD)
         val account = createAccount(1, "volunteer", "volunteer@example.com", thresholdDate.minusDays(1))
         val admin = createAdmin(10, "admin", "admin@example.com")
 
         every { accountRepository.findForDepersonalization(thresholdDate) } returns listOf(account)
         every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns listOf(admin)
-        every { templateEngine.process("depersonalization_done_admin", any<Context>()) } returns "body"
 
         scheduler.run()
 
-        verify { depersonalizationService.depersonalize(account) }
-        verify { emailService.sendCommonEmail(admin, SUBJECT, "body") }
+        verify { depersonalizationService.depersonalize(account, listOf(admin)) }
     }
 
     @Test
@@ -64,7 +53,7 @@ class DepersonalizationSchedulerTest {
 
         scheduler.run()
 
-        verify(exactly = 0) { depersonalizationService.depersonalize(any()) }
+        verify(exactly = 0) { depersonalizationService.depersonalize(any(), any()) }
         verify(exactly = 0) { accountRepository.findAllActiveByGroup(any()) }
     }
 
@@ -78,8 +67,7 @@ class DepersonalizationSchedulerTest {
 
         scheduler.run()
 
-        verify { depersonalizationService.depersonalize(account) }
-        verify(exactly = 0) { emailService.sendCommonEmail(any<Account>(), any(), any()) }
+        verify { depersonalizationService.depersonalize(account, emptyList()) }
     }
 
     @Test
@@ -91,32 +79,12 @@ class DepersonalizationSchedulerTest {
 
         every { accountRepository.findForDepersonalization(thresholdDate) } returns listOf(account1, account2)
         every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns listOf(admin)
-        every { templateEngine.process("depersonalization_done_admin", any<Context>()) } returns "body"
-        every { depersonalizationService.depersonalize(account1) } throws RuntimeException("boom")
+        every { depersonalizationService.depersonalize(account1, listOf(admin)) } throws RuntimeException("boom")
 
         scheduler.run()
 
-        verify { depersonalizationService.depersonalize(account1) }
-        verify { depersonalizationService.depersonalize(account2) }
-        verify(exactly = 1) { emailService.sendCommonEmail(admin, SUBJECT, "body") }
-    }
-
-    @Test
-    fun `run skips admin with blank email`() {
-        val thresholdDate = LocalDate.now().minus(TOTAL_PERIOD)
-        val account = createAccount(1, "volunteer", "volunteer@example.com", thresholdDate.minusDays(1))
-        val adminWithEmail = createAdmin(10, "admin1", "admin1@example.com")
-        val adminWithoutEmail = createAdmin(11, "admin2", "")
-
-        every { accountRepository.findForDepersonalization(thresholdDate) } returns listOf(account)
-        every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns
-            listOf(adminWithEmail, adminWithoutEmail)
-        every { templateEngine.process("depersonalization_done_admin", any<Context>()) } returns "body"
-
-        scheduler.run()
-
-        verify(exactly = 1) { emailService.sendCommonEmail(adminWithEmail, SUBJECT, "body") }
-        verify(exactly = 0) { emailService.sendCommonEmail(adminWithoutEmail, any(), any()) }
+        verify { depersonalizationService.depersonalize(account1, listOf(admin)) }
+        verify { depersonalizationService.depersonalize(account2, listOf(admin)) }
     }
 
     private fun createAccount(id: Int, username: String, email: String, contractEndDate: LocalDate): Account {
@@ -150,6 +118,5 @@ class DepersonalizationSchedulerTest {
 
     companion object {
         private val TOTAL_PERIOD: Period = Period.ofYears(3)
-        private const val SUBJECT = "Данные волонтера деперсонализированы"
     }
 }
