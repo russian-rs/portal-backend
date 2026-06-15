@@ -306,4 +306,135 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         assertEquals(1, resultAfter.size)
         assertEquals("multi_contract_unique", resultAfter[0].username)
     }
+
+    @Test
+    fun `findForDepersonalization should return inactive WARNED accounts with contract end before threshold`() {
+        // Given
+        val thresholdDate = LocalDate.of(2021, 5, 1)
+        val account = Account(
+            id = 11001,
+            username = "depers_exec_unique",
+            email = "depers_exec_unique@example.com",
+            fullName = "Depers Exec User",
+            active = false,
+            depersonalizationStatus = DepersonalizationStatus.WARNED,
+        )
+        account.contracts.add(
+            Contract(
+                account = account,
+                startDate = LocalDate.of(2019, 1, 1),
+                endDate = LocalDate.of(2021, 4, 30),
+            )
+        )
+        accountRepository.save(account)
+        accountRepository.flush()
+
+        // When
+        val result = accountRepository.findForDepersonalization(thresholdDate)
+            .filter { it.username.endsWith("_unique") }
+
+        // Then
+        assertEquals(1, result.size)
+        assertEquals("depers_exec_unique", result[0].username)
+    }
+
+    @Test
+    fun `findForDepersonalization should not return accounts that were not warned`() {
+        // Given
+        val thresholdDate = LocalDate.of(2021, 5, 1)
+        val noneAccount = Account(
+            id = 11101,
+            username = "depers_none_unique",
+            email = "depers_none_unique@example.com",
+            fullName = "Not Warned User",
+            active = false,
+            depersonalizationStatus = DepersonalizationStatus.NONE,
+        )
+        val doneAccount = Account(
+            id = 11102,
+            username = "depers_done_unique",
+            email = "depers_done_unique@example.com",
+            fullName = "Already Depersonalized User",
+            active = false,
+            depersonalizationStatus = DepersonalizationStatus.DEPERSONALIZED,
+        )
+        listOf(noneAccount, doneAccount).forEach { acc ->
+            acc.contracts.add(
+                Contract(
+                    account = acc,
+                    startDate = LocalDate.of(2019, 1, 1),
+                    endDate = LocalDate.of(2021, 4, 30),
+                )
+            )
+        }
+        accountRepository.saveAll(listOf(noneAccount, doneAccount))
+        accountRepository.flush()
+
+        // When
+        val result = accountRepository.findForDepersonalization(thresholdDate)
+            .filter { it.username.endsWith("_unique") }
+
+        // Then
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `findForDepersonalization should not return active accounts`() {
+        // Given
+        val thresholdDate = LocalDate.of(2021, 5, 1)
+        val account = Account(
+            id = 11201,
+            username = "depers_active_unique",
+            email = "depers_active_unique@example.com",
+            fullName = "Reactivated User",
+            active = true,
+            depersonalizationStatus = DepersonalizationStatus.WARNED,
+        )
+        account.contracts.add(
+            Contract(
+                account = account,
+                startDate = LocalDate.of(2019, 1, 1),
+                endDate = LocalDate.of(2021, 4, 30),
+            )
+        )
+        accountRepository.save(account)
+        accountRepository.flush()
+
+        // When
+        val result = accountRepository.findForDepersonalization(thresholdDate)
+            .filter { it.username.endsWith("_unique") }
+
+        // Then
+        assertTrue(result.isEmpty())
+    }
+
+    @Test
+    fun `findForDepersonalization should not return accounts with contract end after threshold`() {
+        // Given
+        val thresholdDate = LocalDate.of(2021, 5, 1)
+        val account = Account(
+            id = 11301,
+            username = "depers_future_unique",
+            email = "depers_future_unique@example.com",
+            fullName = "Future Exec User",
+            active = false,
+            depersonalizationStatus = DepersonalizationStatus.WARNED,
+        )
+        account.contracts.add(
+            Contract(
+                account = account,
+                startDate = LocalDate.of(2019, 1, 1),
+                endDate = LocalDate.of(2021, 5, 2),
+            )
+        )
+        accountRepository.save(account)
+        accountRepository.flush()
+
+        // When
+        val result = accountRepository.findForDepersonalization(thresholdDate)
+            .filter { it.username.endsWith("_unique") }
+
+        // Then
+        assertTrue(result.isEmpty())
+    }
 }
