@@ -37,15 +37,12 @@ class AccountDepersonalizationService(
 
     @Transactional
     fun depersonalize(account: Account, admins: List<Account>): Account {
-        // Capture identifying details before they are scrubbed, for the notification email.
         val fullName = account.fullName
         val contractEndDate = account.contracts.maxOfOrNull { it.endDate }
 
-        // Drop residence permits entirely; orphan removal cascades to the photo files and S3.
         account.residencePermits.clear()
 
         account.info?.let { info ->
-            // Nulling the avatar triggers orphan removal -> FileInfoListener removes the S3 object.
             info.avatar = null
             info.city = null
             info.postalCode = null
@@ -54,7 +51,6 @@ class AccountDepersonalizationService(
             info.telegram = null
             info.phone = null
             info.gender = null
-            // program/project are org reference data, not personal — kept for statistics.
         }
 
         account.fullName = DEPERSONALIZED_FULL_NAME
@@ -64,7 +60,6 @@ class AccountDepersonalizationService(
 
         val saved = accountRepository.save(account)
 
-        // Enqueue the notification in the same transaction (transactional outbox).
         notifyAdmins(admins, fullName, contractEndDate)
 
         log.info("Depersonalized account {}", account.username)
