@@ -38,7 +38,10 @@ class DepersonalizationSchedulerTest {
         val account = createAccount(1, "volunteer", "volunteer@example.com", thresholdDate.minusDays(1))
         val admin = createAdmin(10, "admin", "admin@example.com")
 
-        every { accountRepository.findForDepersonalization(thresholdDate) } returns listOf(account)
+        every {
+            accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
+        } returns listOf(account.id!!)
+        every { accountRepository.findAllByIdIn(listOf(account.id!!), any()) } returns listOf(account)
         every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns listOf(admin)
 
         scheduler.run()
@@ -49,11 +52,14 @@ class DepersonalizationSchedulerTest {
     @Test
     fun `run returns early when no accounts found`() {
         val thresholdDate = LocalDate.now().minus(TOTAL_PERIOD)
-        every { accountRepository.findForDepersonalization(thresholdDate) } returns emptyList()
+        every {
+            accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
+        } returns emptyList()
 
         scheduler.run()
 
         verify(exactly = 0) { depersonalizationService.depersonalize(any(), any()) }
+        verify(exactly = 0) { accountRepository.findAllByIdIn(any<Collection<Int>>(), any()) }
         verify(exactly = 0) { accountRepository.findAllActiveByGroup(any()) }
     }
 
@@ -62,7 +68,10 @@ class DepersonalizationSchedulerTest {
         val thresholdDate = LocalDate.now().minus(TOTAL_PERIOD)
         val account = createAccount(1, "volunteer", "volunteer@example.com", thresholdDate.minusDays(1))
 
-        every { accountRepository.findForDepersonalization(thresholdDate) } returns listOf(account)
+        every {
+            accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
+        } returns listOf(account.id!!)
+        every { accountRepository.findAllByIdIn(listOf(account.id!!), any()) } returns listOf(account)
         every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns emptyList()
 
         scheduler.run()
@@ -77,7 +86,10 @@ class DepersonalizationSchedulerTest {
         val account2 = createAccount(2, "volunteer2", "v2@example.com", thresholdDate.minusDays(2))
         val admin = createAdmin(10, "admin", "admin@example.com")
 
-        every { accountRepository.findForDepersonalization(thresholdDate) } returns listOf(account1, account2)
+        every {
+            accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
+        } returns listOf(account1.id!!, account2.id!!)
+        every { accountRepository.findAllByIdIn(any<Collection<Int>>(), any()) } returns listOf(account1, account2)
         every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns listOf(admin)
         every { depersonalizationService.depersonalize(account1, listOf(admin)) } throws RuntimeException("boom")
 

@@ -12,6 +12,7 @@ import rs.russian.portal.user.domain.enums.DepersonalizationStatus
 import rs.russian.portal.user.domain.enums.UserGroup
 import java.time.LocalDate
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
@@ -170,12 +171,10 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.flush()
 
         // When
-        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
 
         // Then
-        assertEquals(1, result.size)
-        assertEquals("depers_warn_unique", result[0].username)
+        assertTrue(result.contains(10401))
     }
 
     @Test
@@ -200,11 +199,10 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.flush()
 
         // When
-        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
 
         // Then
-        assertTrue(result.isEmpty())
+        assertFalse(result.contains(10501))
     }
 
     @Test
@@ -228,12 +226,11 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.save(account)
         accountRepository.flush()
 
-        // When
-        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        // When — querying for NONE accounts must not pick up a WARNED one
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
 
         // Then
-        assertTrue(result.isEmpty())
+        assertFalse(result.contains(10601))
     }
 
     @Test
@@ -258,11 +255,10 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.flush()
 
         // When
-        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
 
         // Then
-        assertTrue(result.isEmpty())
+        assertFalse(result.contains(10701))
     }
 
     @Test
@@ -292,19 +288,17 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.flush()
 
         // When — threshold is before the latest contract end, so should NOT match
-        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
 
         // Then
-        assertTrue(result.isEmpty())
+        assertFalse(result.contains(10801))
 
         // When — threshold after the latest contract end, should match
-        val resultAfter = accountRepository.findForDepersonalizationWarning(LocalDate.of(2022, 7, 2))
-            .filter { it.username.endsWith("_unique") }
+        val resultAfter =
+            accountRepository.findDepersonalizationCandidateIds(LocalDate.of(2022, 7, 2), DepersonalizationStatus.NONE)
 
         // Then
-        assertEquals(1, resultAfter.size)
-        assertEquals("multi_contract_unique", resultAfter[0].username)
+        assertTrue(resultAfter.contains(10801))
     }
 
     @Test
@@ -330,12 +324,10 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.flush()
 
         // When
-        val result = accountRepository.findForDepersonalization(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
 
         // Then
-        assertEquals(1, result.size)
-        assertEquals("depers_exec_unique", result[0].username)
+        assertTrue(result.contains(11001))
     }
 
     @Test
@@ -371,11 +363,11 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.flush()
 
         // When
-        val result = accountRepository.findForDepersonalization(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
 
         // Then
-        assertTrue(result.isEmpty())
+        assertFalse(result.contains(11101))
+        assertFalse(result.contains(11102))
     }
 
     @Test
@@ -401,11 +393,10 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.flush()
 
         // When
-        val result = accountRepository.findForDepersonalization(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
 
         // Then
-        assertTrue(result.isEmpty())
+        assertFalse(result.contains(11201))
     }
 
     @Test
@@ -431,10 +422,9 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.flush()
 
         // When
-        val result = accountRepository.findForDepersonalization(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
 
         // Then
-        assertTrue(result.isEmpty())
+        assertFalse(result.contains(11301))
     }
 }

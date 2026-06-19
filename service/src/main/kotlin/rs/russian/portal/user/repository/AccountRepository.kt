@@ -127,43 +127,30 @@ interface AccountRepository : JpaRepository<Account, Int> {
     )
     fun findAllActiveByGroup(@Param("group") group: String): List<Account>
 
-    @EntityGraph(value = GRAPH_FULL)
+    /**
+     * IDs of inactive accounts in the given depersonalization [status] whose latest contract ended on or
+     * before [thresholdDate]. The inner join excludes accounts without contracts (matching the previous
+     * `MAX(endDate) <= threshold` semantics, where a NULL max never satisfied the comparison).
+     *
+     * Returns IDs only — callers re-fetch full accounts via [findAllByIdIn] with [GRAPH_FULL]. A single
+     * query cannot both `GROUP BY`/`HAVING` and fetch the entity graph: the graph's fetch-joined columns
+     * would have to appear in `GROUP BY`. This is the same two-step pattern used by `findAllFull`.
+     */
     @Query(
         """
-        SELECT a
+        SELECT a.id
         FROM Account a
+        JOIN a.contracts c
         WHERE a.active = false
           AND a.depersonalizationStatus = :status
-          AND (
-              SELECT MAX(c.endDate)
-              FROM Contract c
-              WHERE c.account = a
-          ) <= :thresholdDate
+        GROUP BY a.id
+        HAVING MAX(c.endDate) <= :thresholdDate
         """
     )
-    fun findForDepersonalizationWarning(
+    fun findDepersonalizationCandidateIds(
         @Param("thresholdDate") thresholdDate: LocalDate,
-        @Param("status") status: DepersonalizationStatus = DepersonalizationStatus.NONE,
-    ): List<Account>
-
-    @EntityGraph(value = GRAPH_FULL)
-    @Query(
-        """
-        SELECT a
-        FROM Account a
-        WHERE a.active = false
-          AND a.depersonalizationStatus = :status
-          AND (
-              SELECT MAX(c.endDate)
-              FROM Contract c
-              WHERE c.account = a
-          ) <= :thresholdDate
-        """
-    )
-    fun findForDepersonalization(
-        @Param("thresholdDate") thresholdDate: LocalDate,
-        @Param("status") status: DepersonalizationStatus = DepersonalizationStatus.WARNED,
-    ): List<Account>
+        @Param("status") status: DepersonalizationStatus,
+    ): List<Int>
 
     @EntityGraph(value = GRAPH_FULL)
     @Query(

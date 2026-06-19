@@ -46,7 +46,10 @@ class DepersonalizationWarningSchedulerTest {
         val admin = createAdmin(10, "admin", "admin@example.com")
         val messageBody = "warning-body"
 
-        every { accountRepository.findForDepersonalizationWarning(thresholdDate) } returns listOf(account)
+        every {
+            accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
+        } returns listOf(account.id!!)
+        every { accountRepository.findAllByIdIn(listOf(account.id!!), any()) } returns listOf(account)
         every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns listOf(admin)
         every { templateEngine.process("depersonalization_warning_admin", any<Context>()) } returns messageBody
 
@@ -61,10 +64,13 @@ class DepersonalizationWarningSchedulerTest {
     fun `run should return early when no accounts found`() {
         val thresholdDate = LocalDate.now().minus(WARNING_PERIOD)
 
-        every { accountRepository.findForDepersonalizationWarning(thresholdDate) } returns emptyList()
+        every {
+            accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
+        } returns emptyList()
 
         scheduler.run()
 
+        verify(exactly = 0) { accountRepository.findAllByIdIn(any<Collection<Int>>(), any()) }
         verify(exactly = 0) { accountRepository.findAllActiveByGroup(any()) }
         verify(exactly = 0) { emailService.sendCommonEmail(any<Account>(), any(), any()) }
     }
@@ -74,7 +80,10 @@ class DepersonalizationWarningSchedulerTest {
         val thresholdDate = LocalDate.now().minus(WARNING_PERIOD)
         val account = createAccount(1, "volunteer", "volunteer@example.com", thresholdDate.minusDays(1))
 
-        every { accountRepository.findForDepersonalizationWarning(thresholdDate) } returns listOf(account)
+        every {
+            accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
+        } returns listOf(account.id!!)
+        every { accountRepository.findAllByIdIn(listOf(account.id!!), any()) } returns listOf(account)
         every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns emptyList()
         every { templateEngine.process("depersonalization_warning_admin", any<Context>()) } returns "body"
 
@@ -91,7 +100,10 @@ class DepersonalizationWarningSchedulerTest {
         val account2 = createAccount(2, "volunteer2", "v2@example.com", thresholdDate.minusDays(2))
         val admin = createAdmin(10, "admin", "admin@example.com")
 
-        every { accountRepository.findForDepersonalizationWarning(thresholdDate) } returns listOf(account1, account2)
+        every {
+            accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
+        } returns listOf(account1.id!!, account2.id!!)
+        every { accountRepository.findAllByIdIn(any<Collection<Int>>(), any()) } returns listOf(account1, account2)
         every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns listOf(admin)
         every { templateEngine.process("depersonalization_warning_admin", any<Context>()) } returns "body"
         every { accountRepository.save(account1) } throws RuntimeException("boom")
@@ -111,7 +123,10 @@ class DepersonalizationWarningSchedulerTest {
         val adminWithEmail = createAdmin(10, "admin1", "admin1@example.com")
         val adminWithoutEmail = createAdmin(11, "admin2", "")
 
-        every { accountRepository.findForDepersonalizationWarning(thresholdDate) } returns listOf(account)
+        every {
+            accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
+        } returns listOf(account.id!!)
+        every { accountRepository.findAllByIdIn(listOf(account.id!!), any()) } returns listOf(account)
         every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns listOf(adminWithEmail, adminWithoutEmail)
         every { templateEngine.process("depersonalization_warning_admin", any<Context>()) } returns "body"
 
@@ -128,7 +143,10 @@ class DepersonalizationWarningSchedulerTest {
         val admin1 = createAdmin(10, "admin1", "admin1@example.com")
         val admin2 = createAdmin(11, "admin2", "admin2@example.com")
 
-        every { accountRepository.findForDepersonalizationWarning(thresholdDate) } returns listOf(account)
+        every {
+            accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
+        } returns listOf(account.id!!)
+        every { accountRepository.findAllByIdIn(listOf(account.id!!), any()) } returns listOf(account)
         every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns listOf(admin1, admin2)
         every { templateEngine.process("depersonalization_warning_admin", any<Context>()) } returns "body"
 
