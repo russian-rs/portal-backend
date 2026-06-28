@@ -13,20 +13,13 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 /**
- * Performs the irreversible scrubbing of a volunteer's personal data once the retention period has
- * expired. Strips identifying fields from [Account] / [rs.russian.portal.user.domain.UserInfo],
- * deletes residence permits and any attached files (avatar, permit photos cascade to S3 via JPA
- * orphan removal + FileInfoListener), and flips the status to [DepersonalizationStatus.DEPERSONALIZED].
+ * Irreversibly scrubs a volunteer's personal data once the retention period expires: clears identifying
+ * fields, deletes residence permits and attached files (cascade to S3), and flips status to
+ * [DepersonalizationStatus.DEPERSONALIZED]. Non-personal data (contracts, program, project) is kept for
+ * statistics — see .tasks/37-depersonalization/Analysis.md.
  *
- * Non-personal, statistically relevant data is intentionally kept: contracts (dates/type), program and
- * project. See .tasks/37-depersonalization/Analysis.md for the rationale.
- *
- * Scrubbing and the admin notification run in a single transaction (transactional outbox): the
- * [rs.russian.portal.mail.domain.EmailOutbox] row is persisted in the same transaction as the
- * `DEPERSONALIZED` state change, so the notification is enqueued if and only if the account is actually
- * depersonalized. On any failure the whole transaction rolls back, the account stays `WARNED`, and the
- * next scheduler run retries it — no lost or duplicated notifications. Actual delivery (with retries) is
- * handled separately by the email outbox scheduler.
+ * Scrubbing and the admin notification share one transaction (transactional outbox), so the notice is
+ * enqueued iff the account is depersonalized; on failure everything rolls back and the next run retries.
  */
 @Service
 class AccountDepersonalizationService(

@@ -129,12 +129,9 @@ interface AccountRepository : JpaRepository<Account, Int> {
 
     /**
      * IDs of inactive accounts in the given depersonalization [status] whose latest contract ended on or
-     * before [thresholdDate]. The inner join excludes accounts without contracts (matching the previous
-     * `MAX(endDate) <= threshold` semantics, where a NULL max never satisfied the comparison).
-     *
-     * Returns IDs only — callers re-fetch full accounts via [findAllByIdIn] with [GRAPH_FULL]. A single
-     * query cannot both `GROUP BY`/`HAVING` and fetch the entity graph: the graph's fetch-joined columns
-     * would have to appear in `GROUP BY`. This is the same two-step pattern used by `findAllFull`.
+     * before [thresholdDate]. The inner join skips accounts without contracts. Returns IDs only — callers
+     * re-fetch full accounts via [findAllByIdIn] with [GRAPH_FULL], since `GROUP BY`/`HAVING` can't be
+     * combined with an entity-graph fetch.
      */
     @Query(
         """

@@ -14,13 +14,8 @@ import java.time.LocalDate
 import java.time.Period
 
 /**
- * Executes the actual depersonalization of volunteers whose retention period has expired.
- *
- * Runs daily after [DepersonalizationWarningScheduler]: picks up accounts already flagged WARNED whose
- * last contract ended at least [totalPeriod] ago, then hands each one to [AccountDepersonalizationService],
- * which scrubs the personal data and enqueues the coordinator notification in a single transaction.
- * Per-account failures are isolated so the rest of the batch still completes; failed accounts stay
- * WARNED and are retried on the next run.
+ * Depersonalizes WARNED volunteers whose last contract ended at least [totalPeriod] ago. Runs daily after
+ * [DepersonalizationWarningScheduler]. Per-account failures are isolated and retried on the next run.
  */
 @Component
 class DepersonalizationScheduler(
