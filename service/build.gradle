@@ -35,6 +35,11 @@ dependencyCheck {
     suppressionFile = file("dependency-check-suppressions.xml").absolutePath
     nvd {
         apiKey = System.getenv("NVD_API_KEY") ?: ""
+        // Throttle requests to the NVD API: the initial full database download fires many
+        // paginated requests and NVD answers bursts with HTTP 503. A delay between calls plus
+        // extra retries lets the download complete and seed the cache without tripping throttling.
+        delay = 4000
+        maxRetryCount = 30
     }
 }
 
