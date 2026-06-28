@@ -16,11 +16,15 @@ group = "rs.russian"
 version = "1.16.0"
 
 ext['commons-lang3.version'] = '3.18.0'
-ext['netty.version'] = '4.1.133.Final'
+ext['netty.version'] = '4.1.135.Final'
 ext['tomcat.version'] = '10.1.55'
 ext['log4j2.version'] = '2.26.0'
 ext['postgresql.version'] = '42.7.11'
 ext['thymeleaf.version'] = '3.1.5.RELEASE'
+// Security patch bumps within the Spring Boot 3.5.x managed minor lines (see OWASP scan).
+ext['spring-framework.version'] = '6.2.19'
+ext['spring-security.version'] = '6.5.11'
+ext['jackson-bom.version'] = '2.21.4'
 
 repositories {
     mavenCentral()
@@ -138,7 +142,7 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.ai:spring-ai-bom:1.1.6")
+        mavenBom("org.springframework.ai:spring-ai-bom:1.1.8")
     }
 }
 
