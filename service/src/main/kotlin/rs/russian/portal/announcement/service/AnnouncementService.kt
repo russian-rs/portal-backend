@@ -1,6 +1,7 @@
 package rs.russian.portal.announcement.service
 
 import jakarta.persistence.EntityNotFoundException
+import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.AnnouncementCreateRequest
@@ -16,6 +17,7 @@ import rs.russian.portal.announcement.repository.AnnouncementRepository
 import rs.russian.portal.program.domain.Program
 import rs.russian.portal.program.repository.ProgramRepository
 import rs.russian.portal.shared.exception.InvalidRequestException
+import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.service.AccountService
@@ -63,12 +65,16 @@ class AnnouncementService(
             return
         }
 
-        announcementReadRepository.save(
-            AnnouncementRead(
-                announcementId = announcementId,
-                accountId = account.id!!,
+        try {
+            announcementReadRepository.save(
+                AnnouncementRead(
+                    announcementId = announcementId,
+                    accountId = account.id!!,
+                )
             )
-        )
+        } catch (_: DataIntegrityViolationException) {
+            // duplicate mark-read is ok (concurrent requests)
+        }
     }
 
     @Transactional
@@ -77,10 +83,11 @@ class AnnouncementService(
 
         val audience = mapAudience(request.audience)
         val program = resolveProgram(audience, request.programCode)
+        val createdBy = currentUserLogin() ?: throw NotAuthorizedException()
 
         val announcement = announcementRepository.save(
             Announcement(
-                createdBy = currentUserLogin() ?: "system",
+                createdBy = createdBy,
                 title = request.title.trim(),
                 body = request.body.trim(),
                 audience = audience,
