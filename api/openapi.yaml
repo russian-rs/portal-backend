@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.35.0
+  version: 1.36.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -755,6 +755,75 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ApplicationStatusDto"
+
+  /announcements:
+    get:
+      operationId: getAnnouncements
+      tags:
+        - announcements
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AnnouncementDto"
+        "500":
+          $ref: "#/components/responses/ServerError"
+    post:
+      operationId: createAnnouncement
+      tags:
+        - announcements
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnnouncementCreateRequest"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnnouncementDto"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /announcements/unread-count:
+    get:
+      operationId: getUnreadAnnouncementsCount
+      tags:
+        - announcements
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnreadAnnouncementsCountDto"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
+  /announcements/{id}/read:
+    post:
+      operationId: markAnnouncementRead
+      tags:
+        - announcements
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Success
+        "500":
+          $ref: "#/components/responses/ServerError"
 
   /mail/send:
     post:
@@ -1955,3 +2024,66 @@ components:
         ticketLink:
           type: string
           description: Ссылка на тикет в системе HelpDesk
+    AnnouncementDto:
+      type: object
+      required:
+        - id
+        - title
+        - body
+        - createTime
+        - audience
+        - read
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        body:
+          type: string
+        createTime:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+          nullable: true
+        audience:
+          $ref: "#/components/schemas/AnnouncementAudience"
+        programCode:
+          type: string
+          nullable: true
+        read:
+          type: boolean
+    AnnouncementCreateRequest:
+      type: object
+      required:
+        - title
+        - body
+        - audience
+      properties:
+        title:
+          type: string
+          minLength: 3
+          maxLength: 200
+        body:
+          type: string
+          minLength: 1
+          maxLength: 10000
+        audience:
+          $ref: "#/components/schemas/AnnouncementAudience"
+        programCode:
+          type: string
+          nullable: true
+    AnnouncementAudience:
+      type: string
+      enum:
+        - ALL
+        - PROGRAM
+    UnreadAnnouncementsCountDto:
+      type: object
+      required:
+        - count
+      properties:
+        count:
+          type: integer
+          format: int32
