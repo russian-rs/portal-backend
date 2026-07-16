@@ -48,13 +48,19 @@ databaseChangeLog:
                   type: VARCHAR(32)
               - column:
                   name: program_code
-                  type: VARCHAR(255)
+                  type: VARCHAR(50)
               - column:
                   constraints:
                     nullable: false
                   name: active
                   type: BOOLEAN
                   defaultValueBoolean: true
+        - addForeignKeyConstraint:
+            baseTableName: announcement
+            baseColumnNames: program_code
+            referencedTableName: program
+            referencedColumnNames: code
+            constraintName: fk_announcement_program
   - changeSet:
       id: 1.20.0-announcement-read-create-table
       author: portal

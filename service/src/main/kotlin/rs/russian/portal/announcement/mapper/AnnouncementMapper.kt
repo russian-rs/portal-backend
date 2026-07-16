@@ -10,6 +10,7 @@ import rs.russian.portal.announcement.domain.enums.AnnouncementAudience as Domai
 @Mapper
 abstract class AnnouncementMapper {
 
+    @Mapping(target = "programCode", source = "program.code")
     @Mapping(target = "read", source = "read")
     abstract fun map(announcement: Announcement, read: Boolean): AnnouncementDto
 

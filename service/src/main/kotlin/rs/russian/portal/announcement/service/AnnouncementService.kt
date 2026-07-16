@@ -12,6 +12,8 @@ import rs.russian.portal.announcement.domain.enums.AnnouncementAudience
 import rs.russian.portal.announcement.mapper.AnnouncementMapper
 import rs.russian.portal.announcement.repository.AnnouncementReadRepository
 import rs.russian.portal.announcement.repository.AnnouncementRepository
+import rs.russian.portal.program.domain.Program
+import rs.russian.portal.program.repository.ProgramRepository
 import rs.russian.portal.shared.exception.InvalidRequestException
 import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.domain.Account
@@ -24,6 +26,7 @@ class AnnouncementService(
     private val announcementReadRepository: AnnouncementReadRepository,
     private val announcementMapper: AnnouncementMapper,
     private val accountService: AccountService,
+    private val programRepository: ProgramRepository,
 ) {
 
     @Transactional(readOnly = true)
@@ -71,17 +74,20 @@ class AnnouncementService(
     fun create(request: AnnouncementCreateRequest): AnnouncementDto {
         validateCreateRequest(request)
 
+        val audience = mapAudience(request.audience)
+        val program = resolveProgram(audience, request.programCode)
+
         val announcement = announcementRepository.save(
             Announcement(
                 createdBy = currentUserLogin() ?: "system",
                 title = request.title.trim(),
                 body = request.body.trim(),
-                audience = mapAudience(request.audience),
-                programCode = request.programCode?.trim()?.takeIf { it.isNotEmpty() },
+                audience = audience,
+                program = program,
             )
         )
 
-        return announcementMapper.map(announcement, read = true)
+        return announcementMapper.map(announcement, read = false)
     }
 
     private fun validateCreateRequest(request: AnnouncementCreateRequest) {
@@ -89,6 +95,18 @@ class AnnouncementService(
         if (audience == AnnouncementAudience.PROGRAM && request.programCode.isNullOrBlank()) {
             throw InvalidRequestException("programCode is required when audience is PROGRAM")
         }
+    }
+
+    private fun resolveProgram(audience: AnnouncementAudience, programCode: String?): Program? {
+        if (audience != AnnouncementAudience.PROGRAM) {
+            return null
+        }
+
+        val code = programCode?.trim()?.takeIf { it.isNotEmpty() }
+            ?: throw InvalidRequestException("programCode is required when audience is PROGRAM")
+
+        return programRepository.findByCode(code)
+            ?: throw InvalidRequestException("Program with code '$code' not found")
     }
 
     private fun mapAudience(audience: AnnouncementCreateRequest.Audience): AnnouncementAudience =
@@ -105,7 +123,7 @@ class AnnouncementService(
         return when (announcement.audience) {
             AnnouncementAudience.ALL -> true
             AnnouncementAudience.PROGRAM ->
-                !programCode.isNullOrBlank() && announcement.programCode.equals(programCode, ignoreCase = true)
+                !programCode.isNullOrBlank() && announcement.program?.code.equals(programCode, ignoreCase = true)
         }
     }
 }
