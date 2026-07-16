@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.AnnouncementCreateRequest
 import rs.russian.generated.model.AnnouncementDto
 import rs.russian.generated.model.UnreadAnnouncementsCountDto
+import rs.russian.generated.model.AnnouncementAudience as ApiAnnouncementAudience
 import rs.russian.portal.announcement.domain.Announcement
 import rs.russian.portal.announcement.domain.AnnouncementRead
 import rs.russian.portal.announcement.domain.enums.AnnouncementAudience
@@ -109,10 +110,10 @@ class AnnouncementService(
             ?: throw InvalidRequestException("Program with code '$code' not found")
     }
 
-    private fun mapAudience(audience: AnnouncementCreateRequest.Audience): AnnouncementAudience =
+    private fun mapAudience(audience: ApiAnnouncementAudience): AnnouncementAudience =
         when (audience) {
-            AnnouncementCreateRequest.Audience.ALL -> AnnouncementAudience.ALL
-            AnnouncementCreateRequest.Audience.PROGRAM -> AnnouncementAudience.PROGRAM
+            ApiAnnouncementAudience.ALL -> AnnouncementAudience.ALL
+            ApiAnnouncementAudience.PROGRAM -> AnnouncementAudience.PROGRAM
         }
 
     private fun matchesAudience(announcement: Announcement, account: Account, programCode: String?): Boolean {
