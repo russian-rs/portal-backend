@@ -1,7 +1,6 @@
 package rs.russian.portal.announcement.service
 
 import jakarta.persistence.EntityNotFoundException
-import org.springframework.dao.DataIntegrityViolationException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.AnnouncementCreateRequest
@@ -9,7 +8,6 @@ import rs.russian.generated.model.AnnouncementDto
 import rs.russian.generated.model.UnreadAnnouncementsCountDto
 import rs.russian.generated.model.AnnouncementAudience as ApiAnnouncementAudience
 import rs.russian.portal.announcement.domain.Announcement
-import rs.russian.portal.announcement.domain.AnnouncementRead
 import rs.russian.portal.announcement.domain.enums.AnnouncementAudience
 import rs.russian.portal.announcement.mapper.AnnouncementMapper
 import rs.russian.portal.announcement.repository.AnnouncementReadRepository
@@ -61,20 +59,11 @@ class AnnouncementService(
             throw InvalidRequestException("Announcement is not available for current user")
         }
 
-        if (announcementReadRepository.existsByAnnouncementIdAndAccountId(announcementId, account.id!!)) {
-            return
-        }
-
-        try {
-            announcementReadRepository.save(
-                AnnouncementRead(
-                    announcementId = announcementId,
-                    accountId = account.id!!,
-                )
-            )
-        } catch (_: DataIntegrityViolationException) {
-            // duplicate mark-read is ok (concurrent requests)
-        }
+        announcementReadRepository.insertIfAbsent(
+            id = UUID.randomUUID(),
+            announcementId = announcementId,
+            accountId = account.id!!,
+        )
     }
 
     @Transactional
