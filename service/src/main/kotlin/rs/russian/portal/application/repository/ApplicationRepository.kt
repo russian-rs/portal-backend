@@ -23,6 +23,9 @@ interface ApplicationRepository : JpaRepository<Application, UUID> {
     fun findByEmail(email: String): Optional<Application>
 
     @EntityGraph(GRAPH_FULL)
+    fun findAllByEmail(email: String): List<Application>
+
+    @EntityGraph(GRAPH_FULL)
     fun findByEmailAndStatusNotIn(email: String, statuses: List<ApplicationStatus>): Optional<Application>
 
     @EntityGraph(GRAPH_FULL)

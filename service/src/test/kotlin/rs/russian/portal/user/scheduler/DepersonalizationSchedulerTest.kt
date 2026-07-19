@@ -41,12 +41,11 @@ class DepersonalizationSchedulerTest {
         every {
             accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
         } returns listOf(account.id!!)
-        every { accountRepository.findAllByIdIn(listOf(account.id!!), any()) } returns listOf(account)
         every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns listOf(admin)
 
         scheduler.run()
 
-        verify { depersonalizationService.depersonalize(account, listOf(admin)) }
+        verify { depersonalizationService.depersonalize(account.id!!, listOf(admin), thresholdDate) }
     }
 
     @Test
@@ -58,8 +57,7 @@ class DepersonalizationSchedulerTest {
 
         scheduler.run()
 
-        verify(exactly = 0) { depersonalizationService.depersonalize(any(), any()) }
-        verify(exactly = 0) { accountRepository.findAllByIdIn(any<Collection<Int>>(), any()) }
+        verify(exactly = 0) { depersonalizationService.depersonalize(any(), any(), any()) }
         verify(exactly = 0) { accountRepository.findAllActiveByGroup(any()) }
     }
 
@@ -71,12 +69,11 @@ class DepersonalizationSchedulerTest {
         every {
             accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
         } returns listOf(account.id!!)
-        every { accountRepository.findAllByIdIn(listOf(account.id!!), any()) } returns listOf(account)
         every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns emptyList()
 
         scheduler.run()
 
-        verify { depersonalizationService.depersonalize(account, emptyList()) }
+        verify { depersonalizationService.depersonalize(account.id!!, emptyList(), thresholdDate) }
     }
 
     @Test
@@ -89,14 +86,15 @@ class DepersonalizationSchedulerTest {
         every {
             accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
         } returns listOf(account1.id!!, account2.id!!)
-        every { accountRepository.findAllByIdIn(any<Collection<Int>>(), any()) } returns listOf(account1, account2)
         every { accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name) } returns listOf(admin)
-        every { depersonalizationService.depersonalize(account1, listOf(admin)) } throws RuntimeException("boom")
+        every {
+            depersonalizationService.depersonalize(account1.id!!, listOf(admin), thresholdDate)
+        } throws RuntimeException("boom")
 
         scheduler.run()
 
-        verify { depersonalizationService.depersonalize(account1, listOf(admin)) }
-        verify { depersonalizationService.depersonalize(account2, listOf(admin)) }
+        verify { depersonalizationService.depersonalize(account1.id!!, listOf(admin), thresholdDate) }
+        verify { depersonalizationService.depersonalize(account2.id!!, listOf(admin), thresholdDate) }
     }
 
     private fun createAccount(id: Int, username: String, email: String, contractEndDate: LocalDate): Account {

@@ -3,7 +3,6 @@ package rs.russian.portal.user.scheduler
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.domain.Sort
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import rs.russian.portal.user.domain.enums.DepersonalizationStatus
@@ -35,24 +34,26 @@ class DepersonalizationScheduler(
             log.info("No accounts found for depersonalization")
             return
         }
-        val accounts = accountRepository.findAllByIdIn(accountIds, Sort.unsorted())
 
         val admins = accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name)
         if (admins.isEmpty()) {
             log.warn("No ADMIN_VOLUNTEER coordinators found, depersonalizing accounts without notifications")
         }
 
+        var processed = 0
         var failures = 0
-        accounts.forEach { account ->
+        accountIds.forEach { accountId ->
             try {
-                depersonalizationService.depersonalize(account, admins)
+                if (depersonalizationService.depersonalize(accountId, admins, thresholdDate) != null) {
+                    processed += 1
+                }
             } catch (ex: Exception) {
                 failures += 1
-                log.error("Failed to depersonalize account {}", account.username, ex)
+                log.error("Failed to depersonalize account {}", accountId, ex)
             }
         }
 
-        log.info("Depersonalization processed: {} (failures: {})", accounts.size - failures, failures)
+        log.info("Depersonalization processed: {} (failures: {})", processed, failures)
     }
 
     companion object {
