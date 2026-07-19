@@ -1,5 +1,6 @@
 package rs.russian.portal.application.service
 
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -67,7 +68,17 @@ class ApplicationEventListener(
                 }
             }
             if (application.type == ApplicationType.PROLONGATION) {
-                val account = accountService.findAccountByEmail(application.email)!!
+                val account = accountService.findAccountByEmail(application.email)
+                if (account == null) {
+                    // The account this prolongation targeted no longer resolves by email — it was
+                    // depersonalized (email replaced by a sentinel) while the application sat pending.
+                    // Nothing to re-activate; skip rather than NPE on the removed identity.
+                    log.warn(
+                        "Prolongation application {} references a missing/depersonalized account, skipping",
+                        application.id,
+                    )
+                    return
+                }
                 accountService.switchActiveState(account.id!!, true)
                 val contracts = contractMapper.map(account.contracts)
                 contracts.add(
@@ -92,5 +103,9 @@ class ApplicationEventListener(
             application.project != null -> accountService.setProject(accountId, application.project!!.code)
             application.program != null -> accountService.setProgram(accountId, application.program!!.code)
         }
+    }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(ApplicationEventListener::class.java)
     }
 }
