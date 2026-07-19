@@ -15,4 +15,52 @@
         <packageUrl regex="true">^pkg:maven/org\.apache\.logging\.log4j/log4j\-api@.*$</packageUrl>
         <cve>CVE-2025-68161</cve>
     </suppress>
+    <suppress>
+        <notes>Not applicable - CVE-2026-42582 is in QpackDecoder of netty-codec-http3 (HTTP/3), a 4.2.x-only
+        module fixed in 4.2.13.Final. This project uses netty 4.1.x (HTTP/1.1 and HTTP/2 only) and does
+        not depend on netty-codec-http3, so the vulnerable code path is not on the classpath.</notes>
+        <packageUrl regex="true">^pkg:maven/io\.netty/netty-.*@.*$</packageUrl>
+        <cve>CVE-2026-42582</cve>
+    </suppress>
+    <suppress>
+        <notes>Not applicable - CVE-2026-47835 affects only the Elasticsearch, OpenSearch and GemFire vector
+        stores (spring-ai-elasticsearch-store / -opensearch-store / -gemfire-store). This project uses the
+        OpenAI model starter only and includes none of those vector store modules.</notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.ai/spring-ai-.*@.*$</packageUrl>
+        <cve>CVE-2026-47835</cve>
+    </suppress>
+    <suppress>
+        <notes>Not applicable - CVE-2026-41863 is a path traversal in Spring AI's support for Anthropic's
+        Skills API. This project uses the OpenAI model only and does not use the Anthropic Skills API.</notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework\.ai/spring-ai-.*@.*$</packageUrl>
+        <cve>CVE-2026-41863</cve>
+    </suppress>
+    <suppress>
+        <notes>Risk accepted (build-time only) - CVE-2026-53914 is code execution via unsafe deserialization
+        of Kotlin build cache metadata, fixed in Kotlin 2.4.20. The affected artifacts are compiler/build
+        tooling on the build classpath, not shipped in the runtime bootJar. Exploitation requires an
+        attacker-controlled build cache; this project uses no shared/remote untrusted build cache. The
+        Kotlin 2.4.x toolchain upgrade is tracked as a separate change. Revisit once that lands.</notes>
+        <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/.*@.*$</packageUrl>
+        <cve>CVE-2026-53914</cve>
+    </suppress>
+    <suppress>
+        <notes>Not applicable - CVE-2026-54399 is a DoS in the HTTP/1.1 message parser of Apache
+        HttpComponents Core 5 (httpcore5), affecting 5.4.2 and earlier; the fix (finite header line
+        length / count defaults) landed in httpcore5 5.4.3. This project ships httpcore 4.4.16 - the
+        terminal 4.x release, pulled in transitively by the AWS SDK apache-client - which does not
+        contain the vulnerable 5.x parser. Dependency-check matches it by CPE only; no 4.x fix exists
+        because the 4.x line is not affected.</notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.httpcomponents/httpcore@.*$</packageUrl>
+        <cve>CVE-2026-54399</cve>
+    </suppress>
+    <suppress>
+        <notes>Not applicable - CVE-2026-54428 is a DoS in the HTTP/2 HPACK decoder of the httpcore5-h2
+        module (Apache HttpComponents Core 5). This project ships httpcore 4.4.16, the terminal 4.x
+        release pulled in transitively by the AWS SDK apache-client; the 4.x line has no HTTP/2 / HPACK
+        support and none of the vulnerable code is on the classpath. Dependency-check matches it by CPE
+        only; no 4.x fix exists because the 4.x line is not affected.</notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.httpcomponents/httpcore@.*$</packageUrl>
+        <cve>CVE-2026-54428</cve>
+    </suppress>
 </suppressions>
