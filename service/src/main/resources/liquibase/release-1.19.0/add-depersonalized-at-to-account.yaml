@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.19.0-add-depersonalized-at-to-account
+      author: Alexey S
+      changes:
+        - addColumn:
+            tableName: account
+            columns:
+              - column:
+                  name: depersonalized_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true

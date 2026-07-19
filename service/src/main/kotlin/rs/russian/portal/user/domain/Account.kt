@@ -72,6 +72,8 @@ class Account(
     @Enumerated(STRING)
     var depersonalizationStatus: DepersonalizationStatus = DepersonalizationStatus.NONE,
 
+    var depersonalizedAt: LocalDateTime? = null,
+
     var lastSynced: LocalDateTime? = null,
 
     ) : JpaEntity<Int>() {
