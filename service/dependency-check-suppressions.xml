@@ -44,4 +44,23 @@
         <packageUrl regex="true">^pkg:maven/org\.jetbrains\.kotlin/.*@.*$</packageUrl>
         <cve>CVE-2026-53914</cve>
     </suppress>
+    <suppress>
+        <notes>Not applicable - CVE-2026-54399 is a DoS in the HTTP/1.1 message parser of Apache
+        HttpComponents Core 5 (httpcore5), affecting 5.4.2 and earlier; the fix (finite header line
+        length / count defaults) landed in httpcore5 5.4.3. This project ships httpcore 4.4.16 - the
+        terminal 4.x release, pulled in transitively by the AWS SDK apache-client - which does not
+        contain the vulnerable 5.x parser. Dependency-check matches it by CPE only; no 4.x fix exists
+        because the 4.x line is not affected.</notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.httpcomponents/httpcore@.*$</packageUrl>
+        <cve>CVE-2026-54399</cve>
+    </suppress>
+    <suppress>
+        <notes>Not applicable - CVE-2026-54428 is a DoS in the HTTP/2 HPACK decoder of the httpcore5-h2
+        module (Apache HttpComponents Core 5). This project ships httpcore 4.4.16, the terminal 4.x
+        release pulled in transitively by the AWS SDK apache-client; the 4.x line has no HTTP/2 / HPACK
+        support and none of the vulnerable code is on the classpath. Dependency-check matches it by CPE
+        only; no 4.x fix exists because the 4.x line is not affected.</notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.httpcomponents/httpcore@.*$</packageUrl>
+        <cve>CVE-2026-54428</cve>
+    </suppress>
 </suppressions>
