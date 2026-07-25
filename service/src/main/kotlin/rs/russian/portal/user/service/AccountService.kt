@@ -3,6 +3,7 @@ package rs.russian.portal.user.service
 import io.authentik.model.User
 import jakarta.persistence.EntityManager
 import jakarta.persistence.EntityNotFoundException
+import org.slf4j.LoggerFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
 import org.springframework.data.domain.Pageable
@@ -21,6 +22,7 @@ import rs.russian.portal.shared.security.currentUserLogin
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.ResidencePermit
 import rs.russian.portal.user.domain.UserInfo
+import rs.russian.portal.user.domain.enums.DepersonalizationStatus
 import rs.russian.portal.user.domain.specification.searchSpecification
 import rs.russian.portal.user.mapper.ContractMapper
 import rs.russian.portal.user.mapper.ResidencePermitMapper
@@ -94,6 +96,7 @@ class AccountService(
         val email = oidcUser.userInfo.email
         val id = authentikUserService.getUser(email)!!.pk
         accountRepository.findById(id).ifPresentOrElse({
+            if (isDepersonalized(it)) return@ifPresentOrElse
             userMapper.update(oidcUser.userInfo, it)
             it.info = it.info ?: UserInfo.default(it)
             accountRepository.saveAndFlush(it)
@@ -108,6 +111,7 @@ class AccountService(
     @Transactional
     fun createOrUpdateAccount(ssoUser: User): Account {
         accountRepository.findById(ssoUser.pk).ifPresentOrElse({
+            if (isDepersonalized(it)) return@ifPresentOrElse
             userMapper.update(ssoUser, it)
             it.info = it.info ?: UserInfo.default(it)
             accountRepository.saveAndFlush(it)
@@ -117,6 +121,20 @@ class AccountService(
             accountRepository.saveAndFlush(account)
         })
         return getAccount(ssoUser.pk)
+    }
+
+    /**
+     * Depersonalization scrubs the local account but not the Authentik record. If that record is later
+     * re-enabled, an SSO sync or OIDC login would otherwise re-run [UserMapper.update] and overwrite the
+     * sentinels with the real email/name/groups still held in Authentik — resurrecting the erased identity
+     * in place. A DEPERSONALIZED account is terminal, so we never let SSO write back over it.
+     */
+    private fun isDepersonalized(account: Account): Boolean {
+        if (account.depersonalizationStatus == DepersonalizationStatus.DEPERSONALIZED) {
+            log.warn("Skipping SSO write-back for depersonalized account {}", account.username)
+            return true
+        }
+        return false
     }
 
     @Transactional(readOnly = true)
@@ -145,6 +163,9 @@ class AccountService(
             return account
         }
         account.active = isActive
+        if (isActive) {
+            resetPendingDepersonalization(account)
+        }
         authentikUserService.switchActiveState(account, isActive)
         return account
     }
@@ -154,7 +175,20 @@ class AccountService(
         val account = getAccount(id)
         account.contracts.clear()
         account.contracts.addAll(contractList.map { contractMapper.map(it, account) })
+        resetPendingDepersonalization(account)
         return account
+    }
+
+    /**
+     * A returning volunteer (reactivated or given a new contract) is no longer pending depersonalization, so
+     * the retention clock restarts from NONE and the warning is re-sent when it next comes due. A WARNED
+     * account is always inactive, so this never fights the scheduler; a DEPERSONALIZED account is terminal
+     * and is left untouched.
+     */
+    private fun resetPendingDepersonalization(account: Account) {
+        if (account.depersonalizationStatus == DepersonalizationStatus.WARNED) {
+            account.depersonalizationStatus = DepersonalizationStatus.NONE
+        }
     }
 
     @Transactional
@@ -258,5 +292,9 @@ class AccountService(
         accounts.forEach { account -> entityManager.detach(account) }
         val accountsFull = accountRepository.findAllByIdIn(accounts.mapNotNull { it.id }, pageable.sort)
         return PageImpl(accountsFull, accounts.pageable, accounts.totalElements)
+    }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(AccountService::class.java)
     }
 }

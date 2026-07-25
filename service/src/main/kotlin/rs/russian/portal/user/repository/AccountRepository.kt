@@ -127,24 +127,27 @@ interface AccountRepository : JpaRepository<Account, Int> {
     )
     fun findAllActiveByGroup(@Param("group") group: String): List<Account>
 
-    @EntityGraph(value = GRAPH_FULL)
+    /**
+     * IDs of inactive accounts in the given depersonalization [status] whose latest contract ended on or
+     * before [thresholdDate]. The inner join skips accounts without contracts. Returns IDs only — callers
+     * re-fetch full accounts via [findAllByIdIn] with [GRAPH_FULL], since `GROUP BY`/`HAVING` can't be
+     * combined with an entity-graph fetch.
+     */
     @Query(
         """
-        SELECT a
+        SELECT a.id
         FROM Account a
+        JOIN a.contracts c
         WHERE a.active = false
           AND a.depersonalizationStatus = :status
-          AND (
-              SELECT MAX(c.endDate)
-              FROM Contract c
-              WHERE c.account = a
-          ) <= :thresholdDate
+        GROUP BY a.id
+        HAVING MAX(c.endDate) <= :thresholdDate
         """
     )
-    fun findForDepersonalizationWarning(
+    fun findDepersonalizationCandidateIds(
         @Param("thresholdDate") thresholdDate: LocalDate,
-        @Param("status") status: DepersonalizationStatus = DepersonalizationStatus.NONE,
-    ): List<Account>
+        @Param("status") status: DepersonalizationStatus,
+    ): List<Int>
 
     @EntityGraph(value = GRAPH_FULL)
     @Query(
