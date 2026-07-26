@@ -3,6 +3,7 @@ package rs.russian.portal.user.scheduler
 import net.javacrumbs.shedlock.spring.annotation.SchedulerLock
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.domain.Sort
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 import org.thymeleaf.TemplateEngine
@@ -31,11 +32,12 @@ class DepersonalizationWarningScheduler(
     fun run() {
         val thresholdDate = LocalDate.now().minus(warningPeriod)
 
-        val accounts = accountRepository.findForDepersonalizationWarning(thresholdDate)
-        if (accounts.isEmpty()) {
+        val accountIds = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
+        if (accountIds.isEmpty()) {
             log.info("No accounts found for depersonalization warning")
             return
         }
+        val accounts = accountRepository.findAllByIdIn(accountIds, Sort.unsorted())
 
         val admins = accountRepository.findAllActiveByGroup(UserGroup.ADMIN_VOLUNTEER.name)
         if (admins.isEmpty()) {

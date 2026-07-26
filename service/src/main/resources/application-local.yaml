@@ -27,6 +27,7 @@ app:
     user-sync: "-"
     contract-expiration: "-"
     depersonalization-warning: "-"
+    depersonalization: "-"
 
 ds:
   cf:

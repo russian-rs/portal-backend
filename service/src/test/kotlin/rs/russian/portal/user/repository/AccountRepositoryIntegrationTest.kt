@@ -12,6 +12,7 @@ import rs.russian.portal.user.domain.enums.DepersonalizationStatus
 import rs.russian.portal.user.domain.enums.UserGroup
 import java.time.LocalDate
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
 class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
@@ -170,12 +171,10 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.flush()
 
         // When
-        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
 
         // Then
-        assertEquals(1, result.size)
-        assertEquals("depers_warn_unique", result[0].username)
+        assertTrue(result.contains(10401))
     }
 
     @Test
@@ -200,11 +199,10 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.flush()
 
         // When
-        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
 
         // Then
-        assertTrue(result.isEmpty())
+        assertFalse(result.contains(10501))
     }
 
     @Test
@@ -228,12 +226,11 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.save(account)
         accountRepository.flush()
 
-        // When
-        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        // When — querying for NONE accounts must not pick up a WARNED one
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
 
         // Then
-        assertTrue(result.isEmpty())
+        assertFalse(result.contains(10601))
     }
 
     @Test
@@ -258,11 +255,10 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.flush()
 
         // When
-        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
 
         // Then
-        assertTrue(result.isEmpty())
+        assertFalse(result.contains(10701))
     }
 
     @Test
@@ -292,18 +288,143 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
         accountRepository.flush()
 
         // When — threshold is before the latest contract end, so should NOT match
-        val result = accountRepository.findForDepersonalizationWarning(thresholdDate)
-            .filter { it.username.endsWith("_unique") }
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.NONE)
 
         // Then
-        assertTrue(result.isEmpty())
+        assertFalse(result.contains(10801))
 
         // When — threshold after the latest contract end, should match
-        val resultAfter = accountRepository.findForDepersonalizationWarning(LocalDate.of(2022, 7, 2))
-            .filter { it.username.endsWith("_unique") }
+        val resultAfter =
+            accountRepository.findDepersonalizationCandidateIds(LocalDate.of(2022, 7, 2), DepersonalizationStatus.NONE)
 
         // Then
-        assertEquals(1, resultAfter.size)
-        assertEquals("multi_contract_unique", resultAfter[0].username)
+        assertTrue(resultAfter.contains(10801))
+    }
+
+    @Test
+    fun `findForDepersonalization should return inactive WARNED accounts with contract end before threshold`() {
+        // Given
+        val thresholdDate = LocalDate.of(2021, 5, 1)
+        val account = Account(
+            id = 11001,
+            username = "depers_exec_unique",
+            email = "depers_exec_unique@example.com",
+            fullName = "Depers Exec User",
+            active = false,
+            depersonalizationStatus = DepersonalizationStatus.WARNED,
+        )
+        account.contracts.add(
+            Contract(
+                account = account,
+                startDate = LocalDate.of(2019, 1, 1),
+                endDate = LocalDate.of(2021, 4, 30),
+            )
+        )
+        accountRepository.save(account)
+        accountRepository.flush()
+
+        // When
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
+
+        // Then
+        assertTrue(result.contains(11001))
+    }
+
+    @Test
+    fun `findForDepersonalization should not return accounts that were not warned`() {
+        // Given
+        val thresholdDate = LocalDate.of(2021, 5, 1)
+        val noneAccount = Account(
+            id = 11101,
+            username = "depers_none_unique",
+            email = "depers_none_unique@example.com",
+            fullName = "Not Warned User",
+            active = false,
+            depersonalizationStatus = DepersonalizationStatus.NONE,
+        )
+        val doneAccount = Account(
+            id = 11102,
+            username = "depers_done_unique",
+            email = "depers_done_unique@example.com",
+            fullName = "Already Depersonalized User",
+            active = false,
+            depersonalizationStatus = DepersonalizationStatus.DEPERSONALIZED,
+        )
+        listOf(noneAccount, doneAccount).forEach { acc ->
+            acc.contracts.add(
+                Contract(
+                    account = acc,
+                    startDate = LocalDate.of(2019, 1, 1),
+                    endDate = LocalDate.of(2021, 4, 30),
+                )
+            )
+        }
+        accountRepository.saveAll(listOf(noneAccount, doneAccount))
+        accountRepository.flush()
+
+        // When
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
+
+        // Then
+        assertFalse(result.contains(11101))
+        assertFalse(result.contains(11102))
+    }
+
+    @Test
+    fun `findForDepersonalization should not return active accounts`() {
+        // Given
+        val thresholdDate = LocalDate.of(2021, 5, 1)
+        val account = Account(
+            id = 11201,
+            username = "depers_active_unique",
+            email = "depers_active_unique@example.com",
+            fullName = "Reactivated User",
+            active = true,
+            depersonalizationStatus = DepersonalizationStatus.WARNED,
+        )
+        account.contracts.add(
+            Contract(
+                account = account,
+                startDate = LocalDate.of(2019, 1, 1),
+                endDate = LocalDate.of(2021, 4, 30),
+            )
+        )
+        accountRepository.save(account)
+        accountRepository.flush()
+
+        // When
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
+
+        // Then
+        assertFalse(result.contains(11201))
+    }
+
+    @Test
+    fun `findForDepersonalization should not return accounts with contract end after threshold`() {
+        // Given
+        val thresholdDate = LocalDate.of(2021, 5, 1)
+        val account = Account(
+            id = 11301,
+            username = "depers_future_unique",
+            email = "depers_future_unique@example.com",
+            fullName = "Future Exec User",
+            active = false,
+            depersonalizationStatus = DepersonalizationStatus.WARNED,
+        )
+        account.contracts.add(
+            Contract(
+                account = account,
+                startDate = LocalDate.of(2019, 1, 1),
+                endDate = LocalDate.of(2021, 5, 2),
+            )
+        )
+        accountRepository.save(account)
+        accountRepository.flush()
+
+        // When
+        val result = accountRepository.findDepersonalizationCandidateIds(thresholdDate, DepersonalizationStatus.WARNED)
+
+        // Then
+        assertFalse(result.contains(11301))
     }
 }

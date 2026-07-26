@@ -16,11 +16,15 @@ group = "rs.russian"
 version = "1.16.0"
 
 ext['commons-lang3.version'] = '3.18.0'
-ext['netty.version'] = '4.1.133.Final'
-ext['tomcat.version'] = '10.1.55'
+ext['netty.version'] = '4.1.136.Final'
+ext['tomcat.version'] = '10.1.57'
 ext['log4j2.version'] = '2.26.0'
-ext['postgresql.version'] = '42.7.11'
+ext['postgresql.version'] = '42.7.13'
 ext['thymeleaf.version'] = '3.1.5.RELEASE'
+// Security patch bumps within the Spring Boot 3.5.x managed minor lines (see OWASP scan).
+ext['spring-framework.version'] = '6.2.19'
+ext['spring-security.version'] = '6.5.11'
+ext['jackson-bom.version'] = '2.21.4'
 
 repositories {
     mavenCentral()
@@ -35,6 +39,11 @@ dependencyCheck {
     suppressionFile = file("dependency-check-suppressions.xml").absolutePath
     nvd {
         apiKey = System.getenv("NVD_API_KEY") ?: ""
+        // Throttle requests to the NVD API: the initial full database download fires many
+        // paginated requests and NVD answers bursts with HTTP 503. A delay between calls plus
+        // extra retries lets the download complete and seed the cache without tripping throttling.
+        delay = 4000
+        maxRetryCount = 30
     }
 }
 
@@ -80,7 +89,6 @@ dependencies {
     testImplementation("io.mockk:mockk:1.13.8")
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testImplementation("org.junit.jupiter:junit-jupiter-engine")
-    implementation("io.github.serpro69:kotlin-faker:2.0.0-rc.11")
     testImplementation("org.instancio:instancio-core:5.4.1")
 
     // S3
@@ -133,7 +141,7 @@ dependencies {
 
 dependencyManagement {
     imports {
-        mavenBom("org.springframework.ai:spring-ai-bom:1.1.6")
+        mavenBom("org.springframework.ai:spring-ai-bom:1.1.8")
     }
 }
 

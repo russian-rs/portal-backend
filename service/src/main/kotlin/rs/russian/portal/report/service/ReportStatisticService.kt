@@ -35,6 +35,21 @@ class ReportStatisticService(
         this.year = year
     }
 
+    /**
+     * KNOWN LIMITATION — demographic drift from depersonalization (accepted trade-off).
+     *
+     * Depersonalization ([rs.russian.portal.user.service.AccountDepersonalizationService]) nulls a
+     * volunteer's `gender` and `birthDate` but keeps their `username` and contracts. As a result, for any
+     * year that included a since-depersonalized volunteer:
+     *  - [totalUsers] (counted by DISTINCT username over overlapping contracts) STILL counts them;
+     *  - the gender breakdown ([getGenderStatistics] groups by gender) drops them into a `null` bucket that
+     *    is not surfaced as male/female;
+     *  - the age slices ([getAgeSliceStatistics] filters `birth_date IS NOT NULL`) exclude them entirely.
+     *
+     * So `maleCount + femaleCount` and `Σ(age slices)` will be LESS than [totalUsers], and historical years
+     * shrink retroactively as volunteers are depersonalized over time. This is accepted: personal-data
+     * erasure takes precedence over demographic reconciliation. Do not "fix" it by un-nulling those fields.
+     */
     private fun getVolunteerStat(yearStart: LocalDate, yearEnd: LocalDate): VolunteerStatistics {
         val ageSlices = getAgeSliceStatistics(yearStart, yearEnd)
         val genderSlices = getGenderStatistics(yearStart, yearEnd)

@@ -145,6 +145,8 @@ class SecurityConfig(
             "/cities/search",
             "/cities/{code}",
             "/csrf",
+            "/programs",
+            "/projects",
         )
 
         // Endpoints that don't need CSRF (public endpoints protected by captcha or non-sensitive)

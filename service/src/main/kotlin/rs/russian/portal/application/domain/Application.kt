@@ -84,7 +84,43 @@ class Application(
 
     ) : JpaEntity<UUID>() {
 
+    /**
+     * Irreversibly scrubs the applicant's personal data, mirroring account depersonalization. Structural
+     * and statistical fields (status, type, created, contract dates/type, program, project) are kept so the
+     * application funnel still aggregates; free-text, contact and identifying fields are cleared and the
+     * moderation notes (which may quote personal data) are removed.
+     */
+    fun depersonalize() {
+        email = DEPERSONALIZED_EMAIL
+        name = DEPERSONALIZED_NAME
+        patronymic = null
+        birthDate = null
+        passport = null
+        citizenship = null
+        telegram = null
+        inSerbia = null
+        enterDate = null
+        city = null
+        postalCode = null
+        address = null
+        phone = null
+        residenceRequired = null
+        occupation = null
+        gender = null
+        hasExperience = null
+        experience = null
+        languages = null
+        skills = null
+        goal = null
+        bio = null
+        refuseReason = null
+        comment = null
+        notes.clear()
+    }
+
     companion object {
         const val GRAPH_FULL = "Application.Full"
+        private const val DEPERSONALIZED_NAME = "Деперсонализированный пользователь"
+        private const val DEPERSONALIZED_EMAIL = "depersonalized@deleted.local"
     }
 }
