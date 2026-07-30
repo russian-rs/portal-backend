@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.35.0
+  version: 1.36.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -957,6 +957,29 @@ paths:
         "500":
           $ref: "#/components/responses/ServerError"
 
+  /statistics/{year}/cities:
+    get:
+      operationId: getCityStatistics
+      description: Количество волонтёров по населённым пунктам за выбранный год
+      tags:
+        - statistics
+      parameters:
+        - name: year
+          in: path
+          description: Год, за который считаются волонтёры
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: Разбивка волонтёров по населённым пунктам за год
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CityStatistics"
+        "500":
+          $ref: "#/components/responses/ServerError"
+
   /ticket:
     post:
       operationId: createTicket
@@ -1114,6 +1137,47 @@ components:
           $ref: "#/components/schemas/VolunteerStatistics"
         finalUsersStatistics:
           $ref: "#/components/schemas/FinalUsersStatistics"
+    CityStatItem:
+      type: object
+      required: [ code, name, nameCyrillic, count ]
+      properties:
+        code:
+          type: string
+          nullable: true
+          description: >
+            Код города из справочника. null — сводная запись «прочее»: все населённые пункты,
+            которых нет в справочнике, одним числом. Такая запись в ответе не более одной
+        name:
+          type: string
+          nullable: true
+          description: Название латиницей из справочника; null у сводной записи «прочее»
+        nameCyrillic:
+          type: string
+          nullable: true
+          description: Название кириллицей из справочника; null у сводной записи «прочее»
+        count:
+          type: integer
+          description: Количество волонтёров, активных в выбранном году
+    CityStatistics:
+      type: object
+      required: [ year, items, totalCount, withoutCityCount ]
+      properties:
+        year:
+          type: integer
+          description: Отчетный год
+        items:
+          type: array
+          description: >
+            Населённые пункты, где есть волонтёры, по убыванию количества;
+            сводная запись «прочее» (code = null) всегда последняя
+          items:
+            $ref: "#/components/schemas/CityStatItem"
+        totalCount:
+          type: integer
+          description: Всего волонтёров, активных в году (сходится с finalUsersStatistics.totalCount)
+        withoutCityCount:
+          type: integer
+          description: Волонтёры без указанного населённого пункта
     PageRequest:
       type: object
       description: Paging object

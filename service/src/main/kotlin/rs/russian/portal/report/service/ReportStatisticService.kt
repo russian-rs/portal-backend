@@ -2,6 +2,8 @@ package rs.russian.portal.report.service
 
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import rs.russian.generated.model.CityStatItem
+import rs.russian.generated.model.CityStatistics
 import rs.russian.generated.model.FinalUsersStatistics
 import rs.russian.generated.model.ProgramStatItem
 import rs.russian.generated.model.ProgramStatistics
@@ -33,6 +35,41 @@ class ReportStatisticService(
         volunteerStatistics = getVolunteerStat(yearStart, yearEnd)
         finalUsersStatistics = getFinalUsersStat(yearStart, yearEnd)
         this.year = year
+    }
+
+    /**
+     * Volunteers per settlement for [year], same year semantics as [getStatistics]: a volunteer counts if any
+     * of their contracts overlaps the year.
+     *
+     * `withoutCityCount` is derived as the remainder rather than counted separately: the breakdown starts from
+     * `user_info` while [getTotalUserCount] starts from `account`, so subtracting keeps the two consistent even
+     * for volunteers with no `user_info` row at all. The remainder is coerced at zero as a guard: every
+     * volunteer lands in at most one group, so the sum cannot exceed the total unless a `user_info.city` value
+     * resolves to two dictionary rows at once — which needs two entries sharing a normalized name.
+     */
+    @Transactional(readOnly = true)
+    fun getCityStatistics(year: Int): CityStatistics {
+        val yearStart = LocalDate.of(year, 1, 1)
+        val yearEnd = yearStart.plusYears(1).minusDays(1)
+
+        val rows = accountRepository.countVolunteersByCity(yearStart, yearEnd)
+        val totalUsers = getTotalUserCount(yearStart, yearEnd)
+
+        val items = rows.map { r ->
+            CityStatItem(
+                code = r.cityCode,
+                name = r.cityName,
+                nameCyrillic = r.cityNameCyrillic,
+                count = r.volunteerCount
+            )
+        }
+
+        return CityStatistics(
+            year = year,
+            items = items.toMutableList(),
+            totalCount = totalUsers,
+            withoutCityCount = (totalUsers - items.sumOf { it.count }).coerceAtLeast(0)
+        )
     }
 
     /**
