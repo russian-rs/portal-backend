@@ -8,11 +8,14 @@ import rs.russian.portal.report.repository.ReportRepository
 import rs.russian.portal.testconfig.AbstractIntegrationTest
 import rs.russian.portal.user.domain.Account
 import rs.russian.portal.user.domain.Contract
+import rs.russian.portal.user.domain.UserInfo
 import rs.russian.portal.user.domain.enums.DepersonalizationStatus
 import rs.russian.portal.user.domain.enums.UserGroup
+import rs.russian.portal.user.repository.projections.CityVolunteerCountProjection
 import java.time.LocalDate
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
@@ -426,5 +429,210 @@ class AccountRepositoryIntegrationTest : AbstractIntegrationTest() {
 
         // Then
         assertFalse(result.contains(11301))
+    }
+
+    @Test
+    fun `countVolunteersByCity should resolve the dictionary by either latin or cyrillic name`() {
+        // Given — same city written three ways, all must land on one dictionary row
+        saveVolunteerWithCity(12001, "city_latin_unique", "Novi Sad")
+        saveVolunteerWithCity(12002, "city_cyrillic_unique", "Нови Сад")
+        saveVolunteerWithCity(12003, "city_lowercase_unique", "novi sad")
+
+        // When
+        val rows = countVolunteersByCityIn2025()
+
+        // Then
+        assertEquals(1, rows.size)
+        assertEquals("novi-sad", rows[0].cityCode)
+        assertEquals("Novi Sad", rows[0].cityName)
+        assertEquals("Нови Сад", rows[0].cityNameCyrillic)
+        assertEquals(3, rows[0].volunteerCount)
+    }
+
+    @Test
+    fun `countVolunteersByCity should normalize surrounding whitespace and serbian diacritics`() {
+        // Given — "Nis" without the caron and with padding must still resolve to "Niš"
+        saveVolunteerWithCity(12101, "city_diacritic_unique", "Niš")
+        saveVolunteerWithCity(12102, "city_no_diacritic_unique", "Nis")
+        saveVolunteerWithCity(12103, "city_padded_unique", "  NIS  ")
+
+        // When
+        val rows = countVolunteersByCityIn2025()
+
+        // Then
+        assertEquals(1, rows.size)
+        assertEquals("nis", rows[0].cityCode)
+        assertEquals(3, rows[0].volunteerCount)
+    }
+
+    @Test
+    fun `countVolunteersByCity should fold case for non-ascii names`() {
+        // Given — LOWER only folds Cyrillic and Š outside ASCII if the database has a UTF-8 ctype, so assert it
+        saveVolunteerWithCity(12701, "city_upper_cyrillic_unique", "  БЕЛГРАД ")
+        saveVolunteerWithCity(12702, "city_upper_diacritic_unique", "NIŠ")
+
+        // When
+        val rows = countVolunteersByCityIn2025()
+
+        // Then
+        assertEquals(listOf("belgrade", "nis"), rows.map { it.cityCode })
+        assertEquals(listOf(1, 1), rows.map { it.volunteerCount })
+    }
+
+    @Test
+    fun `countVolunteersByCity should collapse every value outside the dictionary into one row`() {
+        // Given
+        saveVolunteerWithCity(12201, "city_known_unique", "Beograd")
+        saveVolunteerWithCity(12202, "city_legacy_a_unique", "Zemun")
+        saveVolunteerWithCity(12203, "city_legacy_b_unique", "Podgorica")
+        saveVolunteerWithCity(12204, "city_legacy_c_unique", "Zemun")
+
+        // When
+        val rows = countVolunteersByCityIn2025()
+
+        // Then — one row for Beograd, one roll-up row for the three unknown values, roll-up last
+        assertEquals(2, rows.size)
+        assertEquals("belgrade", rows[0].cityCode)
+        assertEquals(1, rows[0].volunteerCount)
+        assertNull(rows[1].cityCode)
+        assertNull(rows[1].cityName)
+        assertNull(rows[1].cityNameCyrillic)
+        assertEquals(3, rows[1].volunteerCount)
+    }
+
+    @Test
+    fun `countVolunteersByCity should skip volunteers with a blank or missing city`() {
+        // Given
+        saveVolunteerWithCity(12301, "city_filled_unique", "Beograd")
+        saveVolunteerWithCity(12302, "city_null_unique", null)
+        saveVolunteerWithCity(12303, "city_blank_unique", "   ")
+
+        // When
+        val rows = countVolunteersByCityIn2025()
+
+        // Then
+        assertEquals(1, rows.size)
+        assertEquals("belgrade", rows[0].cityCode)
+        assertEquals(1, rows[0].volunteerCount)
+    }
+
+    @Test
+    fun `countVolunteersByCity should only count volunteers whose contract overlaps the year`() {
+        // Given
+        saveVolunteerWithCity(
+            12401, "city_inside_year_unique", "Beograd",
+            contractStart = LocalDate.of(2025, 6, 1), contractEnd = LocalDate.of(2025, 7, 1)
+        )
+        saveVolunteerWithCity(
+            12402, "city_spanning_year_unique", "Beograd",
+            contractStart = LocalDate.of(2024, 1, 1), contractEnd = LocalDate.of(2026, 1, 1)
+        )
+        saveVolunteerWithCity(
+            12403, "city_ends_on_jan_first_unique", "Beograd",
+            contractStart = LocalDate.of(2024, 1, 1), contractEnd = LocalDate.of(2025, 1, 1)
+        )
+        saveVolunteerWithCity(
+            12404, "city_before_year_unique", "Novi Sad",
+            contractStart = LocalDate.of(2023, 1, 1), contractEnd = LocalDate.of(2024, 12, 31)
+        )
+        saveVolunteerWithCity(
+            12405, "city_after_year_unique", "Novi Sad",
+            contractStart = LocalDate.of(2026, 1, 1), contractEnd = LocalDate.of(2026, 12, 31)
+        )
+
+        // When
+        val rows = countVolunteersByCityIn2025()
+
+        // Then — only the three overlapping contracts count; Novi Sad drops out entirely
+        assertEquals(1, rows.size)
+        assertEquals("belgrade", rows[0].cityCode)
+        assertEquals(3, rows[0].volunteerCount)
+    }
+
+    @Test
+    fun `countVolunteersByCity should count a volunteer once regardless of contract count`() {
+        // Given — two contracts, both overlapping 2025
+        val account = volunteerAccount(12501, "city_two_contracts_unique", "Beograd")
+        account.contracts.addAll(
+            listOf(
+                Contract(
+                    account = account,
+                    startDate = LocalDate.of(2025, 1, 1),
+                    endDate = LocalDate.of(2025, 6, 1),
+                ),
+                Contract(
+                    account = account,
+                    startDate = LocalDate.of(2025, 7, 1),
+                    endDate = LocalDate.of(2025, 12, 31),
+                ),
+            )
+        )
+        accountRepository.save(account)
+        accountRepository.flush()
+
+        // When
+        val rows = countVolunteersByCityIn2025()
+
+        // Then
+        assertEquals(1, rows.size)
+        assertEquals(1, rows[0].volunteerCount)
+    }
+
+    @Test
+    fun `countVolunteersByCity should order by count descending`() {
+        // Given
+        saveVolunteerWithCity(12601, "city_order_a_unique", "Novi Sad")
+        saveVolunteerWithCity(12602, "city_order_b_unique", "Beograd")
+        saveVolunteerWithCity(12603, "city_order_c_unique", "Beograd")
+        saveVolunteerWithCity(12604, "city_order_d_unique", "Zemun")
+        saveVolunteerWithCity(12605, "city_order_e_unique", "Zemun")
+        saveVolunteerWithCity(12606, "city_order_f_unique", "Zemun")
+
+        // When
+        val rows = countVolunteersByCityIn2025()
+
+        // Then — the roll-up row is pinned last even though it has the highest count
+        assertEquals(listOf("belgrade", "novi-sad", null), rows.map { it.cityCode })
+        assertEquals(listOf(2, 1, 3), rows.map { it.volunteerCount })
+    }
+
+    /**
+     * The query spans the whole table, so these tests assert on exact row sets. That holds because the seeded
+     * database has the city dictionary but no volunteers, and [cleanup] drops every `_unique` account both
+     * before and after each test — no other test class fills in `user_info.city`.
+     */
+    private fun countVolunteersByCityIn2025(): List<CityVolunteerCountProjection> =
+        accountRepository.countVolunteersByCity(LocalDate.of(2025, 1, 1), LocalDate.of(2025, 12, 31))
+
+    private fun volunteerAccount(id: Int, username: String, city: String?): Account {
+        val account = Account(
+            id = id,
+            username = username,
+            email = "$username@example.com",
+            fullName = "Volunteer $id",
+            groups = setOf(UserGroup.VOLUNTEER),
+            active = true,
+        )
+        account.info = UserInfo.default(account).apply { this.city = city }
+        return account
+    }
+
+    private fun saveVolunteerWithCity(
+        id: Int,
+        username: String,
+        city: String?,
+        contractStart: LocalDate = LocalDate.of(2025, 1, 1),
+        contractEnd: LocalDate = LocalDate.of(2025, 12, 31),
+    ) {
+        val account = volunteerAccount(id, username, city)
+        account.contracts.add(
+            Contract(
+                account = account,
+                startDate = contractStart,
+                endDate = contractEnd,
+            )
+        )
+        accountRepository.save(account)
+        accountRepository.flush()
     }
 }

@@ -14,6 +14,7 @@ import rs.russian.portal.user.domain.Account.Companion.GRAPH_FULL
 import rs.russian.portal.user.domain.enums.DepersonalizationStatus
 import rs.russian.portal.user.domain.enums.UserGroup
 import rs.russian.portal.user.repository.projections.AgeSliceCountProjection
+import rs.russian.portal.user.repository.projections.CityVolunteerCountProjection
 import rs.russian.portal.user.repository.projections.GenderCountProjection
 import rs.russian.portal.user.repository.projections.UsersStatisticGroupCountProjection
 import java.time.LocalDate
@@ -193,4 +194,54 @@ interface AccountRepository : JpaRepository<Account, Int> {
         @Param("yearStart") yearStart: LocalDate,
         @Param("yearEnd") yearEnd: LocalDate,
     ): Long
+
+    /**
+     * Volunteers per settlement among those with a contract overlapping the given year.
+     *
+     * `user_info.city` is free text with no FK to `city`, so the dictionary is resolved by comparing the
+     * value against both the Latin and the Cyrillic name, normalized for case, surrounding whitespace and
+     * Serbian diacritics. `TRANSLATE` is used rather than the `unaccent` extension: it needs no install and
+     * is IMMUTABLE, so it stays index-capable.
+     *
+     * `LOWER` folds `БЕЛГРАД` and `NIŠ` only because the database has a UTF-8 ctype; under the `C` locale it
+     * leaves every non-ASCII letter untouched and those values would fall through to the roll-up row instead.
+     *
+     * Everything that fails to resolve collapses into a single row with all city fields `null` — `GROUP BY`
+     * puts all NULLs in one group. `name`/`name_cyrillic` are grouped alongside `code` so the query does not
+     * rely on the planner recognizing the PK functional dependency through a `LEFT JOIN`. `ORDER BY
+     * (c.code IS NULL)` pins that roll-up row last, since `false < true`.
+     */
+    @Query(
+        value = """
+            SELECT
+                c.code                       AS cityCode,
+                c.name                       AS cityName,
+                c.name_cyrillic              AS cityNameCyrillic,
+                COUNT(DISTINCT ui.username)  AS volunteerCount
+            FROM user_info ui
+            JOIN account a ON a.username = ui.username
+            LEFT JOIN city c
+                   ON TRANSLATE(LOWER(TRIM(ui.city)), 'čćšžđ', 'ccszd')
+                      IN (
+                          TRANSLATE(LOWER(c.name),          'čćšžđ', 'ccszd'),
+                          TRANSLATE(LOWER(c.name_cyrillic), 'čćšžđ', 'ccszd')
+                      )
+            WHERE ui.city IS NOT NULL
+              AND TRIM(ui.city) <> ''
+              AND EXISTS (
+                  SELECT 1
+                  FROM contract ct
+                  WHERE ct.username = a.username
+                    AND ct.start_date <= :yearEnd
+                    AND ct.end_date >= :yearStart
+              )
+            GROUP BY c.code, c.name, c.name_cyrillic
+            ORDER BY (c.code IS NULL), volunteerCount DESC, cityName
+        """,
+        nativeQuery = true
+    )
+    fun countVolunteersByCity(
+        @Param("yearStart") yearStart: LocalDate,
+        @Param("yearEnd") yearEnd: LocalDate,
+    ): List<CityVolunteerCountProjection>
 }
