@@ -196,20 +196,14 @@ interface AccountRepository : JpaRepository<Account, Int> {
     ): Long
 
     /**
-     * Volunteers per settlement among those with a contract overlapping the given year.
+     * `TRANSLATE` rather than the `unaccent` extension: needs no install and stays IMMUTABLE, so the
+     * expression remains index-capable.
      *
-     * `user_info.city` is free text with no FK to `city`, so the dictionary is resolved by comparing the
-     * value against both the Latin and the Cyrillic name, normalized for case, surrounding whitespace and
-     * Serbian diacritics. `TRANSLATE` is used rather than the `unaccent` extension: it needs no install and
-     * is IMMUTABLE, so it stays index-capable.
+     * `LOWER` folds `БЕЛГРАД` and `NIŠ` only under a UTF-8 ctype; with locale `C` non-ASCII letters are left
+     * untouched and those values fall through to the roll-up row.
      *
-     * `LOWER` folds `БЕЛГРАД` and `NIŠ` only because the database has a UTF-8 ctype; under the `C` locale it
-     * leaves every non-ASCII letter untouched and those values would fall through to the roll-up row instead.
-     *
-     * Everything that fails to resolve collapses into a single row with all city fields `null` — `GROUP BY`
-     * puts all NULLs in one group. `name`/`name_cyrillic` are grouped alongside `code` so the query does not
-     * rely on the planner recognizing the PK functional dependency through a `LEFT JOIN`. `ORDER BY
-     * (c.code IS NULL)` pins that roll-up row last, since `false < true`.
+     * `name`/`name_cyrillic` are grouped beside `code` so the query does not depend on the planner
+     * recognizing the PK functional dependency through the `LEFT JOIN`.
      */
     @Query(
         value = """

@@ -152,7 +152,6 @@ class ReportStatisticServiceTest {
         assertEquals("Белград", result.items[0].nameCyrillic)
         assertEquals(142, result.items[0].count)
 
-        // roll-up row for everything absent from the dictionary
         assertNull(result.items[2].code)
         assertNull(result.items[2].name)
         assertNull(result.items[2].nameCyrillic)
