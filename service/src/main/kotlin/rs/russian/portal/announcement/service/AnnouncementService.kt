@@ -33,20 +33,23 @@ class AnnouncementService(
     @Transactional(readOnly = true)
     fun getForCurrentUser(): List<AnnouncementDto> {
         val account = accountService.getCurrentAccount()
+        if (!account.active) return emptyList()
+
         val programCode = account.info?.program?.code
         val readIds = announcementReadRepository.findAnnouncementIdsByAccountId(account.id!!).toSet()
 
-        return announcementRepository.findAllByActiveTrueOrderByCreateTimeDesc()
-            .asSequence()
-            .filter { matchesAudience(it, account, programCode) }
+        return announcementRepository.findForUser(programCode)
             .map { announcementMapper.map(it, readIds.contains(it.id)) }
-            .toList()
     }
 
     @Transactional(readOnly = true)
     fun getUnreadCount(): UnreadAnnouncementsCountDto {
-        val unread = getForCurrentUser().count { !it.read }
-        return UnreadAnnouncementsCountDto(unread)
+        val account = accountService.getCurrentAccount()
+        if (!account.active) return UnreadAnnouncementsCountDto(0)
+
+        val programCode = account.info?.program?.code
+        val count = announcementRepository.countUnreadForUser(programCode, account.id!!).toInt()
+        return UnreadAnnouncementsCountDto(count)
     }
 
     @Transactional

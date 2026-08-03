@@ -1,7 +1,7 @@
 databaseChangeLog:
   - changeSet:
       id: 1.20.0-announcement-create-table
-      author: portal
+      author: Leonid
       changes:
         - createTable:
             tableName: announcement
@@ -105,3 +105,9 @@ databaseChangeLog:
             tableName: announcement_read
             columnNames: announcement_id, account_id
             constraintName: uq_announcement_read_announcement_account
+        - createIndex:
+            tableName: announcement_read
+            indexName: idx_announcement_read_account_id
+            columns:
+              - column:
+                  name: account_id
