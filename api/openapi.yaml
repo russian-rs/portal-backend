@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.36.0
+  version: 1.36.1
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -947,6 +947,8 @@ paths:
           required: true
           schema:
             type: integer
+            minimum: 1900
+            maximum: 2100
       responses:
         "200":
           description: Статистика для мин. труд по группам за год
@@ -954,6 +956,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Statistics"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/ServerError"
 
@@ -970,6 +974,8 @@ paths:
           required: true
           schema:
             type: integer
+            minimum: 1900
+            maximum: 2100
       responses:
         "200":
           description: Разбивка волонтёров по населённым пунктам за год
@@ -977,6 +983,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/CityStatistics"
+        "400":
+          $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/ServerError"
 
@@ -1049,6 +1057,12 @@ paths:
 
 components:
   responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
     ServerError:
       description: Internal server error
       content:
