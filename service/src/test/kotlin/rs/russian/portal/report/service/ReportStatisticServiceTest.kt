@@ -10,6 +10,7 @@ import rs.russian.portal.report.repository.projections.ProgramStatProjection
 import rs.russian.portal.user.domain.enums.Gender
 import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.repository.projections.AgeSliceCountProjection
+import rs.russian.portal.user.repository.projections.CityVolunteerCountProjection
 import rs.russian.portal.user.repository.projections.GenderCountProjection
 import rs.russian.portal.user.repository.projections.UsersStatisticGroupCountProjection
 import java.time.LocalDate
@@ -17,6 +18,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class ReportStatisticServiceTest {
 
@@ -124,6 +126,80 @@ class ReportStatisticServiceTest {
         verify(exactly = 1) { accountRepository.countByStatisticGroup(yearStart, yearEnd) }
         verify(exactly = 2) { accountRepository.countByActiveDuringYear(yearStart, yearEnd) }
     }
+
+    @Test
+    fun `getCityStatistics should map rows and derive withoutCityCount as the remainder`() {
+        val year = 2025
+        val yearStart = LocalDate.of(year, 1, 1)
+        val yearEnd = LocalDate.of(year, 12, 31)
+
+        every { accountRepository.countVolunteersByCity(yearStart, yearEnd) } returns listOf(
+            cityProjection("belgrade", "Beograd", "Белград", 142),
+            cityProjection("novi-sad", "Novi Sad", "Нови Сад", 37),
+            cityProjection(null, null, null, 2)
+        )
+        every { accountRepository.countByActiveDuringYear(yearStart, yearEnd) } returns 195L
+
+        val result = service.getCityStatistics(year)
+
+        assertEquals(year, result.year)
+        assertEquals(195, result.totalCount)
+        assertEquals(14, result.withoutCityCount)
+
+        assertEquals(3, result.items.size)
+        assertEquals("belgrade", result.items[0].code)
+        assertEquals("Beograd", result.items[0].name)
+        assertEquals("Белград", result.items[0].nameCyrillic)
+        assertEquals(142, result.items[0].count)
+
+        assertNull(result.items[2].code)
+        assertNull(result.items[2].name)
+        assertNull(result.items[2].nameCyrillic)
+        assertEquals(2, result.items[2].count)
+
+        verify(exactly = 1) { accountRepository.countVolunteersByCity(yearStart, yearEnd) }
+    }
+
+    @Test
+    fun `getCityStatistics should keep withoutCityCount at zero when the breakdown exceeds the total`() {
+        val yearStart = LocalDate.of(2025, 1, 1)
+        val yearEnd = LocalDate.of(2025, 12, 31)
+
+        every { accountRepository.countVolunteersByCity(yearStart, yearEnd) } returns listOf(
+            cityProjection("belgrade", "Beograd", "Белград", 10)
+        )
+        every { accountRepository.countByActiveDuringYear(yearStart, yearEnd) } returns 4L
+
+        assertEquals(0, service.getCityStatistics(2025).withoutCityCount)
+    }
+
+    @Test
+    fun `getCityStatistics should report every volunteer as without city when no city is filled in`() {
+        val yearStart = LocalDate.of(2025, 1, 1)
+        val yearEnd = LocalDate.of(2025, 12, 31)
+
+        every { accountRepository.countVolunteersByCity(yearStart, yearEnd) } returns emptyList()
+        every { accountRepository.countByActiveDuringYear(yearStart, yearEnd) } returns 8L
+
+        val result = service.getCityStatistics(2025)
+
+        assertEquals(emptyList(), result.items)
+        assertEquals(8, result.totalCount)
+        assertEquals(8, result.withoutCityCount)
+    }
+
+    private fun cityProjection(
+        cityCode: String?,
+        cityName: String?,
+        cityNameCyrillic: String?,
+        volunteerCount: Int
+    ): CityVolunteerCountProjection =
+        object : CityVolunteerCountProjection {
+            override val cityCode: String? = cityCode
+            override val cityName: String? = cityName
+            override val cityNameCyrillic: String? = cityNameCyrillic
+            override val volunteerCount: Int = volunteerCount
+        }
 
     private fun programProjection(groupCode: String, count: Long, totalTimeSpent: Double): ProgramStatProjection =
         object : ProgramStatProjection {
