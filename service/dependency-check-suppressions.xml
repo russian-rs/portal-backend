@@ -63,4 +63,16 @@
         <packageUrl regex="true">^pkg:maven/org\.apache\.httpcomponents/httpcore@.*$</packageUrl>
         <cve>CVE-2026-54428</cve>
     </suppress>
+    <suppress until="2026-12-31Z">
+        <notes>Not applicable - CVE-2026-66299 is uncontrolled resource consumption in the WebSocket chat
+            example of Tomcat's "examples" web application; the advisory states that users who removed the
+            examples web application are not affected. Spring Boot's embedded Tomcat never ships it:
+            tomcat-embed-core-10.1.57.jar contains 1545 classes and none whose path matches example or
+            websocket/chat, so the vulnerable code is not on the classpath. Dependency-check matches it by CPE
+            against the Tomcat product version only. Cannot be bumped away yet - 10.1.57 is the newest release
+            of the 10.1.x line, the listed fix (10.1.58) is unreleased, and 11.0.x means Servlet 6.1 and
+            leaving Spring Boot 3.5. Revisit when 10.1.58 ships.</notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-.*@.*$</packageUrl>
+        <cve>CVE-2026-66299</cve>
+    </suppress>
 </suppressions>
