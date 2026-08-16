@@ -3,8 +3,10 @@ package rs.russian.portal.announcement.service
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkStatic
+import io.mockk.unmockkAll
 import io.mockk.verify
 import jakarta.persistence.EntityNotFoundException
+import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
@@ -53,6 +55,11 @@ class AnnouncementServiceTest {
             accountService,
             programRepository,
         )
+    }
+
+    @AfterEach
+    fun tearDown() {
+        unmockkAll()
     }
 
 
