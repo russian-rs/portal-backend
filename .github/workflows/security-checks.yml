@@ -125,6 +125,8 @@ jobs:
         with:
           path: ~/.gradle/dependency-check-data
           key: owasp-db-${{ hashFiles('**/build.gradle') }}
+          restore-keys: |
+            owasp-db-
 
       - name: Run Dependency Check
         env:

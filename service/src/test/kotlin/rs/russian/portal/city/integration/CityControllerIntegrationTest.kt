@@ -290,6 +290,17 @@ class CityControllerIntegrationTest: AbstractIntegrationTest() {
     }
 
     @Test
+    fun `GET search without the required name parameter should return 400`() {
+        Given {
+            contentType(ContentType.JSON)
+        } When {
+            get("/cities/search")
+        } Then {
+            statusCode(400)
+        }
+    }
+
+    @Test
     fun `full workflow test - get all cities, search by name, get by code`() {
         // Step 1: Get all active cities
         val allCities = Given {
