@@ -7,7 +7,9 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.TypeMismatchException
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
 import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.MissingServletRequestParameterException
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.ServletWebRequest
@@ -68,6 +70,19 @@ class GlobalExceptionHandler {
             .joinToString("; ") { "${it.field}: ${it.defaultMessage}" }
         log.warn("Validation failed on URL: {} - Errors: {}", getRequestUrl(request), errors)
         return ResponseEntity(ErrorResponse("Bad request: $errors"), BAD_REQUEST)
+    }
+
+    /**
+     * Spring's own 400 mapping for these never applies: this advice does not extend
+     * [org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler], so without an
+     * explicit handler both fall through to [handleAllExceptions] and a malformed client request is reported
+     * as a server fault. Only the client-error subtypes are listed — `MissingPathVariableException` is a
+     * mapping bug on our side and must stay a 500.
+     */
+    @ExceptionHandler(MissingServletRequestParameterException::class, HttpMessageNotReadableException::class)
+    fun handleMalformedRequest(ex: Exception, request: WebRequest): ResponseEntity<ErrorResponse> {
+        log.warn("Malformed request on URL: {} - Error: {}", getRequestUrl(request), ex.message)
+        return ResponseEntity(ErrorResponse(BAD_REQUEST.reasonPhrase), BAD_REQUEST)
     }
 
     @ExceptionHandler(ConstraintViolationException::class)
