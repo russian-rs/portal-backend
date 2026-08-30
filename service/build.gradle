@@ -16,8 +16,8 @@ group = "rs.russian"
 version = "1.16.0"
 
 ext['commons-lang3.version'] = '3.18.0'
-ext['netty.version'] = '4.1.136.Final'
-ext['tomcat.version'] = '10.1.57'
+ext['netty.version'] = '4.1.137.Final'   // fixes CVE-2026-62380
+ext['tomcat.version'] = '10.1.59'        // fixes 10 Tomcat CVEs; 10.1.58 RC failed vote
 ext['log4j2.version'] = '2.26.1'
 ext['postgresql.version'] = '42.7.13'
 ext['thymeleaf.version'] = '3.1.5.RELEASE'

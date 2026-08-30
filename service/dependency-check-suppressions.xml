@@ -64,15 +64,21 @@
         <cve>CVE-2026-54428</cve>
     </suppress>
     <suppress until="2026-12-31Z">
-        <notes>Not applicable - CVE-2026-66299 is uncontrolled resource consumption in the WebSocket chat
-            example of Tomcat's "examples" web application; the advisory states that users who removed the
-            examples web application are not affected. Spring Boot's embedded Tomcat never ships it:
-            tomcat-embed-core-10.1.57.jar contains 1545 classes and none whose path matches example or
-            websocket/chat, so the vulnerable code is not on the classpath. Dependency-check matches it by CPE
-            against the Tomcat product version only. Cannot be bumped away yet - 10.1.57 is the newest release
-            of the 10.1.x line, the listed fix (10.1.58) is unreleased, and 11.0.x means Servlet 6.1 and
-            leaving Spring Boot 3.5. Revisit when 10.1.58 ships.</notes>
+        <notes>Not applicable - CVE-2026-66299 is uncontrolled resource consumption in the WebSocket
+            chat example of Tomcat's "examples" web application. Spring Boot's embedded Tomcat never
+            ships it: the embed jars contain no classes matching example or websocket/chat, so the
+            vulnerable code is not on the classpath. Dependency-check matches by CPE against the Tomcat
+            product version only. Fixed upstream in 10.1.59 (10.1.58 RC failed vote); bumped in this
+            project accordingly.</notes>
         <packageUrl regex="true">^pkg:maven/org\.apache\.tomcat\.embed/tomcat-embed-.*@.*$</packageUrl>
         <cve>CVE-2026-66299</cve>
+    </suppress>
+    <suppress>
+        <notes>False positive - CVE-2026-54285 is a DoS in the JavaScript @opentelemetry/core npm
+            package (unbounded memory in W3C Baggage propagation, fixed in npm 2.8.0). This project
+            uses the Java opentelemetry-api/opentelemetry-context jars; dependency-check matches by
+            CPE only. The Java packages are not affected and there is no Java fix to apply.</notes>
+        <packageUrl regex="true">^pkg:maven/io\.opentelemetry/opentelemetry-(api|context)@.*$</packageUrl>
+        <cve>CVE-2026-54285</cve>
     </suppress>
 </suppressions>
