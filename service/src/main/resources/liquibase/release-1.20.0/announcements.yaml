@@ -1,0 +1,113 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.20.0-announcement-create-table
+      author: Leonid
+      changes:
+        - createTable:
+            tableName: announcement
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_announcement
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: version
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                  name: create_time
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                    referencedTableName: account
+                    referencedColumnNames: username
+                    foreignKeyName: fk_announcement_account
+                  name: created_by
+                  type: VARCHAR(255)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: title
+                  type: VARCHAR(200)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: body
+                  type: TEXT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: audience
+                  type: VARCHAR(32)
+              - column:
+                  name: program_code
+                  type: VARCHAR(50)
+              - column:
+                  constraints:
+                    nullable: false
+                  name: active
+                  type: BOOLEAN
+                  defaultValueBoolean: true
+        - addForeignKeyConstraint:
+            baseTableName: announcement
+            baseColumnNames: program_code
+            referencedTableName: program
+            referencedColumnNames: code
+            constraintName: fk_announcement_program
+  - changeSet:
+      id: 1.20.0-announcement-read-create-table
+      author: portal
+      changes:
+        - createTable:
+            tableName: announcement_read
+            columns:
+              - column:
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_announcement_read
+                  name: id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                  name: version
+                  type: DATETIME
+              - column:
+                  constraints:
+                    nullable: false
+                    referencedTableName: announcement
+                    referencedColumnNames: id
+                    foreignKeyName: fk_announcement_read_announcement
+                  name: announcement_id
+                  type: UUID
+              - column:
+                  constraints:
+                    nullable: false
+                    referencedTableName: account
+                    referencedColumnNames: id
+                    foreignKeyName: fk_announcement_read_account
+                  name: account_id
+                  type: INT
+              - column:
+                  constraints:
+                    nullable: false
+                  name: read_time
+                  type: DATETIME
+        - addUniqueConstraint:
+            tableName: announcement_read
+            columnNames: announcement_id, account_id
+            constraintName: uq_announcement_read_announcement_account
+        - createIndex:
+            tableName: announcement_read
+            indexName: idx_announcement_read_account_id
+            columns:
+              - column:
+                  name: account_id
