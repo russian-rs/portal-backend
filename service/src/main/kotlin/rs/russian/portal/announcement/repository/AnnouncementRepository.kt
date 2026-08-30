@@ -20,11 +20,11 @@ interface AnnouncementRepository : JpaRepository<Announcement, UUID> {
 
     @Query("""
         SELECT COUNT(*) FROM announcement
+        LEFT JOIN announcement_read ar
+            ON ar.announcement_id = id AND ar.account_id = :accountId
         WHERE active = true
           AND (audience = 'ALL' OR (audience = 'PROGRAM' AND program_code = :programCode))
-          AND id NOT IN (
-              SELECT announcement_id FROM announcement_read WHERE account_id = :accountId
-          )
+          AND ar.announcement_id IS NULL
     """, nativeQuery = true)
     fun countUnreadForUser(
         @Param("programCode") programCode: String?,
