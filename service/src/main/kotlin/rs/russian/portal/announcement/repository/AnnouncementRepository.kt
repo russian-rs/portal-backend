@@ -19,11 +19,11 @@ interface AnnouncementRepository : JpaRepository<Announcement, UUID> {
     fun findForUser(@Param("programCode") programCode: String?): List<Announcement>
 
     @Query("""
-        SELECT COUNT(*) FROM announcement
+        SELECT COUNT(*) FROM announcement a
         LEFT JOIN announcement_read ar
-            ON ar.announcement_id = id AND ar.account_id = :accountId
-        WHERE active = true
-          AND (audience = 'ALL' OR (audience = 'PROGRAM' AND program_code = :programCode))
+            ON ar.announcement_id = a.id AND ar.account_id = :accountId
+        WHERE a.active = true
+          AND (a.audience = 'ALL' OR (a.audience = 'PROGRAM' AND a.program_code = :programCode))
           AND ar.announcement_id IS NULL
     """, nativeQuery = true)
     fun countUnreadForUser(
