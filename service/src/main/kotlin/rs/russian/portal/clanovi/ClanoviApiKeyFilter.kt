@@ -14,7 +14,7 @@ import java.security.MessageDigest
 import kotlin.text.Charsets.UTF_8
 
 /**
- * Permanent office key for `/clanovi/**`. Does not touch website OAuth/cookie login.
+ * Permanent office key for Clanovi paths. Does not touch website OAuth/cookie login.
  * If [AppProperties.clanovi] key is blank, the API stays closed (401).
  */
 class ClanoviApiKeyFilter(
