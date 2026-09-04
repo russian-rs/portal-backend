@@ -38,6 +38,7 @@ class ApplicationValidationTest {
     fun setUp() {
         val controller = ApplicationController(
             noteMapper = noteMapper,
+            userMapper = mockk(relaxed = true),
             applicationMapper = applicationMapper,
             applicationService = applicationService,
             captchaService = captchaService,

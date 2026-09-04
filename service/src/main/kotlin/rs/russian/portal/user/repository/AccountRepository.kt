@@ -128,6 +128,10 @@ interface AccountRepository : JpaRepository<Account, Int> {
     )
     fun findAllActiveByGroup(@Param("group") group: String): List<Account>
 
+    // Select identifiers first so a later full EntityGraph load does not reuse partially loaded accounts.
+    @Query("SELECT a.username FROM account a WHERE a.active = true AND a.groups @> jsonb_build_array(:group)", nativeQuery = true)
+    fun findAllActiveUsernamesByGroup(@Param("group") group: String): List<String>
+
     /**
      * IDs of inactive accounts in the given depersonalization [status] whose latest contract ended on or
      * before [thresholdDate]. The inner join skips accounts without contracts. Returns IDs only — callers

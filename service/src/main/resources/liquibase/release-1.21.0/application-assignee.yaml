@@ -1,0 +1,26 @@
+databaseChangeLog:
+  - changeSet:
+      id: 1.21.0-application-assignee
+      author: portal
+      changes:
+        - addColumn:
+            tableName: application
+            columns:
+              - column:
+                  name: assignee
+                  type: VARCHAR(255)
+        - addForeignKeyConstraint:
+            baseTableName: application
+            baseColumnNames: assignee
+            referencedTableName: account
+            referencedColumnNames: username
+            constraintName: fk_application_assignee_login
+            onDelete: SET NULL
+            onUpdate: CASCADE
+      rollback:
+        - dropForeignKeyConstraint:
+            baseTableName: application
+            constraintName: fk_application_assignee_login
+        - dropColumn:
+            tableName: application
+            columnName: assignee
