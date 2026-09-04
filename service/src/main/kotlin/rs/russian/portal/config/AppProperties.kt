@@ -11,6 +11,7 @@ private val logger = LoggerFactory.getLogger(AppProperties::class.java)
 data class AppProperties(
     val frontendUri: String,
     val corsAllowedOrigins: List<String> = emptyList(),
+    val clanovi: ClanoviProperties = ClanoviProperties(),
 ) {
     /**
      * Validated CORS origins: frontendUri + additional configured origins.
@@ -40,6 +41,10 @@ private fun validateCorsOrigins(frontendUri: String, corsAllowedOrigins: List<St
 
     return validated
 }
+
+data class ClanoviProperties(
+    val apiKey: String = "",
+)
 
 @ConfigurationProperties(prefix = "app.s3")
 data class S3Properties(

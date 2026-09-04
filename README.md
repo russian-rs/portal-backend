@@ -275,6 +275,7 @@ portal-backend/
 | `S3_BUCKET` | S3 bucket name | Yes |
 | `AUTHENTIK_BASE_URL` | Authentik SSO URL | For SSO |
 | `AUTHENTIK_API_KEY` | Authentik API key | For SSO |
+| `CLANOVI_API_KEY` | Permanent header key for the Clanovi office app (`X-Clanovi-Key`) | For `/api/clanovi/**` |
 | `OAUTH2_CLIENT_ID` | OAuth2 client ID | For SSO |
 | `OAUTH2_CLIENT_SECRET` | OAuth2 client secret | For SSO |
 | `SMTP_HOST` | SMTP server host | For email |

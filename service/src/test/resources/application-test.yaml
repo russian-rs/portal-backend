@@ -20,6 +20,11 @@ spring:
       hibernate:
         format_sql: true
 
+--- # Clanovi office API (header key; not used by the website)
+app:
+  clanovi:
+    api-key: clanovi-test-key
+
 ---
 zonky:
   test:
