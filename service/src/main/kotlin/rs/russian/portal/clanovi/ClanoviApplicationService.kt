@@ -4,6 +4,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import rs.russian.generated.model.ApplicationDto
+import rs.russian.portal.application.domain.ApplicationType
 import rs.russian.portal.application.mapper.ApplicationMapper
 import rs.russian.portal.application.repository.ApplicationRepository
 import rs.russian.portal.application.service.ApplicationService
@@ -25,14 +26,23 @@ class ClanoviApplicationService(
 ) {
 
     @Transactional(readOnly = true)
-    fun listChanged(sinceRaw: String?, limitRaw: Int?): ClanoviApplicationListResponse {
-        val since = parseSince(sinceRaw)
+    fun listChanged(sinceRaw: String?, limitRaw: Int?, open: Boolean?, pageRaw: Int?): ClanoviApplicationListResponse {
         val limit = (limitRaw ?: DEFAULT_LIMIT).coerceIn(1, MAX_LIMIT)
-        val rows = applicationRepository.findChangedSince(
-            since,
-            DEPERSONALIZED_EMAIL,
-            PageRequest.of(0, limit),
-        )
+        val pageNumber = (pageRaw ?: 0).coerceAtLeast(0)
+        val rows = if (open == true) {
+            applicationRepository.findOpenByType(
+                ApplicationType.NEW,
+                DEPERSONALIZED_EMAIL,
+                PageRequest.of(pageNumber, limit),
+            )
+        } else {
+            applicationRepository.findChangedSince(
+                parseSince(sinceRaw),
+                DEPERSONALIZED_EMAIL,
+                PageRequest.of(0, limit),
+            )
+        }
+        val since = parseSince(sinceRaw)
         val items = rows.map { application ->
             val updated = application.version ?: application.created
             ClanoviApplicationListItem(

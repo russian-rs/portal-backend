@@ -168,6 +168,28 @@ class ClanoviControllerIntegrationTest : AbstractIntegrationTest() {
     }
 
     @Test
+    fun `open list returns unfinished NEW applications`() {
+        val open = applicationService.create(
+            ApplicationDto(
+                id = UUID.randomUUID(),
+                email = "clanovi-open-${UUID.randomUUID()}@example.com",
+                name = "Open Applicant",
+            )
+        )
+
+        Given {
+            contentType(ContentType.JSON)
+            header(ClanoviApiKeyFilter.HEADER, TEST_KEY)
+            queryParam("open", true)
+        } When {
+            get("/clanovi/applications")
+        } Then {
+            statusCode(200)
+            body("items.id", hasItem(open.id.toString()))
+        }
+    }
+
+    @Test
     fun `detail of unknown id is 404`() {
         Given {
             contentType(ContentType.JSON)
