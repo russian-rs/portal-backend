@@ -25,6 +25,10 @@ import rs.russian.portal.shared.exception.InvalidRequestException
 import rs.russian.portal.shared.exception.NotAuthorizedException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.currentUserLogin
+import rs.russian.portal.user.domain.Account
+import rs.russian.portal.user.domain.enums.UserGroup.ADMIN_VOLUNTEER
+import rs.russian.portal.user.domain.enums.UserGroup.INTERVIEWER
+import rs.russian.portal.user.repository.AccountRepository
 import rs.russian.portal.user.service.AccountService
 import java.util.*
 
@@ -35,6 +39,7 @@ class ApplicationService(
     private val accountService: AccountService,
     private val applicationMapper: ApplicationMapper,
     private val applicationRepository: ApplicationRepository,
+    private val accountRepository: AccountRepository,
 ) {
 
     @Transactional
@@ -84,11 +89,36 @@ class ApplicationService(
     @Transactional
     fun update(applicationDto: ApplicationDto): Application {
         val application = get(applicationDto.id)
+        val previousStatus = application.status
         applicationMapper.update(applicationDto, application)
         normalizeProgramAndProject(application)
         if (application.status == DONE && application.contractFrom == null) {
             throw InvalidRequestException("Contract dates not specified")
         }
+        if (application.status != previousStatus) {
+            application.assignee = currentUserLogin() ?: throw NotAuthorizedException()
+        }
+        return applicationRepository.save(application)
+    }
+
+    @Transactional(readOnly = true)
+    fun getAssignees(): List<Account> {
+        val logins = listOf(ADMIN_VOLUNTEER, INTERVIEWER)
+            .flatMap { accountRepository.findAllActiveUsernamesByGroup(it.name) }
+            .distinct()
+        return accountService.resolve(logins).sortedBy { it.fullName }
+    }
+
+    @Transactional
+    fun assign(id: UUID, login: String?): Application {
+        val application = get(id)
+        val account = login?.let {
+            accountService.findAccountByLogin(it) ?: throw InvalidRequestException("Employee not found")
+        }
+        if (account != null && (!account.active || account.groups.none { it == ADMIN_VOLUNTEER || it == INTERVIEWER })) {
+            throw InvalidRequestException("Assignee must be an active application employee")
+        }
+        application.assignee = account?.username
         return applicationRepository.save(application)
     }
 

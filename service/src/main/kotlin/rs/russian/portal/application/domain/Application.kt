@@ -37,6 +37,7 @@ class Application(
     @Enumerated(STRING)
     var type: ApplicationType = NEW,
     var created: LocalDateTime = LocalDateTime.now(),
+    var assignee: String? = null,
 
     var email: String,
     var name: String,
@@ -83,6 +84,16 @@ class Application(
     var notes: MutableSet<Note> = mutableSetOf(),
 
     ) : JpaEntity<UUID>() {
+
+    @Transient
+    private var persistedStatus: ApplicationStatus = status
+
+    /** In-memory snapshot for lifecycle side effects; this is not a status history. */
+    fun capturePersistedStatus(): Boolean {
+        val changed = persistedStatus != status
+        persistedStatus = status
+        return changed
+    }
 
     /**
      * Irreversibly scrubs the applicant's personal data, mirroring account depersonalization. Structural

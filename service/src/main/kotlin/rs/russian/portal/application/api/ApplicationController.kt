@@ -9,6 +9,7 @@ import rs.russian.generated.model.*
 import rs.russian.portal.application.mapper.ApplicationMapper
 import rs.russian.portal.application.service.ApplicationService
 import rs.russian.portal.note.mapper.NoteMapper
+import rs.russian.portal.user.mapper.UserMapper
 import rs.russian.portal.shared.exception.CaptchaInvalidException
 import rs.russian.portal.shared.jpa.convert
 import rs.russian.portal.shared.security.Authorized
@@ -19,6 +20,7 @@ import java.util.*
 @RestController
 class ApplicationController(
     private val noteMapper: NoteMapper,
+    private val userMapper: UserMapper,
     private val applicationMapper: ApplicationMapper,
     private val applicationService: ApplicationService,
     private val captchaService: TurnstileValidationService,
@@ -70,6 +72,14 @@ class ApplicationController(
             )
         )
     }
+
+    @Authorized(allowed = [ADMIN_VOLUNTEER, INTERVIEWER])
+    override fun getApplicationAssignees(): ResponseEntity<List<UserInfoDto>> =
+        ResponseEntity.ok(applicationService.getAssignees().map { userMapper.map(it.info) })
+
+    @Authorized(allowed = [ADMIN_VOLUNTEER, INTERVIEWER])
+    override fun assignApplication(id: UUID, applicationAssignmentRequest: ApplicationAssignmentRequest): ResponseEntity<ApplicationDto> =
+        ResponseEntity.ok(applicationMapper.toDto(applicationService.assign(id, applicationAssignmentRequest.assignee)))
 
     @Authorized(allowed = [ADMIN_VOLUNTEER, INTERVIEWER])
     override fun updateApplication(applicationDto: ApplicationDto): ResponseEntity<ApplicationDto> {

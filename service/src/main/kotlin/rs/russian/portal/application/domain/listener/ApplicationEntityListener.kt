@@ -1,5 +1,6 @@
 package rs.russian.portal.application.domain.listener
 
+import jakarta.persistence.PostLoad
 import jakarta.persistence.PostPersist
 import jakarta.persistence.PostUpdate
 import org.springframework.context.ApplicationEventPublisher
@@ -13,8 +14,14 @@ class ApplicationEntityListener(
     private val applicationEventPublisher: ApplicationEventPublisher
 ) {
 
+    @PostLoad
+    fun postLoad(application: Application) {
+        application.capturePersistedStatus()
+    }
+
     @PostPersist
     fun postPersist(application: Application) {
+        application.capturePersistedStatus()
         application.id?.let {
             applicationEventPublisher.publishEvent(ApplicationCreatedEvent(it))
         }
@@ -22,6 +29,8 @@ class ApplicationEntityListener(
 
     @PostUpdate
     fun postUpdate(application: Application) {
+        // Assignment and ordinary edits must not repeat DONE processing (e.g. prolongation contracts).
+        if (!application.capturePersistedStatus()) return
         application.id?.let {
             applicationEventPublisher.publishEvent(ApplicationUpdateEvent(it))
         }

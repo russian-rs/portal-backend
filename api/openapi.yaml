@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.37.0
+  version: 1.38.0
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -636,6 +636,47 @@ paths:
           schema:
             type: string
             format: uuid
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApplicationDto"
+  /application/assignees:
+    get:
+      operationId: getApplicationAssignees
+      description: Active employees who can handle applications.
+      tags:
+        - application
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserInfoDto"
+  /application/{id}/assignee:
+    put:
+      operationId: assignApplication
+      description: Explicitly assign an active application employee, or clear the assignment.
+      tags:
+        - application
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ApplicationAssignmentRequest"
       responses:
         "200":
           description: Success
@@ -1686,6 +1727,15 @@ components:
           $ref: "#/components/schemas/FileInfoDto"
         backSidePhoto:
           $ref: "#/components/schemas/FileInfoDto"
+    ApplicationAssignmentRequest:
+      type: object
+      properties:
+        assignee:
+          type: string
+          nullable: true
+          minLength: 1
+          maxLength: 255
+          description: Employee login. Null or omitted clears the assignment.
     ApplicationDto:
       type: object
       required:
@@ -1694,6 +1744,11 @@ components:
         id:
           type: string
           format: uuid
+        assignee:
+          type: string
+          nullable: true
+          readOnly: true
+          description: Current employee login. Only a real status change or explicit assignment changes it.
         status:
           type: string
           maxLength: 50

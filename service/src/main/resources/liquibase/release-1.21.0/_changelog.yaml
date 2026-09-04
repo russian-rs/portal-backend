@@ -1,0 +1,3 @@
+databaseChangeLog:
+  - include:
+      file: liquibase/release-1.21.0/application-assignee.yaml
