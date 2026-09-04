@@ -18,6 +18,7 @@ import org.springframework.security.web.header.HeaderWriterFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import rs.russian.portal.clanovi.ClanoviApiKeyFilter
 import rs.russian.portal.shared.security.ServiceAccountLoggingFilter
 import rs.russian.portal.user.service.AccountService
 
@@ -27,6 +28,8 @@ class SecurityConfig(
     private val accountService: AccountService,
     private val appProperties: AppProperties,
 ) {
+
+    private val clanoviApiKeyFilter = ClanoviApiKeyFilter(appProperties)
 
     @Bean
     fun corsConfigurationSource(): CorsConfigurationSource {
@@ -95,6 +98,7 @@ class SecurityConfig(
             it.jwt {}
         }
         .addFilterAfter(ServiceAccountLoggingFilter(), HeaderWriterFilter::class.java)
+        .addFilterAfter(clanoviApiKeyFilter, HeaderWriterFilter::class.java)
         .headers {
             it.contentSecurityPolicy { csp ->
                 csp.policyDirectives(buildCspPolicy())
@@ -120,6 +124,7 @@ class SecurityConfig(
         .sessionManagement {
             it.sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
         }
+        .addFilterBefore(clanoviApiKeyFilter, OAuth2LoginAuthenticationFilter::class.java)
         .addFilterBefore(defaultUserFilter, OAuth2LoginAuthenticationFilter::class.java)
         .build()
 
@@ -154,6 +159,7 @@ class SecurityConfig(
             "/application/create",
             "/actuator/health",
             "/turnstile",
+            "/clanovi/**",
         )
     }
 

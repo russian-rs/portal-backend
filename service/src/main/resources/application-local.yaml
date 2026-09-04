@@ -22,6 +22,8 @@ app:
     api-key: ${HELPDESK_API_KEY:no-key}
     api-base-url: ${HELPDESK_API_BASE_URL:http://localhost/api/v1}
     ticket-base-url: ${HELPDESK_TICKET_BASE_URL:http://localhost/ticket/zoom}
+  clanovi:
+    api-key: ${CLANOVI_API_KEY:}
   schedulers:
     email-outbox: "-"
     user-sync: "-"

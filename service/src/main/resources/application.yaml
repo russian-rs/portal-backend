@@ -60,6 +60,8 @@ app:
     api-key: ${HELPDESK_API_KEY}
     api-base-url: ${HELPDESK_API_BASE_URL}
     ticket-base-url: ${HELPDESK_TICKET_BASE_URL}
+  clanovi:
+    api-key: ${CLANOVI_API_KEY:}
   schedulers:
     email-outbox: ${SCHEDULER_EMAIL_OUTBOX_CRON:*/15 * * * * *} # every 15 seconds
     user-sync: ${SCHEDULER_USER_SYNC_CRON:0 0 */1 * * *} # every hour
