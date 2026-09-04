@@ -62,4 +62,20 @@ interface ApplicationRepository : JpaRepository<Application, UUID> {
         @Param("depersonalized") depersonalized: String,
         pageable: Pageable,
     ): List<Application>
+
+    @Query(
+        """
+        SELECT a FROM Application a
+        WHERE a.email <> :depersonalized
+          AND a.type = :type
+          AND a.status <> rs.russian.portal.application.domain.ApplicationStatus.DONE
+          AND a.status <> rs.russian.portal.application.domain.ApplicationStatus.DENY
+        ORDER BY a.created DESC, a.id DESC
+        """
+    )
+    fun findOpenByType(
+        @Param("type") type: ApplicationType,
+        @Param("depersonalized") depersonalized: String,
+        pageable: Pageable,
+    ): List<Application>
 }

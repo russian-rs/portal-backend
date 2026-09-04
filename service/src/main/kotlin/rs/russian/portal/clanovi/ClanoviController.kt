@@ -23,8 +23,10 @@ class ClanoviController(
     fun listApplications(
         @RequestParam(required = false) since: String?,
         @RequestParam(required = false) limit: Int?,
+        @RequestParam(required = false) open: Boolean?,
+        @RequestParam(required = false) page: Int?,
     ): ResponseEntity<ClanoviApplicationListResponse> =
-        ResponseEntity.ok(clanoviApplicationService.listChanged(since, limit))
+        ResponseEntity.ok(clanoviApplicationService.listChanged(since, limit, open, page))
 
     @GetMapping("/application/{id}")
     fun getApplication(@PathVariable id: UUID): ResponseEntity<ApplicationDto> =
