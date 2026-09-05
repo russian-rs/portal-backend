@@ -3,6 +3,9 @@ package rs.russian.portal.application.service
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.NullSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.context.SecurityContextHolder
 import rs.russian.generated.model.ApplicationDto
@@ -18,6 +21,7 @@ import java.time.LocalDate
 import java.util.*
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 
 class ApplicationServiceTest : AbstractIntegrationTest() {
 
@@ -133,6 +137,34 @@ class ApplicationServiceTest : AbstractIntegrationTest() {
         assertNotNull(updatedAccount)
         assertEquals("LAYOUT", updatedAccount.info?.project?.code)
         assertEquals("IT", updatedAccount.info?.program?.code)
+    }
+
+    @ParameterizedTest
+    @NullSource
+    @ValueSource(strings = ["IT"])
+    fun `completion requires program and project and succeeds after employee fills them`(program: String?) {
+        val created = applicationService.create(ApplicationDto(
+            id = UUID.randomUUID(), email = uniqueEmail("missing-program-project"),
+            name = "Incomplete Applicant", program = program
+        ))
+        val prepared = applicationService.update(ApplicationDto(id = created.id!!, contract = testContract()))
+
+        val error = assertThrows<InvalidRequestException> {
+            applicationService.update(ApplicationDto(id = created.id!!, status = ApplicationStatus.DONE.name))
+        }
+        assertEquals("Program and project must be specified before completing the application", error.message)
+        val unchanged = applicationService.get(created.id!!)
+        assertEquals(prepared.status, unchanged.status)
+        assertEquals(prepared.assignee, unchanged.assignee)
+        assertNull(accountService.findAccountByEmail(created.email))
+
+        applicationService.update(ApplicationDto(id = created.id!!, program = "IT", project = "FORMS"))
+        val completed = applicationService.update(ApplicationDto(id = created.id!!, status = ApplicationStatus.DONE.name))
+        assertEquals(ApplicationStatus.DONE, completed.status)
+        val account = accountService.findAccountByEmail(created.email)
+        assertNotNull(account)
+        assertEquals("IT", account.info?.program?.code)
+        assertEquals("FORMS", account.info?.project?.code)
     }
 
     private fun uniqueEmail(prefix: String) = "$prefix-${UUID.randomUUID()}@example.com"

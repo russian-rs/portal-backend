@@ -95,6 +95,9 @@ class ApplicationService(
         if (application.status == DONE && application.contractFrom == null) {
             throw InvalidRequestException("Contract dates not specified")
         }
+        if (application.status == DONE && (application.program == null || application.project == null)) {
+            throw InvalidRequestException("Program and project must be specified before completing the application")
+        }
         if (application.status != previousStatus) {
             application.assignee = currentUserLogin() ?: throw NotAuthorizedException()
         }
