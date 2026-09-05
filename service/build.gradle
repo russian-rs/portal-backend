@@ -7,7 +7,6 @@ plugins {
     id("org.jetbrains.kotlin.plugin.noarg")
     id("org.jetbrains.kotlin.plugin.spring")
     id("org.jetbrains.kotlin.plugin.allopen")
-    id("org.hibernate.orm") version "6.6.23.Final"
     id("org.jetbrains.kotlin.plugin.serialization")
     id("org.owasp.dependencycheck")
 }
@@ -47,7 +46,17 @@ dependencyCheck {
     }
 }
 
+configurations {
+    hibernateEnhancement {
+        canBeConsumed = false
+        canBeResolved = true
+    }
+}
+
 dependencies {
+    // Use the same Hibernate version as the application, managed by the Spring Boot BOM.
+    hibernateEnhancement("org.hibernate.orm:hibernate-ant")
+
     // API
     implementation(project(":server-api"))
     implementation(project(":server-external-api"))
@@ -157,11 +166,23 @@ allOpen {
     annotation("jakarta.persistence.Embeddable")
 }
 
-hibernate {
-    enhancement {
-        enableLazyInitialization.set(true)
-        enableDirtyTracking.set(true)
-        enableExtendedEnhancement.set(true)
+// Hibernate 6.6's Gradle plugin calls ResolvedConfiguration.getFiles(), removed in Gradle 9.
+// Run Hibernate's official Ant enhancer after compilation with the same enhancement settings.
+["compileKotlin", "compileJava"].each { compileTaskName ->
+    tasks.named(compileTaskName) {
+        inputs.files(configurations.hibernateEnhancement).withPropertyName("hibernateEnhancementClasspath")
+                .withNormalizer(ClasspathNormalizer)
+        doLast {
+            def classesDir = destinationDirectory.get().asFile
+            if (classesDir.exists()) {
+                ant.taskdef(name: "hibernateEnhance", classname: "org.hibernate.tool.enhance.EnhancementTask",
+                        classpath: (configurations.hibernateEnhancement + configurations.compileClasspath +
+                                files(classesDir, sourceSets.main.output.classesDirs)).asPath)
+                ant.hibernateEnhance(base: classesDir.absolutePath, dir: classesDir.absolutePath,
+                        failOnError: true, enableLazyInitialization: true, enableDirtyTracking: true,
+                        enableAssociationManagement: false, enableExtendedEnhancement: true)
+            }
+        }
     }
 }
 

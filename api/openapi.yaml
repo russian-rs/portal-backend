@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: volunteer-portal-api
-  version: 1.38.0
+  version: 1.38.1
   contact:
     email: dev@russian.rs
     url: https://russian.rs
@@ -1852,6 +1852,13 @@ components:
           type: boolean
           default: false
           description: Показывать обработанные заявки
+        assignee:
+          type: string
+          description: Логин ответственного за обработку заявки; если не указан, показываются заявки всех ответственных
+        unassigned:
+          type: boolean
+          default: false
+          description: Только заявки без ответственного. При true фильтр assignee игнорируется.
     ApplicationStatusDto:
       type: object
       required:
